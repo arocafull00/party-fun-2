@@ -57,80 +57,69 @@ export interface PartidaActual {
 
 class DatabaseManager {
   private db: SQLite.SQLiteDatabase | null = null;
+  private isInitialized = false;
 
   async init(): Promise<void> {
     try {
       console.log('Starting database initialization...');
       
-      // Use the correct API for expo-sqlite v15+
-      this.db = await SQLite.openDatabaseAsync('partyfun.db');
+      if (this.isInitialized && this.db) {
+        console.log('Database already initialized');
+        return;
+      }
+
+      // Open database with proper error handling
+      this.db = await SQLite.openDatabaseAsync('partyfun.db', {
+        enableChangeListener: true,
+      });
+      
+      if (!this.db) {
+        throw new Error('Failed to open database connection');
+      }
+      
       console.log('Database connection opened successfully');
       
+      // Configure database settings
+      await this.configurateDatabase();
+      
+      // Create all tables
       await this.createTables();
       
-      // Test the database by checking if tables exist
-      await this.verifyTables();
+      // Verify database integrity
+      await this.verifyDatabase();
       
+      // Initialize with default data if needed
+      await this.initializeDefaultData();
+      
+      this.isInitialized = true;
       console.log('Database initialized successfully');
     } catch (error) {
       console.error('Error initializing database:', error);
-      throw error;
+      this.db = null;
+      this.isInitialized = false;
+      throw new Error(`Database initialization failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
 
-  private async verifyTables(): Promise<void> {
+  private async configurateDatabase(): Promise<void> {
     if (!this.db) throw new Error('Database not initialized');
 
     try {
-      // Check if tables exist
-      const tables = await this.db.getAllAsync(`
-        SELECT name FROM sqlite_master 
-        WHERE type='table' AND name NOT LIKE 'sqlite_%'
-        ORDER BY name;
-      `);
+      // Enable WAL mode for better performance and concurrency
+      await this.db.execAsync('PRAGMA journal_mode = WAL;');
       
-      console.log('Created tables:', tables);
+      // Enable foreign key constraints
+      await this.db.execAsync('PRAGMA foreign_keys = ON;');
       
-      // Verify we can insert and read data
-      const testResult = await this.db.getFirstAsync('SELECT 1 as test');
-      console.log('Database test query result:', testResult);
+      // Set synchronous mode for better performance
+      await this.db.execAsync('PRAGMA synchronous = NORMAL;');
       
-      // Test basic functionality
-      await this.testBasicFunctionality();
+      // Set cache size
+      await this.db.execAsync('PRAGMA cache_size = 10000;');
       
+      console.log('Database configuration completed');
     } catch (error) {
-      console.error('Error verifying tables:', error);
-      throw error;
-    }
-  }
-
-  private async testBasicFunctionality(): Promise<void> {
-    if (!this.db) throw new Error('Database not initialized');
-
-    try {
-      console.log('Testing basic database functionality...');
-      
-      // Check if we can count existing baterias
-      const count = await this.db.getFirstAsync('SELECT COUNT(*) as count FROM baterias');
-      console.log('Current baterias count:', count);
-      
-      // Try to create a test bateria if none exist
-      const currentBaterias = await this.getBaterias();
-      console.log('Existing baterias:', currentBaterias);
-      
-      if (currentBaterias.length === 0) {
-        console.log('No baterias found, creating test bateria...');
-        const testId = await this.createBateria('Batería de Prueba');
-        console.log('Test bateria created with ID:', testId);
-        
-        // Verify it was created
-        const updatedBaterias = await this.getBaterias();
-        console.log('Baterias after test creation:', updatedBaterias);
-      }
-      
-      console.log('Basic functionality test completed successfully');
-    } catch (error) {
-      console.error('Error testing basic functionality:', error);
+      console.error('Error configuring database:', error);
       throw error;
     }
   }
@@ -141,18 +130,14 @@ class DatabaseManager {
     try {
       console.log('Creating database tables...');
       
-      // Enable WAL mode for better performance
-      await this.db.execAsync('PRAGMA journal_mode = WAL;');
-      console.log('WAL mode enabled');
-
       // Create baterias table
       await this.db.execAsync(`
         CREATE TABLE IF NOT EXISTS baterias (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
-          nombre TEXT NOT NULL UNIQUE
+          nombre TEXT NOT NULL UNIQUE,
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP
         );
       `);
-      console.log('Baterias table created');
 
       // Create palabras table
       await this.db.execAsync(`
@@ -160,29 +145,29 @@ class DatabaseManager {
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           bateria_id INTEGER NOT NULL,
           texto TEXT NOT NULL,
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
           FOREIGN KEY (bateria_id) REFERENCES baterias (id) ON DELETE CASCADE
         );
       `);
-      console.log('Palabras table created');
 
       // Create equipos table
       await this.db.execAsync(`
         CREATE TABLE IF NOT EXISTS equipos (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
-          nombre TEXT NOT NULL
+          nombre TEXT NOT NULL,
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP
         );
       `);
-      console.log('Equipos table created');
 
       // Create jugadores table
       await this.db.execAsync(`
         CREATE TABLE IF NOT EXISTS jugadores (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           nombre TEXT NOT NULL,
-          equipo TEXT NOT NULL CHECK (equipo IN ('azul', 'rojo'))
+          equipo TEXT NOT NULL CHECK (equipo IN ('azul', 'rojo')),
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP
         );
       `);
-      console.log('Jugadores table created');
 
       // Create partidas table
       await this.db.execAsync(`
@@ -196,10 +181,10 @@ class DatabaseManager {
           total_palabras INTEGER NOT NULL DEFAULT 0,
           palabras_correctas INTEGER NOT NULL DEFAULT 0,
           precision INTEGER NOT NULL DEFAULT 0,
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
           FOREIGN KEY (bateria_id) REFERENCES baterias (id)
         );
       `);
-      console.log('Partidas table created');
 
       // Create partida_jugadores table
       await this.db.execAsync(`
@@ -208,30 +193,44 @@ class DatabaseManager {
           partida_id INTEGER NOT NULL,
           jugador_id INTEGER NOT NULL,
           equipo TEXT NOT NULL CHECK (equipo IN ('azul', 'rojo')),
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
           FOREIGN KEY (partida_id) REFERENCES partidas (id) ON DELETE CASCADE,
           FOREIGN KEY (jugador_id) REFERENCES jugadores (id) ON DELETE CASCADE
         );
       `);
-      console.log('Partida_jugadores table created');
 
-      // Create partida_actual table for persistent game state
+      // Create partida_actual table (for current game state)
       await this.db.execAsync(`
         CREATE TABLE IF NOT EXISTS partida_actual (
-          id INTEGER PRIMARY KEY CHECK (id = 1),
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
           bateria_id INTEGER NOT NULL,
-          ronda_actual INTEGER NOT NULL,
-          turno_jugador_id INTEGER NOT NULL,
-          palabras_restantes TEXT NOT NULL,
-          puntaje_azul INTEGER NOT NULL,
-          puntaje_rojo INTEGER NOT NULL,
-          jugadores_azul TEXT NOT NULL,
-          jugadores_rojo TEXT NOT NULL,
-          palabras_acertadas TEXT NOT NULL,
-          palabras_falladas TEXT NOT NULL,
+          ronda_actual INTEGER NOT NULL DEFAULT 1,
+          turno_jugador_id INTEGER,
+          palabras_restantes TEXT NOT NULL DEFAULT '[]',
+          puntaje_azul INTEGER NOT NULL DEFAULT 0,
+          puntaje_rojo INTEGER NOT NULL DEFAULT 0,
+          jugadores_azul TEXT NOT NULL DEFAULT '[]',
+          jugadores_rojo TEXT NOT NULL DEFAULT '[]',
+          palabras_acertadas TEXT NOT NULL DEFAULT '[]',
+          palabras_falladas TEXT NOT NULL DEFAULT '[]',
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+          updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
           FOREIGN KEY (bateria_id) REFERENCES baterias (id)
         );
       `);
-      console.log('Partida_actual table created');
+
+      // Create indexes for better performance
+      await this.db.execAsync(`
+        CREATE INDEX IF NOT EXISTS idx_palabras_bateria_id ON palabras(bateria_id);
+      `);
+      
+      await this.db.execAsync(`
+        CREATE INDEX IF NOT EXISTS idx_partidas_fecha ON partidas(fecha);
+      `);
+      
+      await this.db.execAsync(`
+        CREATE INDEX IF NOT EXISTS idx_partida_jugadores_partida_id ON partida_jugadores(partida_id);
+      `);
 
       console.log('All database tables created successfully');
     } catch (error) {
@@ -240,12 +239,90 @@ class DatabaseManager {
     }
   }
 
+  private async verifyDatabase(): Promise<void> {
+    if (!this.db) throw new Error('Database not initialized');
+
+    try {
+      console.log('Verifying database integrity...');
+      
+      // Check if all tables exist
+      const tables = await this.db.getAllAsync(`
+        SELECT name FROM sqlite_master 
+        WHERE type='table' AND name NOT LIKE 'sqlite_%'
+        ORDER BY name;
+      `) as Array<{ name: string }>;
+      
+      const expectedTables = ['baterias', 'palabras', 'equipos', 'jugadores', 'partidas', 'partida_jugadores', 'partida_actual'];
+      const existingTables = tables.map(t => t.name);
+      
+      console.log('Existing tables:', existingTables);
+      
+      for (const expectedTable of expectedTables) {
+        if (!existingTables.includes(expectedTable)) {
+          throw new Error(`Required table '${expectedTable}' not found`);
+        }
+      }
+      
+      // Test basic database functionality
+      const testResult = await this.db.getFirstAsync('SELECT 1 as test') as { test: number } | null;
+      if (!testResult || testResult.test !== 1) {
+        throw new Error('Database test query failed');
+      }
+      
+      console.log('Database verification completed successfully');
+    } catch (error) {
+      console.error('Error verifying database:', error);
+      throw error;
+    }
+  }
+
+  private async initializeDefaultData(): Promise<void> {
+    if (!this.db) throw new Error('Database not initialized');
+
+    try {
+      console.log('Checking for default data...');
+      
+      // Check if we have any baterias
+      const bateriasCount = await this.db.getFirstAsync('SELECT COUNT(*) as count FROM baterias') as { count: number };
+      
+      if (bateriasCount.count === 0) {
+        console.log('No baterias found, creating default battery...');
+        
+        // Create a default battery with some sample words
+        const defaultBatteryId = await this.createBateria('Batería Básica');
+        
+        const defaultWords = [
+          'Casa', 'Perro', 'Gato', 'Coche', 'Libro', 'Mesa', 'Silla', 'Agua',
+          'Fuego', 'Tierra', 'Aire', 'Sol', 'Luna', 'Estrella', 'Mar', 'Montaña',
+          'Árbol', 'Flor', 'Pájaro', 'Pez', 'Música', 'Baile', 'Comida', 'Amor'
+        ];
+        
+        for (const word of defaultWords) {
+          await this.addPalabra(defaultBatteryId, word);
+        }
+        
+        console.log(`Default battery created with ${defaultWords.length} words`);
+      }
+      
+      console.log('Default data initialization completed');
+    } catch (error) {
+      console.error('Error initializing default data:', error);
+      // Don't throw here, as this is not critical for app functionality
+    }
+  }
+
+  private ensureInitialized(): void {
+    if (!this.isInitialized || !this.db) {
+      throw new Error('Database not initialized. Call init() first.');
+    }
+  }
+
   // Bateria methods
   async createBateria(nombre: string): Promise<number> {
-    if (!this.db) throw new Error('Database not initialized');
+    this.ensureInitialized();
     
     try {
-      const result = await this.db.runAsync('INSERT INTO baterias (nombre) VALUES (?)', [nombre]);
+      const result = await this.db!.runAsync('INSERT INTO baterias (nombre) VALUES (?)', [nombre]);
       return result.lastInsertRowId;
     } catch (error) {
       console.error('Error creating bateria:', error);
@@ -254,11 +331,11 @@ class DatabaseManager {
   }
 
   async getBaterias(): Promise<Bateria[]> {
-    if (!this.db) throw new Error('Database not initialized');
+    this.ensureInitialized();
     
     try {
-      const result = await this.db.getAllAsync('SELECT * FROM baterias ORDER BY nombre');
-      return result as Bateria[];
+      const result = await this.db!.getAllAsync('SELECT id, nombre FROM baterias ORDER BY nombre') as Bateria[];
+      return result;
     } catch (error) {
       console.error('Error getting baterias:', error);
       throw error;
@@ -266,11 +343,10 @@ class DatabaseManager {
   }
 
   async deleteBateria(id: number): Promise<void> {
-    if (!this.db) throw new Error('Database not initialized');
+    this.ensureInitialized();
     
     try {
-      await this.db.runAsync('DELETE FROM palabras WHERE bateria_id = ?', [id]);
-      await this.db.runAsync('DELETE FROM baterias WHERE id = ?', [id]);
+      await this.db!.runAsync('DELETE FROM baterias WHERE id = ?', [id]);
     } catch (error) {
       console.error('Error deleting bateria:', error);
       throw error;
@@ -279,10 +355,13 @@ class DatabaseManager {
 
   // Palabra methods
   async addPalabra(bateria_id: number, texto: string): Promise<number> {
-    if (!this.db) throw new Error('Database not initialized');
+    this.ensureInitialized();
     
     try {
-      const result = await this.db.runAsync('INSERT INTO palabras (bateria_id, texto) VALUES (?, ?)', [bateria_id, texto]);
+      const result = await this.db!.runAsync(
+        'INSERT INTO palabras (bateria_id, texto) VALUES (?, ?)',
+        [bateria_id, texto]
+      );
       return result.lastInsertRowId;
     } catch (error) {
       console.error('Error adding palabra:', error);
@@ -291,22 +370,25 @@ class DatabaseManager {
   }
 
   async getPalabrasByBateria(bateria_id: number): Promise<Palabra[]> {
-    if (!this.db) throw new Error('Database not initialized');
+    this.ensureInitialized();
     
     try {
-      const result = await this.db.getAllAsync('SELECT * FROM palabras WHERE bateria_id = ? ORDER BY texto', [bateria_id]);
-      return result as Palabra[];
+      const result = await this.db!.getAllAsync(
+        'SELECT id, bateria_id, texto FROM palabras WHERE bateria_id = ? ORDER BY texto',
+        [bateria_id]
+      ) as Palabra[];
+      return result;
     } catch (error) {
-      console.error('Error getting palabras:', error);
+      console.error('Error getting palabras by bateria:', error);
       throw error;
     }
   }
 
   async deletePalabra(id: number): Promise<void> {
-    if (!this.db) throw new Error('Database not initialized');
+    this.ensureInitialized();
     
     try {
-      await this.db.runAsync('DELETE FROM palabras WHERE id = ?', [id]);
+      await this.db!.runAsync('DELETE FROM palabras WHERE id = ?', [id]);
     } catch (error) {
       console.error('Error deleting palabra:', error);
       throw error;
