@@ -348,41 +348,43 @@ const GameTurnScreen: React.FC = () => {
           </Surface>
         </View>
         <View style={styles.timerHeaderRight}>
+          <Text style={styles.teamNameSmall}>Restantes</Text>
           <Text style={styles.wordsRemainingNumberSmall}>{wordsRemaining}</Text>
         </View>
       </View>
 
-      {/* Main game area */}
+      {/* Main game area with buttons on sides */}
       <View style={styles.gameContent}>
-        {/* Word card */}
-        <Card style={styles.wordCard}>
-          <Card.Content style={styles.wordCardContent}>
-            <Text style={styles.wordText}>{currentWord}</Text>
-          </Card.Content>
-        </Card>
+        <View style={styles.gameRow}>
+          {/* Left button */}
+          <Surface style={styles.incorrectButton} elevation={4}>
+            <IconButton
+              icon="close"
+              iconColor={colors.textLight}
+              size={60}
+              onPress={handleIncorrect}
+            />
+          </Surface>
+
+          {/* Word card */}
+          <Card style={styles.wordCard}>
+            <Card.Content style={styles.wordCardContent}>
+              <Text style={styles.wordText}>{currentWord}</Text>
+            </Card.Content>
+          </Card>
+
+          {/* Right button */}
+          <Surface style={styles.correctButton} elevation={4}>
+            <IconButton
+              icon="check"
+              iconColor={colors.textLight}
+              size={60}
+              onPress={handleCorrect}
+            />
+          </Surface>
+        </View>
 
         <Text style={styles.gameInstruction}>¡UNA PALABRA!</Text>
-      </View>
-
-      {/* Action buttons */}
-      <View style={styles.actionButtons}>
-        <Surface style={styles.incorrectButton} elevation={4}>
-          <IconButton
-            icon="close"
-            iconColor={colors.textLight}
-            size={40}
-            onPress={handleIncorrect}
-          />
-        </Surface>
-
-        <Surface style={styles.correctButton} elevation={4}>
-          <IconButton
-            icon="check"
-            iconColor={colors.textLight}
-            size={40}
-            onPress={handleCorrect}
-          />
-        </Surface>
       </View>
 
       {/* Exit Dialog */}
@@ -429,18 +431,18 @@ const styles = StyleSheet.create({
     alignItems: "flex-end",
   },
   roundText: {
-    fontSize: 16,
+    fontSize: 24,
     fontWeight: "bold",
-    color: colors.text,
+    color: colors.textLight,
   },
   wordsRemainingText: {
     fontSize: 14,
     color: colors.text,
   },
   wordsRemainingNumber: {
-    fontSize: 32,
+    fontSize: 24,
     fontWeight: "bold",
-    color: colors.text,
+    color: colors.textLight,
   },
   preparationContent: {
     flex: 1,
@@ -529,13 +531,13 @@ const styles = StyleSheet.create({
   },
   teamNameSmall: {
     fontSize: 14,
-    color: colors.text,
+    color: colors.textLight,
     fontWeight: "500",
   },
   playerNameSmall: {
-    fontSize: 12,
-    color: colors.text + "80",
-    marginTop: 2,
+    fontSize: 20,
+    fontWeight: "bold",
+    color: colors.textLight,
   },
   timerCenter: {
     flex: 1,
@@ -568,7 +570,7 @@ const styles = StyleSheet.create({
   wordsRemainingNumberSmall: {
     fontSize: 24,
     fontWeight: "bold",
-    color: colors.text,
+    color: colors.textLight,
   },
   gameContent: {
     flex: 1,
@@ -576,12 +578,24 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 20,
   },
-  wordCard: {
+  gameRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     width: "100%",
+    marginBottom: 30,
+    height: "100%",
+    paddingVertical: 40,
+  },
+  wordCard: {
+    flex: 1,
+    marginHorizontal: 20,
     backgroundColor: colors.surface,
     elevation: 8,
     borderRadius: 15,
-    marginBottom: 30,
+    height: "100%",
+    justifyContent: "center",
+    alignItems: "center",
   },
   wordCardContent: {
     padding: 40,
@@ -614,17 +628,17 @@ const styles = StyleSheet.create({
   },
   incorrectButton: {
     backgroundColor: colors.error,
-    borderRadius: 40,
-    width: 80,
-    height: 80,
+    borderRadius: 60,
+    width: 120,
+    height: 120,
     justifyContent: "center",
     alignItems: "center",
   },
   correctButton: {
     backgroundColor: colors.success,
-    borderRadius: 40,
-    width: 80,
-    height: 80,
+    borderRadius: 60,
+    width: 120,
+    height: 120,
     justifyContent: "center",
     alignItems: "center",
   },
