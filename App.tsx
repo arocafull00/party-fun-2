@@ -99,6 +99,7 @@ export default function App() {
               component={CreateBatteryScreen}
               options={{
                 title: 'Crear Batería',
+                headerShown: false,
               }}
             />
             <Stack.Screen
