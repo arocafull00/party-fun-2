@@ -6,7 +6,6 @@ import {
   Button, 
   Card, 
   Chip,
-  IconButton,
   Divider,
   HelperText
 } from 'react-native-paper';
@@ -255,19 +254,6 @@ const CreateBatteryScreen: React.FC = () => {
           >
             GUARDAR BATERÍA
           </Button>
-
-          {/* Helper Text */}
-          <Card style={styles.helperCard}>
-            <Card.Content>
-              <Text style={styles.helperTitle}>💡 Consejos</Text>
-              <Text style={styles.helperText}>
-                • Se recomienda tener al menos 30 palabras{'\n'}
-                • Usa palabras variadas y divertidas{'\n'}
-                • Evita palabras muy difíciles o muy fáciles{'\n'}
-                • Piensa en diferentes categorías
-              </Text>
-            </Card.Content>
-          </Card>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -281,6 +267,8 @@ const styles = StyleSheet.create({
   },
   keyboardView: {
     flex: 1,
+    maxWidth: 1000,
+    alignSelf: "center",
   },
   content: {
     flex: 1,
