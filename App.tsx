@@ -107,6 +107,7 @@ export default function App() {
               component={NewGameScreen}
               options={{
                 title: 'Nueva Partida',
+                headerShown: false,
               }}
             />
             <Stack.Screen
