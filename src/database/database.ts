@@ -1,5 +1,5 @@
 import { eq, desc, count, sum, avg, sql } from 'drizzle-orm';
-import { db, runMigrations } from './connection';
+import { getDb, runMigrations } from './connection';
 import * as schema from './schema';
 
 import type {
@@ -14,6 +14,10 @@ import type {
 
 class DatabaseManager {
   private isInitialized = false;
+
+  private get db() {
+    return getDb();
+  }
 
   public async init(): Promise<void> {
     if (this.isInitialized) {
@@ -39,7 +43,7 @@ class DatabaseManager {
       console.log('Checking for default data...');
       
       // Check if we have any mazos
-      const mazosCount = await db.select({ count: count() }).from(schema.mazos);
+      const mazosCount = await this.db.select({ count: count() }).from(schema.mazos);
       
       if (mazosCount[0].count === 0) {
         console.log('No mazos found, database is ready for first use');
@@ -76,7 +80,7 @@ class DatabaseManager {
     this.ensureInitialized();
     
     try {
-      const result = await db.insert(schema.mazos).values({ nombre }).returning({ id: schema.mazos.id });
+      const result = await this.db.insert(schema.mazos).values({ nombre }).returning({ id: schema.mazos.id });
       return result[0].id;
     } catch (error) {
       console.error('Error creating mazo:', error);
@@ -88,7 +92,7 @@ class DatabaseManager {
     this.ensureInitialized();
     
     try {
-      const result = await db.select().from(schema.mazos).orderBy(schema.mazos.nombre);
+      const result = await this.db.select().from(schema.mazos).orderBy(schema.mazos.nombre);
       return result;
     } catch (error) {
       console.error('Error getting mazos:', error);
@@ -100,7 +104,7 @@ class DatabaseManager {
     this.ensureInitialized();
     
     try {
-      await db.delete(schema.mazos).where(eq(schema.mazos.id, id));
+      await this.db.delete(schema.mazos).where(eq(schema.mazos.id, id));
     } catch (error) {
       console.error('Error deleting mazo:', error);
       throw error;
@@ -112,7 +116,7 @@ class DatabaseManager {
     this.ensureInitialized();
     
     try {
-      const result = await db.insert(schema.cartas).values({ 
+      const result = await this.db.insert(schema.cartas).values({ 
         mazoId: mazo_id, 
         texto 
       }).returning({ id: schema.cartas.id });
@@ -127,7 +131,7 @@ class DatabaseManager {
     this.ensureInitialized();
     
     try {
-      const result = await db.select()
+      const result = await this.db.select()
         .from(schema.cartas)
         .where(eq(schema.cartas.mazoId, mazo_id))
         .orderBy(schema.cartas.texto);
@@ -142,7 +146,7 @@ class DatabaseManager {
     this.ensureInitialized();
     
     try {
-      await db.delete(schema.cartas).where(eq(schema.cartas.id, id));
+      await this.db.delete(schema.cartas).where(eq(schema.cartas.id, id));
     } catch (error) {
       console.error('Error deleting carta:', error);
       throw error;
@@ -154,7 +158,7 @@ class DatabaseManager {
     this.ensureInitialized();
     
     try {
-      const result = await db.insert(schema.partidas).values(partida).returning({ id: schema.partidas.id });
+      const result = await this.db.insert(schema.partidas).values(partida).returning({ id: schema.partidas.id });
       return result[0].id;
     } catch (error) {
       console.error('Error saving partida:', error);
@@ -166,7 +170,7 @@ class DatabaseManager {
     this.ensureInitialized();
     
     try {
-      const result = await db.select().from(schema.partidas).orderBy(desc(schema.partidas.fecha));
+      const result = await this.db.select().from(schema.partidas).orderBy(desc(schema.partidas.fecha));
       return result;
     } catch (error) {
       console.error('Error getting partidas:', error);
@@ -180,8 +184,8 @@ class DatabaseManager {
     
     try {
       // Use upsert pattern - delete existing and insert new
-      await db.delete(schema.partidaActual).where(eq(schema.partidaActual.id, 1));
-      await db.insert(schema.partidaActual).values({ ...partida, id: 1 });
+      await this.db.delete(schema.partidaActual).where(eq(schema.partidaActual.id, 1));
+      await this.db.insert(schema.partidaActual).values({ ...partida, id: 1 });
     } catch (error) {
       console.error('Error saving partida actual:', error);
       throw error;
@@ -192,7 +196,7 @@ class DatabaseManager {
     this.ensureInitialized();
     
     try {
-      const result = await db.select().from(schema.partidaActual).where(eq(schema.partidaActual.id, 1)).limit(1);
+      const result = await this.db.select().from(schema.partidaActual).where(eq(schema.partidaActual.id, 1)).limit(1);
       return result[0] || null;
     } catch (error) {
       console.error('Error getting partida actual:', error);
@@ -204,7 +208,7 @@ class DatabaseManager {
     this.ensureInitialized();
     
     try {
-      await db.delete(schema.partidaActual).where(eq(schema.partidaActual.id, 1));
+      await this.db.delete(schema.partidaActual).where(eq(schema.partidaActual.id, 1));
     } catch (error) {
       console.error('Error clearing partida actual:', error);
       throw error;
@@ -225,7 +229,7 @@ class DatabaseManager {
     this.ensureInitialized();
     
     try {
-      const result = await db.insert(schema.partidas).values(gameData as NewPartida).returning({ id: schema.partidas.id });
+      const result = await this.db.insert(schema.partidas).values(gameData as NewPartida).returning({ id: schema.partidas.id });
       return result[0].id;
     } catch (error) {
       console.error('Error creating partida:', error);
@@ -241,7 +245,7 @@ class DatabaseManager {
     this.ensureInitialized();
     
     try {
-      const result = await db.insert(schema.jugadores).values(playerData as NewJugador).returning({ id: schema.jugadores.id });
+      const result = await this.db.insert(schema.jugadores).values(playerData as NewJugador).returning({ id: schema.jugadores.id });
       return result[0].id;
     } catch (error) {
       console.error('Error creating jugador:', error);
@@ -254,7 +258,7 @@ class DatabaseManager {
     this.ensureInitialized();
     
     try {
-      await db.insert(schema.partidaJugadores).values({
+      await this.db.insert(schema.partidaJugadores).values({
         partidaId,
         jugadorId,
         equipo,
@@ -277,7 +281,7 @@ class DatabaseManager {
     this.ensureInitialized();
     
     try {
-      const stats = await db.select({
+      const stats = await this.db.select({
         totalGames: count(),
         totalCards: sum(schema.partidas.totalCartas),
         averageAccuracy: avg(schema.partidas.precision),
@@ -316,7 +320,7 @@ class DatabaseManager {
     this.ensureInitialized();
     
     try {
-      const result = await db.select({
+      const result = await this.db.select({
         id: schema.partidas.id,
         fecha: schema.partidas.fecha,
         mazo_nombre: schema.mazos.nombre,
@@ -332,7 +336,7 @@ class DatabaseManager {
       .orderBy(desc(schema.partidas.fecha))
       .limit(limit);
       
-      return result.map(row => ({
+      return result.map((row: { mazo_nombre: any; }) => ({
         ...row,
         mazo_nombre: row.mazo_nombre || 'Unknown',
       }));
@@ -351,7 +355,7 @@ class DatabaseManager {
     this.ensureInitialized();
     
     try {
-      const result = await db.select({
+      const result = await this.db.select({
         id: schema.jugadores.id,
         nombre: schema.jugadores.nombre,
         equipo: schema.jugadores.equipo,
@@ -380,7 +384,7 @@ class DatabaseManager {
       console.log('Getting last game players...');
       
       // First, try to get the most recent game
-      const lastGame = await db.select({
+      const lastGame = await this.db.select({
         id: schema.partidas.id,
         fecha: schema.partidas.fecha,
       })
@@ -392,7 +396,7 @@ class DatabaseManager {
       
       if (lastGame.length > 0) {
         // Get the players for that game
-        const result = await db.select({
+        const result = await this.db.select({
           id: schema.jugadores.id,
           nombre: schema.jugadores.nombre,
           equipo: schema.partidaJugadores.equipo,
@@ -411,7 +415,7 @@ class DatabaseManager {
       
       // If no previous games or no players found, try to get temporary team data
       console.log('No previous game players found, checking for temporary team data...');
-      const tempPlayers = await db.select({
+      const tempPlayers = await this.db.select({
         id: schema.jugadores.id,
         nombre: schema.jugadores.nombre,
         equipo: sql<string>`CASE 
@@ -444,7 +448,7 @@ class DatabaseManager {
       console.log('Saving current teams to database...');
       
       // Clear any existing temporary team data
-      await db.delete(schema.jugadores).where(sql`${schema.jugadores.equipo} IN ('azul_temp', 'rojo_temp')`);
+      await this.db.delete(schema.jugadores).where(sql`${schema.jugadores.equipo} IN ('azul_temp', 'rojo_temp')`);
       
       // Prepare all players data
       const playersData: NewJugador[] = [];
@@ -467,7 +471,7 @@ class DatabaseManager {
       
       // Insert all players at once
       if (playersData.length > 0) {
-        await db.insert(schema.jugadores).values(playersData);
+        await this.db.insert(schema.jugadores).values(playersData);
       }
       
       console.log('Teams saved successfully as temporary records');
