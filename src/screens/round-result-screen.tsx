@@ -17,13 +17,13 @@ import { colors } from '../theme/theme';
 
 
 const RoundResultScreen: React.FC = () => {
-  const { currentRound, teams, gameHistory, currentRoundWords, endGame } = useGameStore();
+  const { currentRound, teams, gameHistory, currentRoundCards, endGame } = useGameStore();
 
   // Get current round results
-  const azulCorrect = currentRoundWords.correct.slice(0, Math.floor(currentRoundWords.correct.length / 2));
-  const azulIncorrect = currentRoundWords.incorrect.slice(0, Math.floor(currentRoundWords.incorrect.length / 2));
-  const rojoCorrect = currentRoundWords.correct.slice(Math.floor(currentRoundWords.correct.length / 2));
-  const rojoIncorrect = currentRoundWords.incorrect.slice(Math.floor(currentRoundWords.incorrect.length / 2));
+  const azulCorrect = currentRoundCards.correct.slice(0, Math.floor(currentRoundCards.correct.length / 2));
+  const azulIncorrect = currentRoundCards.incorrect.slice(0, Math.floor(currentRoundCards.incorrect.length / 2));
+  const rojoCorrect = currentRoundCards.correct.slice(Math.floor(currentRoundCards.correct.length / 2));
+  const rojoIncorrect = currentRoundCards.incorrect.slice(Math.floor(currentRoundCards.incorrect.length / 2));
 
   const handleNextRound = () => {
     if (currentRound >= 3) {
@@ -43,12 +43,12 @@ const RoundResultScreen: React.FC = () => {
     }
   };
 
-  const WordsList: React.FC<{ 
-    words: string[], 
+  const CardsList: React.FC<{ 
+    cards: string[], 
     title: string, 
     color: string,
     correct: boolean 
-  }> = ({ words, title, color, correct }) => (
+  }> = ({ cards, title, color, correct }) => (
     <Card style={styles.wordsCard}>
       <Card.Content>
         <View style={styles.wordsHeader}>
@@ -58,17 +58,17 @@ const RoundResultScreen: React.FC = () => {
             style={[styles.countChip, { backgroundColor: color }]}
             textStyle={{ color: colors.textLight }}
           >
-            {words.length}
+            {cards.length}
           </Chip>
         </View>
         <Divider style={styles.divider} />
-        {words.length === 0 ? (
-          <Text style={styles.emptyText}>Sin palabras</Text>
+        {cards.length === 0 ? (
+          <Text style={styles.emptyText}>Sin cartas</Text>
         ) : (
-          words.map((word: string, index: number) => (
+          cards.map((card: string, index: number) => (
             <List.Item
               key={index}
-              title={word}
+              title={card}
               left={props => (
                 <List.Icon 
                   {...props} 
@@ -130,14 +130,14 @@ const RoundResultScreen: React.FC = () => {
           <View style={styles.teamsResultsRow}>
             {/* Blue Team */}
             <View style={styles.teamResults}>
-              <WordsList 
-                words={azulCorrect}
+              <CardsList 
+                cards={azulCorrect}
                 title="Equipo Azul - Acertadas"
                 color={colors.success}
                 correct={true}
               />
-              <WordsList 
-                words={azulIncorrect}
+              <CardsList 
+                cards={azulIncorrect}
                 title="Equipo Azul - Falladas"
                 color={colors.error}
                 correct={false}
@@ -146,14 +146,14 @@ const RoundResultScreen: React.FC = () => {
 
             {/* Red Team */}
             <View style={styles.teamResults}>
-              <WordsList 
-                words={rojoCorrect}
+              <CardsList 
+                cards={rojoCorrect}
                 title="Equipo Rojo - Acertadas"
                 color={colors.success}
                 correct={true}
               />
-              <WordsList 
-                words={rojoIncorrect}
+              <CardsList 
+                cards={rojoIncorrect}
                 title="Equipo Rojo - Falladas"
                 color={colors.error}
                 correct={false}

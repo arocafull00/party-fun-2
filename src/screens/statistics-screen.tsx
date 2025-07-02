@@ -18,7 +18,7 @@ import { colors } from '../theme/theme';
 
 interface GameStatistics {
   totalGames: number;
-  totalWords: number;
+  totalCards: number;
   averageAccuracy: number;
   gamesWonByBlue: number;
   gamesWonByRed: number;
@@ -28,12 +28,12 @@ interface GameStatistics {
 interface RecentGame {
   id: number;
   fecha: string;
-  bateria_nombre: string;
+  mazo_nombre: string;
   equipo_ganador: string | null;
   puntuacion_azul: number;
   puntuacion_rojo: number;
-  total_palabras: number;
-  palabras_correctas: number;
+  total_cartas: number;
+  cartas_correctas: number;
   precision: number;
 }
 

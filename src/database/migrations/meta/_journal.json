@@ -8,6 +8,13 @@
       "when": 1751443150118,
       "tag": "0000_furry_yellowjacket",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1751471783333,
+      "tag": "0001_stiff_deadpool",
+      "breakpoints": true
     }
   ]
 }

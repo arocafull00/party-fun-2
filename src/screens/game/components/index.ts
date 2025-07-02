@@ -1,4 +1,4 @@
-export { default as BatterySelectionPhase } from './BatterySelectionPhase';
+export { default as DeckSelectionPhase } from './DeckSelectionPhase';
 export { default as TeamConfigurationPhase } from './TeamConfigurationPhase';
 export { default as GameSummaryPhase } from './GameSummaryPhase';
 export { default as TeamCard } from './TeamCard';

@@ -2,17 +2,17 @@ import { sql } from 'drizzle-orm';
 import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';
 import { relations } from 'drizzle-orm';
 
-// Baterias table
-export const baterias = sqliteTable('baterias', {
+// Mazos table
+export const mazos = sqliteTable('mazos', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   nombre: text('nombre').notNull().unique(),
   createdAt: text('created_at').default(sql`CURRENT_TIMESTAMP`),
 });
 
-// Palabras table
-export const palabras = sqliteTable('palabras', {
+// Cartas table
+export const cartas = sqliteTable('cartas', {
   id: integer('id').primaryKey({ autoIncrement: true }),
-  bateriaId: integer('bateria_id').notNull().references(() => baterias.id, { onDelete: 'cascade' }),
+  mazoId: integer('mazo_id').notNull().references(() => mazos.id, { onDelete: 'cascade' }),
   texto: text('texto').notNull(),
   createdAt: text('created_at').default(sql`CURRENT_TIMESTAMP`),
 });
@@ -36,12 +36,12 @@ export const jugadores = sqliteTable('jugadores', {
 export const partidas = sqliteTable('partidas', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   fecha: text('fecha').notNull(),
-  bateriaId: integer('bateria_id').references(() => baterias.id),
+  mazoId: integer('mazo_id').references(() => mazos.id),
   equipoGanador: text('equipo_ganador', { enum: ['azul', 'rojo'] }),
   puntuacionAzul: integer('puntuacion_azul').notNull().default(0),
   puntuacionRojo: integer('puntuacion_rojo').notNull().default(0),
-  totalPalabras: integer('total_palabras').notNull().default(0),
-  palabrasCorrectas: integer('palabras_correctas').notNull().default(0),
+  totalCartas: integer('total_cartas').notNull().default(0),
+  cartasCorrectas: integer('cartas_correctas').notNull().default(0),
   precision: integer('precision').notNull().default(0),
   createdAt: text('created_at').default(sql`CURRENT_TIMESTAMP`),
 });
@@ -58,38 +58,38 @@ export const partidaJugadores = sqliteTable('partida_jugadores', {
 // Partida actual table (for current game state)
 export const partidaActual = sqliteTable('partida_actual', {
   id: integer('id').primaryKey({ autoIncrement: true }),
-  bateriaId: integer('bateria_id').notNull().references(() => baterias.id),
+  mazoId: integer('mazo_id').notNull().references(() => mazos.id),
   rondaActual: integer('ronda_actual').notNull().default(1),
   turnoJugadorId: integer('turno_jugador_id'),
-  palabrasRestantes: text('palabras_restantes').notNull().default('[]'),
+  cartasRestantes: text('cartas_restantes').notNull().default('[]'),
   puntajeAzul: integer('puntaje_azul').notNull().default(0),
   puntajeRojo: integer('puntaje_rojo').notNull().default(0),
   jugadoresAzul: text('jugadores_azul').notNull().default('[]'),
   jugadoresRojo: text('jugadores_rojo').notNull().default('[]'),
-  palabrasAcertadas: text('palabras_acertadas').notNull().default('[]'),
-  palabrasFalladas: text('palabras_falladas').notNull().default('[]'),
+  cartasAcertadas: text('cartas_acertadas').notNull().default('[]'),
+  cartasFalladas: text('cartas_falladas').notNull().default('[]'),
   createdAt: text('created_at').default(sql`CURRENT_TIMESTAMP`),
   updatedAt: text('updated_at').default(sql`CURRENT_TIMESTAMP`),
 });
 
 // Relations
-export const bateriasRelations = relations(baterias, ({ many }) => ({
-  palabras: many(palabras),
+export const mazosRelations = relations(mazos, ({ many }) => ({
+  cartas: many(cartas),
   partidas: many(partidas),
   partidasActuales: many(partidaActual),
 }));
 
-export const palabrasRelations = relations(palabras, ({ one }) => ({
-  bateria: one(baterias, {
-    fields: [palabras.bateriaId],
-    references: [baterias.id],
+export const cartasRelations = relations(cartas, ({ one }) => ({
+  mazo: one(mazos, {
+    fields: [cartas.mazoId],
+    references: [mazos.id],
   }),
 }));
 
 export const partidasRelations = relations(partidas, ({ one, many }) => ({
-  bateria: one(baterias, {
-    fields: [partidas.bateriaId],
-    references: [baterias.id],
+  mazo: one(mazos, {
+    fields: [partidas.mazoId],
+    references: [mazos.id],
   }),
   jugadores: many(partidaJugadores),
 }));
@@ -110,18 +110,18 @@ export const partidaJugadoresRelations = relations(partidaJugadores, ({ one }) =
 }));
 
 export const partidaActualRelations = relations(partidaActual, ({ one }) => ({
-  bateria: one(baterias, {
-    fields: [partidaActual.bateriaId],
-    references: [baterias.id],
+  mazo: one(mazos, {
+    fields: [partidaActual.mazoId],
+    references: [mazos.id],
   }),
 }));
 
 // Type exports for TypeScript
-export type Bateria = typeof baterias.$inferSelect;
-export type NewBateria = typeof baterias.$inferInsert;
+export type Mazo = typeof mazos.$inferSelect;
+export type NewMazo = typeof mazos.$inferInsert;
 
-export type Palabra = typeof palabras.$inferSelect;
-export type NewPalabra = typeof palabras.$inferInsert;
+export type Carta = typeof cartas.$inferSelect;
+export type NewCarta = typeof cartas.$inferInsert;
 
 export type Equipo = typeof equipos.$inferSelect;
 export type NewEquipo = typeof equipos.$inferInsert;

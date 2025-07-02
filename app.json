@@ -3,6 +3,7 @@
     "name": "PartyFun Game",
     "slug": "party-fun-2",
     "version": "1.0.0",
+    "platforms": ["ios", "android"],
     "orientation": "landscape",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -31,7 +32,8 @@
     "scheme": "partyfun",
     "plugins": [
       "expo-router",
-      "expo-sqlite"
+      "expo-sqlite",
+      "expo-font"
     ]
   }
 }

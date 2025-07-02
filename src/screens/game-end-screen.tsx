@@ -21,7 +21,7 @@ import { colors } from '../theme/theme';
 const GameEndScreen: React.FC = () => {
   const {
     teams,
-    selectedBattery,
+    selectedDeck,
     gameHistory,
     resetGame
   } = useGameStore();
@@ -33,13 +33,13 @@ const GameEndScreen: React.FC = () => {
   const blueScore = teams.azul.score;
   const redScore = teams.rojo.score;
   const winner = blueScore > redScore ? 'azul' : redScore > blueScore ? 'rojo' : 'empate';
-  const totalWords = gameHistory.reduce((total, round) => {
-    return total + round.correctWords.length + round.incorrectWords.length;
+  const totalCards = gameHistory.reduce((total, round) => {
+    return total + round.correctCards.length + round.incorrectCards.length;
   }, 0);
   const totalCorrect = gameHistory.reduce((total, round) => {
-    return total + round.correctWords.length;
+    return total + round.correctCards.length;
   }, 0);
-  const accuracy = totalWords > 0 ? Math.round((totalCorrect / totalWords) * 100) : 0;
+  const accuracy = totalCards > 0 ? Math.round((totalCorrect / totalCards) * 100) : 0;
 
   useEffect(() => {
     saveGameToDatabase();
@@ -53,12 +53,12 @@ const GameEndScreen: React.FC = () => {
       // Create game record
       const gameData = {
         fecha: new Date().toISOString(),
-        bateriaId: selectedBattery?.id || 0,
+        mazoId: selectedDeck?.id || 0,
         equipoGanador: winner === 'empate' ? null : (winner as 'azul' | 'rojo'),
         puntuacionAzul: blueScore,
         puntuacionRojo: redScore,
-        totalPalabras: totalWords,
-        palabrasCorrectas: totalCorrect,
+        totalCartas: totalCards,
+        cartasCorrectas: totalCorrect,
         precision: accuracy
       };
 
@@ -167,19 +167,19 @@ const GameEndScreen: React.FC = () => {
             <Text style={styles.sectionTitle}>Estadísticas del Juego</Text>
             
             <List.Item
-              title="Batería utilizada"
-              description={selectedBattery?.nombre || 'Sin batería'}
+              title="Mazo utilizado"
+              description={selectedDeck?.nombre || 'Sin mazo'}
               left={props => <List.Icon {...props} icon="cards" color={colors.primary} />}
             />
             
             <List.Item
-              title="Total de palabras"
-              description={`${totalWords} palabras jugadas`}
+              title="Total de cartas"
+              description={`${totalCards} cartas jugadas`}
               left={props => <List.Icon {...props} icon="format-list-numbered" color={colors.primary} />}
             />
             
             <List.Item
-              title="Palabras correctas"
+              title="Cartas correctas"
               description={`${totalCorrect} aciertos`}
               left={props => <List.Icon {...props} icon="check-circle" color={colors.success} />}
             />
@@ -218,14 +218,14 @@ const GameEndScreen: React.FC = () => {
                     style={[styles.statChip, { backgroundColor: colors.success + '20' }]}
                     textStyle={{ color: colors.success }}
                   >
-                    {round.correctWords.length} correctas
+                    {round.correctCards.length} correctas
                   </Chip>
                   <Chip 
                     icon="close" 
                     style={[styles.statChip, { backgroundColor: colors.error + '20' }]}
                     textStyle={{ color: colors.error }}
                   >
-                    {round.incorrectWords.length} incorrectas
+                    {round.incorrectCards.length} incorrectas
                   </Chip>
                 </View>
                 

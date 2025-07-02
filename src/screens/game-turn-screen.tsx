@@ -25,13 +25,13 @@ const GameTurnScreen: React.FC = () => {
     teams,
     timer,
     isTimerRunning,
-    currentWordIndex,
-    roundWords,
+    currentCardIndex,
+    roundCards,
     startTimer,
     stopTimer,
     resetTimer,
-    markWordCorrect,
-    markWordIncorrect,
+    markCardCorrect,
+    markCardIncorrect,
     nextTurn,
     endRound,
     endGame,
@@ -46,8 +46,8 @@ const GameTurnScreen: React.FC = () => {
   // Current player and team info
   const currentTeamData = teams[currentTeam];
   const currentPlayer = currentTeamData.players[currentPlayerIndex];
-  const currentWord = roundWords[currentWordIndex];
-  const wordsRemaining = roundWords.length - currentWordIndex;
+  const currentCard = roundCards[currentCardIndex];
+  const cardsRemaining = roundCards.length - currentCardIndex;
 
   // Round descriptions
   const getRoundDescription = (round: number): string => {
@@ -95,7 +95,7 @@ const GameTurnScreen: React.FC = () => {
 
   // Timer effect
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    let interval: ReturnType<typeof setInterval>;
 
     if (isTimerRunning && timer > 0) {
       interval = setInterval(() => {
@@ -145,40 +145,40 @@ const GameTurnScreen: React.FC = () => {
   };
 
   const handleCorrect = () => {
-    if (!currentWord) return;
+    if (!currentCard) return;
 
-    markWordCorrect(currentWord);
+    markCardCorrect(currentCard);
 
-    // Check if all words are done
-    if (currentWordIndex >= roundWords.length - 1) {
-      handleAllWordsCompleted();
+    // Check if all cards are done
+    if (currentCardIndex >= roundCards.length - 1) {
+      handleAllCardsCompleted();
     } else {
-      // Continue with next word
-      useGameStore.setState({ currentWordIndex: currentWordIndex + 1 });
+      // Continue with next card
+      useGameStore.setState({ currentCardIndex: currentCardIndex + 1 });
     }
   };
 
   const handleIncorrect = () => {
-    if (!currentWord) return;
+    if (!currentCard) return;
 
-    markWordIncorrect(currentWord);
+    markCardIncorrect(currentCard);
 
-    // Check if all words are done
-    if (currentWordIndex >= roundWords.length - 1) {
-      handleAllWordsCompleted();
+    // Check if all cards are done
+    if (currentCardIndex >= roundCards.length - 1) {
+      handleAllCardsCompleted();
     } else {
-      // Continue with next word
-      useGameStore.setState({ currentWordIndex: currentWordIndex + 1 });
+      // Continue with next card
+      useGameStore.setState({ currentCardIndex: currentCardIndex + 1 });
     }
   };
 
-  const handleAllWordsCompleted = () => {
+  const handleAllCardsCompleted = () => {
     stopTimer();
     setGamePhase("preparation");
 
     Alert.alert(
-      "¡Todas las palabras completadas!",
-      "Se han completado todas las palabras de esta ronda.",
+      "¡Todas las cartas completadas!",
+      "Se han completado todas las cartas de esta ronda.",
       [
         {
           text: "Finalizar Ronda",
@@ -252,7 +252,7 @@ const GameTurnScreen: React.FC = () => {
             <Text style={styles.roundText}>Ronda {currentRound}</Text>
           </View>
           <View style={styles.headerRight}>
-            <Text style={styles.wordsRemainingNumber}>x{wordsRemaining}</Text>
+                            <Text style={styles.wordsRemainingNumber}>x{cardsRemaining}</Text>
           </View>
         </View>
 
@@ -336,7 +336,7 @@ const GameTurnScreen: React.FC = () => {
         </View>
         <View style={styles.timerHeaderRight}>
           <Text style={styles.teamNameSmall}>Restantes</Text>
-          <Text style={styles.wordsRemainingNumberSmall}>{wordsRemaining}</Text>
+                          <Text style={styles.wordsRemainingNumberSmall}>{cardsRemaining}</Text>
         </View>
       </View>
 
@@ -356,7 +356,7 @@ const GameTurnScreen: React.FC = () => {
           {/* Word card */}
           <Card style={styles.wordCard}>
             <Card.Content style={styles.wordCardContent}>
-              <Text style={styles.wordText}>{currentWord}</Text>
+                                <Text style={styles.wordText}>{currentCard}</Text>
             </Card.Content>
           </Card>
 

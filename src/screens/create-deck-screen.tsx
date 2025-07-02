@@ -22,18 +22,18 @@ import { colors } from '../theme/theme';
 const { width: screenWidth } = Dimensions.get('window');
 const isTablet = screenWidth > 600;
 
-const CreateBatteryScreen: React.FC = () => {
-  const [batteryName, setBatteryName] = useState('');
-  const [currentWord, setCurrentWord] = useState('');
-  const [words, setWords] = useState<string[]>([]);
+const CreateDeckScreen: React.FC = () => {
+  const [deckName, setDeckName] = useState('');
+  const [currentCard, setCurrentCard] = useState('');
+  const [cards, setCards] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [nameError, setNameError] = useState('');
-  const [wordError, setWordError] = useState('');
-  const [showWordsList, setShowWordsList] = useState(false);
+  const [cardError, setCardError] = useState('');
+  const [showCardsList, setShowCardsList] = useState(false);
 
-  const validateBatteryName = (name: string): boolean => {
+  const validateDeckName = (name: string): boolean => {
     if (!name.trim()) {
-      setNameError('El nombre de la batería es obligatorio');
+      setNameError('El nombre del mazo es obligatorio');
       return false;
     }
     if (name.trim().length < 3) {
@@ -44,83 +44,83 @@ const CreateBatteryScreen: React.FC = () => {
     return true;
   };
 
-  const validateWord = (word: string): boolean => {
-    if (!word.trim()) {
-      setWordError('La palabra no puede estar vacía');
+  const validateCard = (card: string): boolean => {
+    if (!card.trim()) {
+      setCardError('La carta no puede estar vacía');
       return false;
     }
-    if (word.trim().length < 2) {
-      setWordError('La palabra debe tener al menos 2 caracteres');
+    if (card.trim().length < 2) {
+      setCardError('La carta debe tener al menos 2 caracteres');
       return false;
     }
-    if (words.includes(word.trim().toLowerCase())) {
-      setWordError('Esta palabra ya existe en la lista');
+    if (cards.includes(card.trim().toLowerCase())) {
+      setCardError('Esta carta ya existe en la lista');
       return false;
     }
-    setWordError('');
+    setCardError('');
     return true;
   };
 
-  const handleAddWord = () => {
-    const trimmedWord = currentWord.trim();
+  const handleAddCard = () => {
+    const trimmedCard = currentCard.trim();
     
-    if (!validateWord(trimmedWord)) {
+    if (!validateCard(trimmedCard)) {
       return;
     }
 
-    setWords([...words, trimmedWord]);
-    setCurrentWord('');
-    setWordError('');
+    setCards([...cards, trimmedCard]);
+    setCurrentCard('');
+    setCardError('');
   };
 
-  const handleRemoveWord = (index: number) => {
-    const newWords = words.filter((_, i) => i !== index);
-    setWords(newWords);
+  const handleRemoveCard = (index: number) => {
+    const newCards = cards.filter((_, i) => i !== index);
+    setCards(newCards);
   };
 
-  const handleSaveBattery = async () => {
-    if (!validateBatteryName(batteryName)) {
+  const handleSaveDeck = async () => {
+    if (!validateDeckName(deckName)) {
       return;
     }
 
-    if (words.length === 0) {
-      Alert.alert('Sin palabras', 'Debes agregar al menos una palabra a la batería');
+    if (cards.length === 0) {
+      Alert.alert('Sin cartas', 'Debes agregar al menos una carta al mazo');
       return;
     }
 
-    if (words.length < 10) {
+    if (cards.length < 10) {
       Alert.alert(
-        'Pocas palabras',
-        `Solo tienes ${words.length} palabras. Se recomienda tener al menos 30 palabras para una mejor experiencia de juego. ¿Quieres continuar?`,
+        'Pocas cartas',
+        `Solo tienes ${cards.length} cartas. Se recomienda tener al menos 30 cartas para una mejor experiencia de juego. ¿Quieres continuar?`,
         [
           { text: 'Cancelar', style: 'cancel' },
-          { text: 'Guardar', onPress: saveBattery },
+          { text: 'Guardar', onPress: saveDeck },
         ]
       );
       return;
     }
 
-    saveBattery();
+    saveDeck();
   };
 
-  const saveBattery = async () => {
+  const saveDeck = async () => {
     setLoading(true);
     try {
-      const batteryId = await database.createBateria(batteryName.trim());
+      const deckId = await database.createMazo(deckName.trim());
       
-      // Add all words to the battery
-      for (const word of words) {
-        await database.addPalabra(batteryId, word);
+      // Add all cards to the deck
+      for (const card of cards) {
+        await database.addCarta(deckId, card);
       }
 
       Alert.alert(
-        'Batería creada',
-        `Se ha creado la batería "${batteryName}" con ${words.length} palabras`,
+        'Mazo creado',
+        `Se ha creado el mazo "${deckName}" con ${cards.length} cartas`,
         [{ text: 'OK', onPress: () => router.back() }]
       );
     } catch (error) {
-      console.error('Error saving battery:', error);
-      Alert.alert('Error', 'No se pudo guardar la batería');
+      console.error('Error saving deck:', error);
+      Alert.alert('Error', 'No se pudo guardar el mazo');
     } finally {
       setLoading(false);
     }
@@ -128,20 +128,20 @@ const CreateBatteryScreen: React.FC = () => {
 
   const getProgressValue = () => {
     const maxRecommended = 50;
-    return Math.min(words.length / maxRecommended, 1);
+    return Math.min(cards.length / maxRecommended, 1);
   };
 
   const getProgressColor = () => {
-    if (words.length < 10) return colors.error;
-    if (words.length < 30) return colors.warning;
+    if (cards.length < 10) return colors.error;
+    if (cards.length < 30) return colors.warning;
     return colors.success;
   };
 
   const getStatusInfo = () => {
-    if (words.length === 0) return { text: 'Comienza agregando palabras', icon: 'plus-circle-outline' };
-    if (words.length < 10) return { text: 'Necesitas más palabras', icon: 'alert-circle-outline' };
-    if (words.length < 30) return { text: 'Buen progreso', icon: 'check-circle-outline' };
-    return { text: '¡Excelente batería!', icon: 'star-circle' };
+    if (cards.length === 0) return { text: 'Comienza agregando cartas', icon: 'plus-circle-outline' };
+    if (cards.length < 10) return { text: 'Necesitas más cartas', icon: 'alert-circle-outline' };
+    if (cards.length < 30) return { text: 'Buen progreso', icon: 'check-circle-outline' };
+    return { text: '¡Excelente mazo!', icon: 'star-circle' };
   };
 
   const statusInfo = getStatusInfo();
@@ -155,9 +155,9 @@ const CreateBatteryScreen: React.FC = () => {
         >
           {/* Header Section */}
           <View style={styles.header}>
-            <Text style={styles.headerTitle}>Crear Nueva Batería</Text>
+            <Text style={styles.headerTitle}>Crear Nuevo Mazo</Text>
             <Text style={styles.headerSubtitle}>
-              Crea tu propia colección de palabras para jugar
+              Crea tu propia colección de cartas para jugar
             </Text>
           </View>
 
@@ -170,7 +170,7 @@ const CreateBatteryScreen: React.FC = () => {
             <Surface style={styles.progressCard} elevation={3}>
               <View style={styles.progressHeader}>
                 <View style={styles.progressInfo}>
-                  <Text style={styles.progressTitle}>Progreso de la Batería</Text>
+                  <Text style={styles.progressTitle}>Progreso del Mazo</Text>
                   <View style={styles.statusContainer}>
                     <IconButton 
                       icon={statusInfo.icon} 
@@ -183,9 +183,9 @@ const CreateBatteryScreen: React.FC = () => {
                     </Text>
                   </View>
                 </View>
-                <View style={styles.wordsCount}>
-                  <Text style={styles.wordsCountNumber}>{words.length}</Text>
-                  <Text style={styles.wordsCountLabel}>palabras</Text>
+                <View style={styles.cardsCount}>
+                  <Text style={styles.cardsCountNumber}>{cards.length}</Text>
+                  <Text style={styles.cardsCountLabel}>cartas</Text>
                 </View>
               </View>
               <ProgressBar 
@@ -194,111 +194,111 @@ const CreateBatteryScreen: React.FC = () => {
                 style={styles.progressBar}
               />
               <Text style={styles.progressHelp}>
-                Recomendado: 30-50 palabras para la mejor experiencia
+                Recomendado: 30-50 cartas para la mejor experiencia
               </Text>
             </Surface>
 
-            {/* Battery Name Section */}
+            {/* Deck Name Section */}
             <Surface style={styles.inputCard} elevation={2}>
-              <Text style={styles.cardTitle}>Nombre de la Batería</Text>
+              <Text style={styles.cardTitle}>Nombre del Mazo</Text>
               <TextInput
                 label="Ej: Animales, Deportes, Comida..."
-                value={batteryName}
+                value={deckName}
                 onChangeText={(text) => {
-                  setBatteryName(text);
-                  validateBatteryName(text);
+                  setDeckName(text);
+                  validateDeckName(text);
                 }}
                 mode="outlined"
                 style={styles.nameInput}
                 error={!!nameError}
                 maxLength={50}
-                left={<TextInput.Icon icon="battery" />}
+                left={<TextInput.Icon icon="cards" />}
               />
               <HelperText type="error" visible={!!nameError}>
                 {nameError}
               </HelperText>
             </Surface>
 
-            {/* Add Words Section */}
+            {/* Add Cards Section */}
             <Surface style={styles.inputCard} elevation={2}>
-              <Text style={styles.cardTitle}>Agregar Palabras</Text>
-              <View style={styles.addWordContainer}>
+              <Text style={styles.cardTitle}>Agregar Cartas</Text>
+              <View style={styles.addCardContainer}>
                 <TextInput
-                  label="Escribe una palabra"
-                  value={currentWord}
+                  label="Escribe una carta"
+                  value={currentCard}
                   onChangeText={(text) => {
-                    setCurrentWord(text);
-                    if (wordError) setWordError('');
+                    setCurrentCard(text);
+                    if (cardError) setCardError('');
                   }}
                   mode="outlined"
-                  style={styles.wordInput}
-                  error={!!wordError}
+                  style={styles.cardInput}
+                  error={!!cardError}
                   maxLength={30}
-                  onSubmitEditing={handleAddWord}
+                  onSubmitEditing={handleAddCard}
                   returnKeyType="done"
                   left={<TextInput.Icon icon="pencil" />}
                 />
                 <FAB
                   icon="plus"
                   size="small"
-                  onPress={handleAddWord}
+                  onPress={handleAddCard}
                   style={[styles.addFAB, { backgroundColor: colors.success }]}
-                  disabled={!currentWord.trim()}
+                  disabled={!currentCard.trim()}
                 />
               </View>
-              <HelperText type="error" visible={!!wordError}>
-                {wordError}
+              <HelperText type="error" visible={!!cardError}>
+                {cardError}
               </HelperText>
             </Surface>
 
-            {/* Recent Words Preview */}
-            {words.length > 0 && (
+            {/* Recent Cards Preview */}
+            {cards.length > 0 && (
               <Surface style={styles.previewCard} elevation={2}>
                 <View style={styles.previewHeader}>
-                  <Text style={styles.cardTitle}>Últimas palabras agregadas</Text>
+                  <Text style={styles.cardTitle}>Últimas cartas agregadas</Text>
                   <Button
                     mode="text"
-                    onPress={() => setShowWordsList(!showWordsList)}
+                    onPress={() => setShowCardsList(!showCardsList)}
                     compact
                   >
-                    {showWordsList ? 'Ocultar' : `Ver todas (${words.length})`}
+                    {showCardsList ? 'Ocultar' : `Ver todas (${cards.length})`}
                   </Button>
                 </View>
-                <View style={styles.previewWordsContainer}>
-                  {words.slice(-6).reverse().map((word, index) => (
+                <View style={styles.previewCardsContainer}>
+                  {cards.slice(-6).reverse().map((card, index) => (
                     <Chip 
                       key={`preview-${index}`}
-                      style={styles.previewWordChip}
-                      textStyle={styles.previewWordText}
+                      style={styles.previewCardChip}
+                      textStyle={styles.previewCardText}
                     >
-                      {word}
+                      {card}
                     </Chip>
                   ))}
                 </View>
               </Surface>
             )}
 
-            {/* Full Words List */}
-            {showWordsList && words.length > 0 && (
-              <Surface style={styles.wordsListCard} elevation={2}>
-                <View style={styles.wordsListHeader}>
-                  <Text style={styles.cardTitle}>Todas las palabras ({words.length})</Text>
+            {/* Full Cards List */}
+            {showCardsList && cards.length > 0 && (
+              <Surface style={styles.cardsListCard} elevation={2}>
+                <View style={styles.cardsListHeader}>
+                  <Text style={styles.cardTitle}>Todas las cartas ({cards.length})</Text>
                   <IconButton
                     icon="close"
                     size={20}
-                    onPress={() => setShowWordsList(false)}
+                    onPress={() => setShowCardsList(false)}
                   />
                 </View>
                 <Divider style={styles.divider} />
-                <View style={styles.wordsContainer}>
-                  {words.map((word, index) => (
+                <View style={styles.cardsContainer}>
+                  {cards.map((card, index) => (
                     <Chip 
                       key={index}
-                      style={styles.wordChip}
-                      onClose={() => handleRemoveWord(index)}
+                      style={styles.cardChip}
+                      onClose={() => handleRemoveCard(index)}
                       closeIcon="delete"
                     >
-                      {word}
+                      {card}
                     </Chip>
                   ))}
                 </View>
@@ -310,15 +310,15 @@ const CreateBatteryScreen: React.FC = () => {
           <View style={styles.saveButtonContainer}>
             <Button
               mode="contained"
-              onPress={handleSaveBattery}
+              onPress={handleSaveDeck}
               style={styles.saveButton}
               contentStyle={styles.saveButtonContent}
               labelStyle={styles.saveButtonLabel}
               loading={loading}
-              disabled={loading || !batteryName.trim() || words.length === 0}
+              disabled={loading || !deckName.trim() || cards.length === 0}
               icon="content-save"
             >
-              GUARDAR BATERÍA
+              GUARDAR MAZO
             </Button>
           </View>
         </KeyboardAvoidingView>
@@ -401,7 +401,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
   },
-  wordsCount: {
+  cardsCount: {
     alignItems: 'center',
     backgroundColor: colors.primary,
     borderRadius: 20,
@@ -409,12 +409,12 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     minWidth: 70,
   },
-  wordsCountNumber: {
+  cardsCountNumber: {
     fontSize: 24,
     fontWeight: 'bold',
     color: colors.textLight,
   },
-  wordsCountLabel: {
+  cardsCountLabel: {
     fontSize: 12,
     color: colors.textLight,
     opacity: 0.9,
@@ -445,12 +445,12 @@ const styles = StyleSheet.create({
   nameInput: {
     backgroundColor: 'transparent',
   },
-  addWordContainer: {
+  addCardContainer: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     gap: 12,
   },
-  wordInput: {
+  cardInput: {
     flex: 1,
     backgroundColor: 'transparent',
   },
@@ -469,25 +469,25 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 12,
   },
-  previewWordsContainer: {
+  previewCardsContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 8,
   },
-  previewWordChip: {
+  previewCardChip: {
     backgroundColor: colors.tertiary,
   },
-  previewWordText: {
+  previewCardText: {
     color: colors.textLight,
     fontWeight: '500',
   },
-  wordsListCard: {
+  cardsListCard: {
     backgroundColor: colors.surface,
     borderRadius: 12,
     padding: 20,
     marginBottom: 16,
   },
-  wordsListHeader: {
+  cardsListHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -497,12 +497,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#E0E0E0',
     marginBottom: 16,
   },
-  wordsContainer: {
+  cardsContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 8,
   },
-  wordChip: {
+  cardChip: {
     backgroundColor: colors.primary,
     marginBottom: 4,
   },
@@ -560,4 +560,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CreateBatteryScreen; 
+export default CreateDeckScreen; 

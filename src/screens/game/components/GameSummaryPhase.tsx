@@ -1,19 +1,19 @@
 import React from "react";
 import { View, StyleSheet } from "react-native";
 import { Text, Card, Chip, List } from "react-native-paper";
-import { Bateria } from "../../../database/database";
+import { Mazo } from "../../../database/database";
 import { colors } from "../../../theme/theme";
 import { Teams } from "../interfaces/types";
 import ButtonPrimaryAction from "./ButtonPrimaryAction";
 
 interface GameSummaryPhaseProps {
-  selectedBattery: Bateria | null;
+  selectedDeck: Mazo | null;
   teams: Teams;
   onStartGame: () => void;
 }
 
 const GameSummaryPhase: React.FC<GameSummaryPhaseProps> = ({
-  selectedBattery,
+  selectedDeck,
   teams,
   onStartGame,
 }) => {
@@ -27,16 +27,16 @@ const GameSummaryPhase: React.FC<GameSummaryPhaseProps> = ({
         icon="play"
       />
 
-      {/* Selected Battery */}
+      {/* Selected Deck */}
       <Card style={styles.summaryCard}>
         <Card.Content style={{ width: "100%" }}>
-          <Text style={styles.summaryTitle}>Batería Seleccionada</Text>
+          <Text style={styles.summaryTitle}>Mazo Seleccionado</Text>
           <Chip
             icon="cards"
-            style={styles.selectedBatteryChip}
+            style={styles.selectedDeckChip}
             textStyle={{ color: colors.textLight }}
           >
-            {selectedBattery?.nombre}
+            {selectedDeck?.nombre}
           </Chip>
         </Card.Content>
       </Card>
@@ -130,7 +130,7 @@ const styles = StyleSheet.create({
     color: colors.text,
     marginBottom: 10,
   },
-  selectedBatteryChip: {
+  selectedDeckChip: {
     backgroundColor: colors.success,
     alignSelf: "flex-start",
   },

@@ -8,31 +8,35 @@ import {
   IconButton,
   Divider,
   Chip,
+  Surface,
+  Icon,
 } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { router } from "expo-router";
+import { router, useRouter } from "expo-router";
 
-import { database, Bateria } from "../database/database";
+import { database, Mazo } from "../database/database";
 import { useGameStore } from "../store/game-store";
 import { colors } from "../theme/theme";
 
-const HomeScreen: React.FC = () => {
-  const { setBatteries, batteries } = useGameStore();
+export const HomeScreen: React.FC = () => {
+  const { setDecks, decks } = useGameStore();
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [hasOngoingGame, setHasOngoingGame] = useState(false);
 
   useEffect(() => {
-    loadBatteries();
+    loadDecks();
     checkOngoingGame();
   }, []);
 
-  const loadBatteries = async () => {
+  const loadDecks = async () => {
     try {
-      const batteriesData = await database.getBaterias();
-      setBatteries(batteriesData);
+      setLoading(true);
+      const decksData = await database.getMazos();
+      setDecks(decksData);
     } catch (error) {
-      console.error("Error loading batteries:", error);
-      Alert.alert("Error", "No se pudieron cargar las baterías");
+      console.error("Error loading decks:", error);
+      Alert.alert("Error", "No se pudieron cargar los mazos");
     } finally {
       setLoading(false);
     }
@@ -47,10 +51,10 @@ const HomeScreen: React.FC = () => {
     }
   };
 
-  const handleDeleteBattery = async (battery: Bateria) => {
+  const handleDeleteDeck = async (deck: Mazo) => {
     Alert.alert(
-      "Eliminar Batería",
-      `¿Estás seguro de que quieres eliminar "${battery.nombre}"?`,
+      "Eliminar Mazo",
+      `¿Estás seguro de que quieres eliminar "${deck.nombre}"?`,
       [
         { text: "Cancelar", style: "cancel" },
         {
@@ -58,11 +62,11 @@ const HomeScreen: React.FC = () => {
           style: "destructive",
           onPress: async () => {
             try {
-              await database.deleteBateria(battery.id);
-              loadBatteries();
+              await database.deleteMazo(deck.id);
+              await loadDecks();
             } catch (error) {
-              console.error("Error deleting battery:", error);
-              Alert.alert("Error", "No se pudo eliminar la batería");
+              console.error("Error deleting deck:", error);
+              Alert.alert("Error", "No se pudo eliminar el mazo");
             }
           },
         },
@@ -71,10 +75,10 @@ const HomeScreen: React.FC = () => {
   };
 
   const handleNewGame = () => {
-    if (batteries.length === 0) {
+    if (decks.length === 0) {
       Alert.alert(
-        "Sin baterías",
-        "Necesitas crear al menos una batería de palabras para jugar",
+        "Sin mazos",
+        "Necesitas crear al menos un mazo de cartas para jugar",
         [{ text: "OK" }]
       );
       return;
@@ -86,6 +90,28 @@ const HomeScreen: React.FC = () => {
     // TODO: Load ongoing game state and navigate to appropriate screen
     Alert.alert("Continuar Partida", "Funcionalidad en desarrollo");
   };
+
+  if (decks.length === 0) {
+    return (
+      <ScrollView style={styles.container} contentContainerStyle={styles.emptyContainer}>
+        <Surface style={styles.emptyCard} elevation={2}>
+          <Icon source="cards-outline" size={80} />
+          <Text style={styles.emptyTitle}>Sin mazos</Text>
+          <Text style={styles.emptyDescription}>
+            Necesitas crear al menos un mazo de cartas para jugar
+          </Text>
+          <Button
+            mode="contained"
+            onPress={() => router.push("/create-deck")}
+            style={styles.createButton}
+            icon="plus"
+          >
+            CREAR CARTAS
+          </Button>
+        </Surface>
+      </ScrollView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -126,13 +152,13 @@ const HomeScreen: React.FC = () => {
         <View style={styles.actionButtons}>
           <Button
             mode="contained"
-            onPress={() => router.push("/create-battery")}
+            onPress={() => router.push("/create-deck")}
             style={[styles.actionButton, { backgroundColor: colors.tertiary }]}
             contentStyle={styles.actionButtonContent}
             labelStyle={styles.actionButtonLabel}
             icon="cards"
           >
-            CREAR PALABRAS
+            CREAR CARTAS
           </Button>
 
           <Button
@@ -235,6 +261,31 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: colors.textLight,
   },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  emptyCard: {
+    padding: 20,
+    borderRadius: 10,
+    backgroundColor: colors.background,
+    alignItems: "center",
+  },
+  emptyTitle: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: colors.textLight,
+    marginBottom: 10,
+  },
+  emptyDescription: {
+    fontSize: 16,
+    color: colors.textLight,
+    textAlign: "center",
+  },
+  createButton: {
+    backgroundColor: colors.primary,
+    borderRadius: 25,
+  },
 });
 
-export default HomeScreen;

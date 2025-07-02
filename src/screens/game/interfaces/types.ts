@@ -5,6 +5,6 @@ export interface Teams {
   rojo: { players: Player[] };
 }
 
-export type GamePhase = "battery" | "teams" | "summary";
+export type GamePhase = "deck" | "teams" | "summary";
 
 export type TeamColor = "azul" | "rojo"; 

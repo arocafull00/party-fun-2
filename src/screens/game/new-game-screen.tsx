@@ -3,11 +3,11 @@ import { View, StyleSheet, ScrollView, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 
-import { database, Bateria } from "../../database/database";
+import { database, Mazo } from "../../database/database";
 import { useGameStore, Player } from "../../store/game-store";
 import { colors } from "../../theme/theme";
 import {
-  BatterySelectionPhase,
+  DeckSelectionPhase,
   TeamConfigurationPhase,
   GameSummaryPhase,
   NewGameHeader,
@@ -16,11 +16,11 @@ import { GamePhase, TeamColor } from "./interfaces/types";
 
 const NewGameScreen: React.FC = () => {
   const {
-    batteries,
-    setBatteries,
-    selectedBattery,
-    setSelectedBattery,
-    setWords,
+    decks,
+    setDecks,
+    selectedDeck,
+    setSelectedDeck,
+    setCards,
     teams,
     addPlayerToTeam,
     removePlayerFromTeam,
@@ -30,13 +30,13 @@ const NewGameScreen: React.FC = () => {
     startGame,
   } = useGameStore();
 
-  const [currentPhase, setCurrentPhase] = useState<GamePhase>("battery");
+  const [currentPhase, setCurrentPhase] = useState<GamePhase>("deck");
   const [newPlayerName, setNewPlayerName] = useState("");
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const initializeScreen = async () => {
-      await loadBatteries();
+      await loadDecks();
       
       // Only clear teams if there are players configured, otherwise try to load last game players
       const hasPlayers = teams.azul.players.length > 0 || teams.rojo.players.length > 0;
@@ -48,12 +48,12 @@ const NewGameScreen: React.FC = () => {
     initializeScreen();
   }, []);
 
-  const loadBatteries = async () => {
+  const loadDecks = async () => {
     try {
-      const batteriesData = await database.getBaterias();
-      setBatteries(batteriesData);
+      const decksData = await database.getMazos();
+      setDecks(decksData);
     } catch (error) {
-      console.error("Error loading batteries:", error);
+      console.error("Error loading decks:", error);
     }
   };
 
@@ -102,15 +102,15 @@ const NewGameScreen: React.FC = () => {
     );
   };
 
-  const handleSelectBattery = async (battery: Bateria) => {
-    setSelectedBattery(battery);
+  const handleSelectDeck = async (deck: Mazo) => {
+    setSelectedDeck(deck);
 
     try {
-      const words = await database.getPalabrasByBateria(battery.id);
-      setWords(words);
+      const cards = await database.getCartasByMazo(deck.id);
+      setCards(cards);
       setCurrentPhase("teams");
     } catch (error) {
-      console.error("Error loading words:", error);
+      console.error("Error loading cards:", error);
     }
   };
 
@@ -176,11 +176,11 @@ const NewGameScreen: React.FC = () => {
   };
 
   const handleStartGame = () => {
-    if (!selectedBattery) return;
+    if (!selectedDeck) return;
 
     try {
-      const wordsList = useGameStore.getState().words.map((w) => w.texto);
-      startGame(wordsList);
+      const cardsList = useGameStore.getState().cards.map((c) => c.texto);
+      startGame(cardsList);
       router.push("/game-turn");
     } catch (error) {
       console.error("Error starting game:", error);
@@ -189,10 +189,10 @@ const NewGameScreen: React.FC = () => {
   };
 
   const handleBackPress = () => {
-    if (currentPhase === "battery") {
-      navigation.goBack();
+    if (currentPhase === "deck") {
+      router.back();
     } else if (currentPhase === "teams") {
-      setCurrentPhase("battery");
+      setCurrentPhase("deck");
     } else if (currentPhase === "summary") {
       setCurrentPhase("teams");
     }
@@ -200,8 +200,8 @@ const NewGameScreen: React.FC = () => {
 
   const getPhaseTitle = () => {
     switch (currentPhase) {
-      case "battery":
-        return "Seleccionar Batería";
+      case "deck":
+        return "Seleccionar Mazo";
       case "teams":
         return "Configurar Equipos";
       case "summary":
@@ -213,11 +213,11 @@ const NewGameScreen: React.FC = () => {
 
   const renderCurrentPhase = () => {
     switch (currentPhase) {
-      case "battery":
+      case "deck":
         return (
-          <BatterySelectionPhase
-            batteries={batteries}
-            onSelectBattery={handleSelectBattery}
+          <DeckSelectionPhase
+            decks={decks}
+            onSelectDeck={handleSelectDeck}
           />
         );
       case "teams":
@@ -238,16 +238,16 @@ const NewGameScreen: React.FC = () => {
       case "summary":
         return (
           <GameSummaryPhase
-            selectedBattery={selectedBattery}
+            selectedDeck={selectedDeck}
             teams={teams}
             onStartGame={handleStartGame}
           />
         );
       default:
         return (
-          <BatterySelectionPhase
-            batteries={batteries}
-            onSelectBattery={handleSelectBattery}
+          <DeckSelectionPhase
+            decks={decks}
+            onSelectDeck={handleSelectDeck}
           />
         );
     }

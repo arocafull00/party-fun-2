@@ -73,7 +73,7 @@ export default function RootLayout() {
           }}
         >
           <Stack.Screen name="index" options={{ title: "PartyFun" }} />
-          <Stack.Screen name="create-battery" options={{ title: "Crear Batería" }} />
+          <Stack.Screen name="create-deck" options={{ title: "Crear Mazo" }} />
           <Stack.Screen name="new-game" options={{ title: "Nueva Partida" }} />
           <Stack.Screen 
             name="game-turn" 

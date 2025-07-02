@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { Bateria, Palabra, database } from "../database/database";
+import { Mazo, Carta, database } from "../database/database";
 
 export interface Player {
   id: string;
@@ -18,8 +18,8 @@ export interface Teams {
 
 export interface RoundHistory {
   roundNumber: number;
-  correctWords: string[];
-  incorrectWords: string[];
+  correctCards: string[];
+  incorrectCards: string[];
   teamScores: {
     azul: number;
     rojo: number;
@@ -27,10 +27,10 @@ export interface RoundHistory {
 }
 
 export interface GameState {
-  // Battery management
-  selectedBattery: Bateria | null;
-  batteries: Bateria[];
-  words: Palabra[];
+  // Deck management
+  selectedDeck: Mazo | null;
+  decks: Mazo[];
+  cards: Carta[];
 
   // Game state
   gameStarted: boolean;
@@ -42,20 +42,20 @@ export interface GameState {
   // Turn management
   timer: number;
   isTimerRunning: boolean;
-  currentWordIndex: number;
-  roundWords: string[];
+  currentCardIndex: number;
+  roundCards: string[];
 
   // Game history
   gameHistory: RoundHistory[];
-  currentRoundWords: {
+  currentRoundCards: {
     correct: string[];
     incorrect: string[];
   };
 
   // Actions
-  setBatteries: (batteries: Bateria[]) => void;
-  setSelectedBattery: (battery: Bateria | null) => void;
-  setWords: (words: Palabra[]) => void;
+  setDecks: (decks: Mazo[]) => void;
+  setSelectedDeck: (deck: Mazo | null) => void;
+  setCards: (cards: Carta[]) => void;
 
   // Team management
   addPlayerToTeam: (team: "azul" | "rojo", player: Player) => void;
@@ -70,12 +70,12 @@ export interface GameState {
   saveCurrentTeamsToDatabase: () => Promise<void>;
 
   // Game flow
-  startGame: (wordsList: string[]) => void;
+  startGame: (cardsList: string[]) => void;
   startTimer: () => void;
   stopTimer: () => void;
   resetTimer: () => void;
-  markWordCorrect: (word: string) => void;
-  markWordIncorrect: (word: string) => void;
+  markCardCorrect: (card: string) => void;
+  markCardIncorrect: (card: string) => void;
   nextTurn: () => boolean;
   endRound: () => void;
   endGame: () => void;
@@ -86,9 +86,9 @@ const TURN_TIME = 30; // 30 seconds per turn
 
 export const useGameStore = create<GameState>((set, get) => ({
   // Initial state
-  selectedBattery: null,
-  batteries: [],
-  words: [],
+  selectedDeck: null,
+  decks: [],
+  cards: [],
 
   // Game state
   gameStarted: false,
@@ -103,20 +103,20 @@ export const useGameStore = create<GameState>((set, get) => ({
   // Turn management
   timer: TURN_TIME,
   isTimerRunning: false,
-  currentWordIndex: 0,
-  roundWords: [],
+  currentCardIndex: 0,
+  roundCards: [],
 
   // Game history
   gameHistory: [],
-  currentRoundWords: {
+  currentRoundCards: {
     correct: [],
     incorrect: [],
   },
 
   // Actions
-  setBatteries: (batteries) => set({ batteries }),
-  setSelectedBattery: (battery) => set({ selectedBattery: battery }),
-  setWords: (words) => set({ words }),
+  setDecks: (decks) => set({ decks }),
+  setSelectedDeck: (deck) => set({ selectedDeck: deck }),
+  setCards: (cards) => set({ cards }),
 
   // Team management
   addPlayerToTeam: (team, player) => {
@@ -233,7 +233,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   },
 
   // Game flow
-  startGame: (wordsList: string[]) => {
+  startGame: (cardsList: string[]) => {
     // Save current teams to database before starting the game
     const currentState = get();
     if (currentState.teams.azul.players.length > 0 || currentState.teams.rojo.players.length > 0) {
@@ -242,8 +242,8 @@ export const useGameStore = create<GameState>((set, get) => ({
       });
     }
 
-    // Shuffle words for the game
-    const shuffledWords = [...wordsList].sort(() => Math.random() - 0.5);
+    // Shuffle cards for the game
+    const shuffledCards = [...cardsList].sort(() => Math.random() - 0.5);
 
     set({
       gameStarted: true,
@@ -252,16 +252,16 @@ export const useGameStore = create<GameState>((set, get) => ({
       currentPlayerIndex: 0,
       timer: TURN_TIME,
       isTimerRunning: false,
-      currentWordIndex: 0,
-      roundWords: shuffledWords,
+      currentCardIndex: 0,
+      roundCards: shuffledCards,
       gameHistory: [],
-      currentRoundWords: { correct: [], incorrect: [] },
+      currentRoundCards: { correct: [], incorrect: [] },
       teams: {
         azul: { ...get().teams.azul, score: 0 },
         rojo: { ...get().teams.rojo, score: 0 },
       },
-      selectedBattery: null,
-      words: [],
+      selectedDeck: null,
+      cards: [],
     });
   },
 
@@ -280,14 +280,14 @@ export const useGameStore = create<GameState>((set, get) => ({
       timer: TURN_TIME,
     }),
 
-  markWordCorrect: (word: string) => {
+  markCardCorrect: (card: string) => {
     const state = get();
-    const newCorrect = [...state.currentRoundWords.correct, word];
+    const newCorrect = [...state.currentRoundCards.correct, card];
     const newTeamScore = state.teams[state.currentTeam].score + 1;
 
     set({
-      currentRoundWords: {
-        ...state.currentRoundWords,
+      currentRoundCards: {
+        ...state.currentRoundCards,
         correct: newCorrect,
       },
       teams: {
@@ -300,13 +300,13 @@ export const useGameStore = create<GameState>((set, get) => ({
     });
   },
 
-  markWordIncorrect: (word: string) => {
+  markCardIncorrect: (card: string) => {
     const state = get();
-    const newIncorrect = [...state.currentRoundWords.incorrect, word];
+    const newIncorrect = [...state.currentRoundCards.incorrect, card];
 
     set({
-      currentRoundWords: {
-        ...state.currentRoundWords,
+      currentRoundCards: {
+        ...state.currentRoundCards,
         incorrect: newIncorrect,
       },
     });
@@ -346,8 +346,8 @@ export const useGameStore = create<GameState>((set, get) => ({
     const state = get();
     const roundHistory: RoundHistory = {
       roundNumber: state.currentRound,
-      correctWords: state.currentRoundWords.correct,
-      incorrectWords: state.currentRoundWords.incorrect,
+      correctCards: state.currentRoundCards.correct,
+      incorrectCards: state.currentRoundCards.incorrect,
       teamScores: {
         azul: state.teams.azul.score,
         rojo: state.teams.rojo.score,
@@ -362,12 +362,12 @@ export const useGameStore = create<GameState>((set, get) => ({
       currentRound: nextRound,
       currentTeam: "azul",
       currentPlayerIndex: 0,
-      currentWordIndex: 0,
+      currentCardIndex: 0,
       timer: TURN_TIME,
       isTimerRunning: false,
-      currentRoundWords: { correct: [], incorrect: [] },
-      // Reset round words (same words, different order)
-      roundWords: [...state.roundWords].sort(() => Math.random() - 0.5),
+      currentRoundCards: { correct: [], incorrect: [] },
+      // Reset round cards (same cards, different order)
+      roundCards: [...state.roundCards].sort(() => Math.random() - 0.5),
     });
   },
 
@@ -388,16 +388,16 @@ export const useGameStore = create<GameState>((set, get) => ({
       currentPlayerIndex: 0,
       timer: TURN_TIME,
       isTimerRunning: false,
-      currentWordIndex: 0,
-      roundWords: [],
+      currentCardIndex: 0,
+      roundCards: [],
       gameHistory: [],
-      currentRoundWords: { correct: [], incorrect: [] },
+      currentRoundCards: { correct: [], incorrect: [] },
       teams: {
         azul: { players: [], score: 0 },
         rojo: { players: [], score: 0 },
       },
-      selectedBattery: null,
-      words: [],
+      selectedDeck: null,
+      cards: [],
     });
   },
 }));

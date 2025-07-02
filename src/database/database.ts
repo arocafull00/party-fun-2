@@ -3,8 +3,8 @@ import { db, runMigrations } from './connection';
 import * as schema from './schema';
 
 import type {
-  Bateria,
-  Palabra,
+  Mazo,
+  Carta,
   NewJugador,
   Partida,
   NewPartida,
@@ -38,11 +38,11 @@ class DatabaseManager {
     try {
       console.log('Checking for default data...');
       
-      // Check if we have any baterias
-      const bateriasCount = await db.select({ count: count() }).from(schema.baterias);
+      // Check if we have any mazos
+      const mazosCount = await db.select({ count: count() }).from(schema.mazos);
       
-      if (bateriasCount[0].count === 0) {
-        console.log('No baterias found, database is ready for first use');
+      if (mazosCount[0].count === 0) {
+        console.log('No mazos found, database is ready for first use');
       }
 
       // Load last game players
@@ -71,80 +71,80 @@ class DatabaseManager {
     }
   }
 
-  // Bateria methods
-  async createBateria(nombre: string): Promise<number> {
+  // Mazo methods
+  async createMazo(nombre: string): Promise<number> {
     this.ensureInitialized();
     
     try {
-      const result = await db.insert(schema.baterias).values({ nombre }).returning({ id: schema.baterias.id });
+      const result = await db.insert(schema.mazos).values({ nombre }).returning({ id: schema.mazos.id });
       return result[0].id;
     } catch (error) {
-      console.error('Error creating bateria:', error);
+      console.error('Error creating mazo:', error);
       throw error;
     }
   }
 
-  async getBaterias(): Promise<Bateria[]> {
+  async getMazos(): Promise<Mazo[]> {
     this.ensureInitialized();
     
     try {
-      const result = await db.select().from(schema.baterias).orderBy(schema.baterias.nombre);
+      const result = await db.select().from(schema.mazos).orderBy(schema.mazos.nombre);
       return result;
     } catch (error) {
-      console.error('Error getting baterias:', error);
+      console.error('Error getting mazos:', error);
       throw error;
     }
   }
 
-  async deleteBateria(id: number): Promise<void> {
+  async deleteMazo(id: number): Promise<void> {
     this.ensureInitialized();
     
     try {
-      await db.delete(schema.baterias).where(eq(schema.baterias.id, id));
+      await db.delete(schema.mazos).where(eq(schema.mazos.id, id));
     } catch (error) {
-      console.error('Error deleting bateria:', error);
+      console.error('Error deleting mazo:', error);
       throw error;
     }
   }
 
-  // Palabra methods
-  async addPalabra(bateria_id: number, texto: string): Promise<number> {
+  // Carta methods
+  async addCarta(mazo_id: number, texto: string): Promise<number> {
     this.ensureInitialized();
     
     try {
-      const result = await db.insert(schema.palabras).values({ 
-        bateriaId: bateria_id, 
+      const result = await db.insert(schema.cartas).values({ 
+        mazoId: mazo_id, 
         texto 
-      }).returning({ id: schema.palabras.id });
+      }).returning({ id: schema.cartas.id });
       return result[0].id;
     } catch (error) {
-      console.error('Error adding palabra:', error);
+      console.error('Error adding carta:', error);
       throw error;
     }
   }
 
-  async getPalabrasByBateria(bateria_id: number): Promise<Palabra[]> {
+  async getCartasByMazo(mazo_id: number): Promise<Carta[]> {
     this.ensureInitialized();
     
     try {
       const result = await db.select()
-        .from(schema.palabras)
-        .where(eq(schema.palabras.bateriaId, bateria_id))
-        .orderBy(schema.palabras.texto);
+        .from(schema.cartas)
+        .where(eq(schema.cartas.mazoId, mazo_id))
+        .orderBy(schema.cartas.texto);
       return result;
     } catch (error) {
-      console.error('Error getting palabras by bateria:', error);
+      console.error('Error getting cartas by mazo:', error);
       throw error;
     }
   }
 
-  async deletePalabra(id: number): Promise<void> {
+  async deleteCarta(id: number): Promise<void> {
     this.ensureInitialized();
     
     try {
-      await db.delete(schema.palabras).where(eq(schema.palabras.id, id));
+      await db.delete(schema.cartas).where(eq(schema.cartas.id, id));
     } catch (error) {
-      console.error('Error deleting palabra:', error);
+      console.error('Error deleting carta:', error);
       throw error;
     }
   }
@@ -214,12 +214,12 @@ class DatabaseManager {
   // Create a new game/partida
   async createPartida(gameData: {
     fecha: string;
-    bateriaId: number;
+    mazoId: number;
     equipoGanador: 'azul' | 'rojo' | null;
     puntuacionAzul: number;
     puntuacionRojo: number;
-    totalPalabras: number;
-    palabrasCorrectas: number;
+    totalCartas: number;
+    cartasCorrectas: number;
     precision: number;
   }): Promise<number> {
     this.ensureInitialized();
@@ -268,7 +268,7 @@ class DatabaseManager {
   // Get game statistics
   async getGameStatistics(): Promise<{
     totalGames: number;
-    totalWords: number;
+    totalCards: number;
     averageAccuracy: number;
     gamesWonByBlue: number;
     gamesWonByRed: number;
@@ -279,7 +279,7 @@ class DatabaseManager {
     try {
       const stats = await db.select({
         totalGames: count(),
-        totalWords: sum(schema.partidas.totalPalabras),
+        totalCards: sum(schema.partidas.totalCartas),
         averageAccuracy: avg(schema.partidas.precision),
         gamesWonByBlue: sum(sql`CASE WHEN ${schema.partidas.equipoGanador} = 'azul' THEN 1 ELSE 0 END`),
         gamesWonByRed: sum(sql`CASE WHEN ${schema.partidas.equipoGanador} = 'rojo' THEN 1 ELSE 0 END`),
@@ -289,7 +289,7 @@ class DatabaseManager {
       const result = stats[0];
       return {
         totalGames: Number(result.totalGames) || 0,
-        totalWords: Number(result.totalWords) || 0,
+        totalCards: Number(result.totalCards) || 0,
         averageAccuracy: Math.round(Number(result.averageAccuracy) || 0),
         gamesWonByBlue: Number(result.gamesWonByBlue) || 0,
         gamesWonByRed: Number(result.gamesWonByRed) || 0,
@@ -305,12 +305,12 @@ class DatabaseManager {
   async getRecentGames(limit: number = 10): Promise<Array<{
     id: number;
     fecha: string;
-    bateria_nombre: string;
+    mazo_nombre: string;
     equipo_ganador: string | null;
     puntuacion_azul: number;
     puntuacion_rojo: number;
-    total_palabras: number;
-    palabras_correctas: number;
+    total_cartas: number;
+    cartas_correctas: number;
     precision: number;
   }>> {
     this.ensureInitialized();
@@ -319,22 +319,22 @@ class DatabaseManager {
       const result = await db.select({
         id: schema.partidas.id,
         fecha: schema.partidas.fecha,
-        bateria_nombre: schema.baterias.nombre,
+        mazo_nombre: schema.mazos.nombre,
         equipo_ganador: schema.partidas.equipoGanador,
         puntuacion_azul: schema.partidas.puntuacionAzul,
         puntuacion_rojo: schema.partidas.puntuacionRojo,
-        total_palabras: schema.partidas.totalPalabras,
-        palabras_correctas: schema.partidas.palabrasCorrectas,
+        total_cartas: schema.partidas.totalCartas,
+        cartas_correctas: schema.partidas.cartasCorrectas,
         precision: schema.partidas.precision,
       })
       .from(schema.partidas)
-      .leftJoin(schema.baterias, eq(schema.partidas.bateriaId, schema.baterias.id))
+      .leftJoin(schema.mazos, eq(schema.partidas.mazoId, schema.mazos.id))
       .orderBy(desc(schema.partidas.fecha))
       .limit(limit);
       
       return result.map(row => ({
         ...row,
-        bateria_nombre: row.bateria_nombre || 'Unknown',
+        mazo_nombre: row.mazo_nombre || 'Unknown',
       }));
     } catch (error) {
       console.error('Error getting recent games:', error);
@@ -482,8 +482,8 @@ export const database = new DatabaseManager();
 
 // Export types for backward compatibility
 export type {
-  Bateria,
-  Palabra,
+  Mazo,
+  Carta,
   Jugador,
   Partida,
   PartidaJugador,
