@@ -159,22 +159,19 @@ const CreateDeckScreen: React.FC = () => {
                 </Text>
               </View>
             ) : (
-              <View style={styles.cardsGrid}>
-                {cards.map((card, index) => (
-                  <View key={index} style={styles.cardContainer}>
-                    <Surface style={styles.cardSurface} elevation={2}>
-                      <Text style={styles.cardText}>{card}</Text>
-                      <IconButton
-                        icon="close"
-                        size={16}
-                        iconColor={colors.error}
-                        style={styles.removeButton}
-                        onPress={() => handleRemoveCard(index)}
-                      />
-                    </Surface>
-                  </View>
-                ))}
-              </View>
+                             <View style={styles.cardsGrid}>
+                 {cards.map((card, index) => (
+                   <Chip 
+                     key={index}
+                     style={styles.cardChip}
+                     textStyle={styles.cardChipText}
+                     onClose={() => handleRemoveCard(index)}
+                     closeIcon="delete"
+                   >
+                     {card}
+                   </Chip>
+                 ))}
+               </View>
             )}
           </ScrollView>
         </View>
@@ -360,42 +357,20 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 22,
   },
-  cardsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 12,
-    justifyContent: 'flex-start',
-  },
-  cardContainer: {
-    minWidth: '45%',
-    maxWidth: '48%',
-    marginBottom: 8,
-  },
-  cardSurface: {
-    backgroundColor: '#FFA726',
-    borderRadius: 12,
-    padding: 16,
-    minHeight: 60,
-    position: 'relative',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  cardText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
-    textAlign: 'center',
-    paddingRight: 20,
-  },
-  removeButton: {
-    position: 'absolute',
-    top: -8,
-    right: -8,
-    backgroundColor: colors.surface,
-    margin: 0,
-    width: 24,
-    height: 24,
-  },
+     cardsGrid: {
+     flexDirection: 'row',
+     flexWrap: 'wrap',
+     gap: 8,
+     justifyContent: 'flex-start',
+   },
+   cardChip: {
+     backgroundColor: '#E3F2FD',
+     marginBottom: 4,
+   },
+   cardChipText: {
+     color: colors.primary,
+     fontWeight: '500',
+   },
   bottomSection: {
     backgroundColor: 'rgba(0, 0, 0, 0.3)',
     paddingHorizontal: 20,
