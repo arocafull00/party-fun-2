@@ -4,14 +4,13 @@ import {
   Text, 
   TextInput, 
   Button, 
-  Card, 
   Chip,
-  Divider,
   HelperText,
-  ProgressBar,
   FAB,
   IconButton,
-  Surface
+  Surface,
+  Modal,
+  Portal
 } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
@@ -23,26 +22,13 @@ const { width: screenWidth } = Dimensions.get('window');
 const isTablet = screenWidth > 600;
 
 const CreateDeckScreen: React.FC = () => {
-  const [deckName, setDeckName] = useState('');
   const [currentCard, setCurrentCard] = useState('');
   const [cards, setCards] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
-  const [nameError, setNameError] = useState('');
   const [cardError, setCardError] = useState('');
-  const [showCardsList, setShowCardsList] = useState(false);
-
-  const validateDeckName = (name: string): boolean => {
-    if (!name.trim()) {
-      setNameError('El nombre del mazo es obligatorio');
-      return false;
-    }
-    if (name.trim().length < 3) {
-      setNameError('El nombre debe tener al menos 3 caracteres');
-      return false;
-    }
-    setNameError('');
-    return true;
-  };
+  const [showNameModal, setShowNameModal] = useState(false);
+  const [deckName, setDeckName] = useState('');
+  const [nameError, setNameError] = useState('');
 
   const validateCard = (card: string): boolean => {
     if (!card.trim()) {
@@ -57,7 +43,24 @@ const CreateDeckScreen: React.FC = () => {
       setCardError('Esta carta ya existe en la lista');
       return false;
     }
+    if (cards.length >= 30) {
+      setCardError('Has alcanzado el límite máximo de 30 cartas');
+      return false;
+    }
     setCardError('');
+    return true;
+  };
+
+  const validateDeckName = (name: string): boolean => {
+    if (!name.trim()) {
+      setNameError('El nombre del mazo es obligatorio');
+      return false;
+    }
+    if (name.trim().length < 3) {
+      setNameError('El nombre debe tener al menos 3 caracteres');
+      return false;
+    }
+    setNameError('');
     return true;
   };
 
@@ -78,32 +81,19 @@ const CreateDeckScreen: React.FC = () => {
     setCards(newCards);
   };
 
+  const handleSaveRequest = () => {
+    if (cards.length === 0) {
+      Alert.alert('Sin cartas', 'Debes agregar al menos una carta al mazo');
+      return;
+    }
+    setShowNameModal(true);
+  };
+
   const handleSaveDeck = async () => {
     if (!validateDeckName(deckName)) {
       return;
     }
 
-    if (cards.length === 0) {
-      Alert.alert('Sin cartas', 'Debes agregar al menos una carta al mazo');
-      return;
-    }
-
-    if (cards.length < 10) {
-      Alert.alert(
-        'Pocas cartas',
-        `Solo tienes ${cards.length} cartas. Se recomienda tener al menos 30 cartas para una mejor experiencia de juego. ¿Quieres continuar?`,
-        [
-          { text: 'Cancelar', style: 'cancel' },
-          { text: 'Guardar', onPress: saveDeck },
-        ]
-      );
-      return;
-    }
-
-    saveDeck();
-  };
-
-  const saveDeck = async () => {
     setLoading(true);
     try {
       const deckId = await database.createMazo(deckName.trim());
@@ -113,6 +103,7 @@ const CreateDeckScreen: React.FC = () => {
         await database.addCarta(deckId, card);
       }
 
+      setShowNameModal(false);
       Alert.alert(
         'Mazo creado',
         `Se ha creado el mazo "${deckName}" con ${cards.length} cartas`,
@@ -126,203 +117,179 @@ const CreateDeckScreen: React.FC = () => {
     }
   };
 
-  const getProgressValue = () => {
-    const maxRecommended = 50;
-    return Math.min(cards.length / maxRecommended, 1);
+  const handleCloseModal = () => {
+    setShowNameModal(false);
+    setDeckName('');
+    setNameError('');
   };
-
-  const getProgressColor = () => {
-    if (cards.length < 10) return colors.error;
-    if (cards.length < 30) return colors.warning;
-    return colors.success;
-  };
-
-  const getStatusInfo = () => {
-    if (cards.length === 0) return { text: 'Comienza agregando cartas', icon: 'plus-circle-outline' };
-    if (cards.length < 10) return { text: 'Necesitas más cartas', icon: 'alert-circle-outline' };
-    if (cards.length < 30) return { text: 'Buen progreso', icon: 'check-circle-outline' };
-    return { text: '¡Excelente mazo!', icon: 'star-circle' };
-  };
-
-  const statusInfo = getStatusInfo();
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.backgroundView}>
-        <KeyboardAvoidingView 
-          style={styles.keyboardView}
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        >
-          {/* Header Section */}
-          <View style={styles.header}>
-            <Text style={styles.headerTitle}>Crear Nuevo Mazo</Text>
-            <Text style={styles.headerSubtitle}>
-              Crea tu propia colección de cartas para jugar
-            </Text>
-          </View>
+        {/* Header Section */}
+        <View style={styles.header}>
+          <IconButton
+            icon="close"
+            size={24}
+            iconColor={colors.textLight}
+            style={styles.closeButton}
+            onPress={() => router.back()}
+          />
+          <Text style={styles.headerTitle}>CREACIÓN DE MAZO</Text>
+        </View>
 
+        {/* Main Cards Area */}
+        <View style={styles.mainArea}>
           <ScrollView 
-            style={styles.content} 
+            style={styles.cardsScrollView}
+            contentContainerStyle={styles.cardsContainer}
             showsVerticalScrollIndicator={false}
-            contentContainerStyle={styles.scrollContent}
           >
-            {/* Progress Card */}
-            <Surface style={styles.progressCard} elevation={3}>
-              <View style={styles.progressHeader}>
-                <View style={styles.progressInfo}>
-                  <Text style={styles.progressTitle}>Progreso del Mazo</Text>
-                  <View style={styles.statusContainer}>
-                    <IconButton 
-                      icon={statusInfo.icon} 
-                      size={24} 
-                      iconColor={getProgressColor()}
-                      style={styles.statusIcon}
-                    />
-                    <Text style={[styles.statusText, { color: getProgressColor() }]}>
-                      {statusInfo.text}
-                    </Text>
+            {cards.length === 0 ? (
+              <View style={styles.emptyState}>
+                <IconButton 
+                  icon="cards-outline" 
+                  size={64} 
+                  iconColor={colors.textLight}
+                  style={styles.emptyIcon}
+                />
+                <Text style={styles.emptyTitle}>Agrega cartas a tu mazo</Text>
+                <Text style={styles.emptySubtitle}>
+                  Usa el campo de abajo para añadir palabras
+                </Text>
+              </View>
+            ) : (
+              <View style={styles.cardsGrid}>
+                {cards.map((card, index) => (
+                  <View key={index} style={styles.cardContainer}>
+                    <Surface style={styles.cardSurface} elevation={2}>
+                      <Text style={styles.cardText}>{card}</Text>
+                      <IconButton
+                        icon="close"
+                        size={16}
+                        iconColor={colors.error}
+                        style={styles.removeButton}
+                        onPress={() => handleRemoveCard(index)}
+                      />
+                    </Surface>
                   </View>
-                </View>
-                <View style={styles.cardsCount}>
-                  <Text style={styles.cardsCountNumber}>{cards.length}</Text>
-                  <Text style={styles.cardsCountLabel}>cartas</Text>
-                </View>
+                ))}
               </View>
-              <ProgressBar 
-                progress={getProgressValue()} 
-                color={getProgressColor()}
-                style={styles.progressBar}
-              />
-              <Text style={styles.progressHelp}>
-                Recomendado: 30-50 cartas para la mejor experiencia
-              </Text>
-            </Surface>
-
-            {/* Deck Name Section */}
-            <Surface style={styles.inputCard} elevation={2}>
-              <Text style={styles.cardTitle}>Nombre del Mazo</Text>
-              <TextInput
-                label="Ej: Animales, Deportes, Comida..."
-                value={deckName}
-                onChangeText={(text) => {
-                  setDeckName(text);
-                  validateDeckName(text);
-                }}
-                mode="outlined"
-                style={styles.nameInput}
-                error={!!nameError}
-                maxLength={50}
-                left={<TextInput.Icon icon="cards" />}
-              />
-              <HelperText type="error" visible={!!nameError}>
-                {nameError}
-              </HelperText>
-            </Surface>
-
-            {/* Add Cards Section */}
-            <Surface style={styles.inputCard} elevation={2}>
-              <Text style={styles.cardTitle}>Agregar Cartas</Text>
-              <View style={styles.addCardContainer}>
-                <TextInput
-                  label="Escribe una carta"
-                  value={currentCard}
-                  onChangeText={(text) => {
-                    setCurrentCard(text);
-                    if (cardError) setCardError('');
-                  }}
-                  mode="outlined"
-                  style={styles.cardInput}
-                  error={!!cardError}
-                  maxLength={30}
-                  onSubmitEditing={handleAddCard}
-                  returnKeyType="done"
-                  left={<TextInput.Icon icon="pencil" />}
-                />
-                <FAB
-                  icon="plus"
-                  size="small"
-                  onPress={handleAddCard}
-                  style={[styles.addFAB, { backgroundColor: colors.success }]}
-                  disabled={!currentCard.trim()}
-                />
-              </View>
-              <HelperText type="error" visible={!!cardError}>
-                {cardError}
-              </HelperText>
-            </Surface>
-
-            {/* Recent Cards Preview */}
-            {cards.length > 0 && (
-              <Surface style={styles.previewCard} elevation={2}>
-                <View style={styles.previewHeader}>
-                  <Text style={styles.cardTitle}>Últimas cartas agregadas</Text>
-                  <Button
-                    mode="text"
-                    onPress={() => setShowCardsList(!showCardsList)}
-                    compact
-                  >
-                    {showCardsList ? 'Ocultar' : `Ver todas (${cards.length})`}
-                  </Button>
-                </View>
-                <View style={styles.previewCardsContainer}>
-                  {cards.slice(-6).reverse().map((card, index) => (
-                    <Chip 
-                      key={`preview-${index}`}
-                      style={styles.previewCardChip}
-                      textStyle={styles.previewCardText}
-                    >
-                      {card}
-                    </Chip>
-                  ))}
-                </View>
-              </Surface>
-            )}
-
-            {/* Full Cards List */}
-            {showCardsList && cards.length > 0 && (
-              <Surface style={styles.cardsListCard} elevation={2}>
-                <View style={styles.cardsListHeader}>
-                  <Text style={styles.cardTitle}>Todas las cartas ({cards.length})</Text>
-                  <IconButton
-                    icon="close"
-                    size={20}
-                    onPress={() => setShowCardsList(false)}
-                  />
-                </View>
-                <Divider style={styles.divider} />
-                <View style={styles.cardsContainer}>
-                  {cards.map((card, index) => (
-                    <Chip 
-                      key={index}
-                      style={styles.cardChip}
-                      onClose={() => handleRemoveCard(index)}
-                      closeIcon="delete"
-                    >
-                      {card}
-                    </Chip>
-                  ))}
-                </View>
-              </Surface>
             )}
           </ScrollView>
+        </View>
 
-          {/* Fixed Save Button */}
-          <View style={styles.saveButtonContainer}>
-            <Button
-              mode="contained"
-              onPress={handleSaveDeck}
-              style={styles.saveButton}
-              contentStyle={styles.saveButtonContent}
-              labelStyle={styles.saveButtonLabel}
-              loading={loading}
-              disabled={loading || !deckName.trim() || cards.length === 0}
-              icon="content-save"
-            >
-              GUARDAR MAZO
-            </Button>
+        {/* Bottom Fixed Section */}
+        <View style={styles.bottomSection}>
+          <View style={styles.inputSection}>
+            <View style={styles.inputContainer}>
+              <TextInput
+                label="Añadir nueva carta"
+                value={currentCard}
+                onChangeText={(text) => {
+                  setCurrentCard(text);
+                  if (cardError) setCardError('');
+                }}
+                mode="outlined"
+                style={styles.cardInput}
+                error={!!cardError}
+                maxLength={30}
+                onSubmitEditing={handleAddCard}
+                returnKeyType="done"
+                theme={{
+                  colors: {
+                    primary: colors.textLight,
+                    onSurface: colors.textLight,
+                    outline: colors.textLight,
+                  }
+                }}
+                textColor={colors.textLight}
+              />
+              <Button
+                mode="contained"
+                onPress={handleAddCard}
+                style={styles.addButton}
+                contentStyle={styles.addButtonContent}
+                disabled={!currentCard.trim() || cards.length >= 30}
+                buttonColor={colors.success}
+              >
+                AÑADIR
+              </Button>
+            </View>
+            {cardError && (
+              <HelperText type="error" style={styles.errorText}>
+                {cardError}
+              </HelperText>
+            )}
           </View>
-        </KeyboardAvoidingView>
+
+          <Button
+            mode="contained"
+            onPress={handleSaveRequest}
+            style={styles.acceptButton}
+            contentStyle={styles.acceptButtonContent}
+            labelStyle={styles.acceptButtonLabel}
+            disabled={cards.length === 0}
+            buttonColor="#007AFF"
+          >
+            ACEPTAR
+          </Button>
+        </View>
       </View>
+
+      {/* Name Modal */}
+      <Portal>
+        <Modal 
+          visible={showNameModal} 
+          onDismiss={handleCloseModal}
+          contentContainerStyle={styles.modalContainer}
+        >
+          <Surface style={styles.modalContent} elevation={5}>
+            <Text style={styles.modalTitle}>Nombra tu mazo</Text>
+            <Text style={styles.modalSubtitle}>
+              Dale un nombre descriptivo a tu mazo de {cards.length} cartas
+            </Text>
+            
+            <TextInput
+              label="Nombre del mazo"
+              value={deckName}
+              onChangeText={(text) => {
+                setDeckName(text);
+                if (nameError) setNameError('');
+              }}
+              mode="outlined"
+              style={styles.modalInput}
+              error={!!nameError}
+              maxLength={50}
+              placeholder="Ej: Animales, Deportes, Comida..."
+              left={<TextInput.Icon icon="cards" />}
+            />
+            <HelperText type="error" visible={!!nameError}>
+              {nameError}
+            </HelperText>
+
+            <View style={styles.modalButtons}>
+              <Button
+                mode="outlined"
+                onPress={handleCloseModal}
+                style={styles.modalButton}
+                disabled={loading}
+              >
+                Cancelar
+              </Button>
+              <Button
+                mode="contained"
+                onPress={handleSaveDeck}
+                style={[styles.modalButton, styles.modalSaveButton]}
+                loading={loading}
+                disabled={loading || !deckName.trim()}
+              >
+                Guardar
+              </Button>
+            </View>
+          </Surface>
+        </Modal>
+      </Portal>
     </SafeAreaView>
   );
 };
@@ -336,116 +303,111 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
-  keyboardView: {
-    flex: 1,
-    maxWidth: isTablet ? 800 : '100%',
-    alignSelf: 'center',
-    width: '100%',
-  },
   header: {
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 15,
+    flexDirection: 'row',
     alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingTop: 10,
+    paddingBottom: 20,
+    position: 'relative',
+  },
+  closeButton: {
+    position: 'absolute',
+    left: 10,
+    top: 5,
+    zIndex: 1,
   },
   headerTitle: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: colors.textLight,
-    textAlign: 'center',
-    marginBottom: 8,
-  },
-  headerSubtitle: {
-    fontSize: 16,
-    color: colors.textLight,
-    textAlign: 'center',
-    opacity: 0.9,
-  },
-  content: {
-    flex: 1,
-    paddingHorizontal: 20,
-  },
-  scrollContent: {
-    paddingBottom: 100,
-  },
-  progressCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 20,
-  },
-  progressHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 16,
-  },
-  progressInfo: {
-    flex: 1,
-  },
-  progressTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: colors.text,
-    marginBottom: 8,
+    color: colors.textLight,
+    textAlign: 'center',
+    flex: 1,
   },
-  statusContainer: {
-    flexDirection: 'row',
+  mainArea: {
+    flex: 1,
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+  },
+  cardsScrollView: {
+    flex: 1,
+  },
+  cardsContainer: {
+    flexGrow: 1,
+    paddingBottom: 20,
+  },
+  emptyState: {
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
+    paddingVertical: 60,
   },
-  statusIcon: {
+  emptyIcon: {
     margin: 0,
-    marginRight: 4,
+    marginBottom: 20,
   },
-  statusText: {
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  cardsCount: {
-    alignItems: 'center',
-    backgroundColor: colors.primary,
-    borderRadius: 20,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    minWidth: 70,
-  },
-  cardsCountNumber: {
+  emptyTitle: {
     fontSize: 24,
     fontWeight: 'bold',
     color: colors.textLight,
-  },
-  cardsCountLabel: {
-    fontSize: 12,
-    color: colors.textLight,
-    opacity: 0.9,
-  },
-  progressBar: {
-    height: 8,
-    borderRadius: 4,
     marginBottom: 12,
-  },
-  progressHelp: {
-    fontSize: 12,
-    color: colors.text,
-    opacity: 0.7,
     textAlign: 'center',
   },
-  inputCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 12,
-    padding: 20,
-    marginBottom: 16,
-  },
-  cardTitle: {
+  emptySubtitle: {
     fontSize: 16,
-    fontWeight: '600',
-    color: colors.text,
-    marginBottom: 12,
+    color: colors.textLight,
+    opacity: 0.8,
+    textAlign: 'center',
+    lineHeight: 22,
   },
-  nameInput: {
-    backgroundColor: 'transparent',
+  cardsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+    justifyContent: 'flex-start',
   },
-  addCardContainer: {
+  cardContainer: {
+    minWidth: '45%',
+    maxWidth: '48%',
+    marginBottom: 8,
+  },
+  cardSurface: {
+    backgroundColor: '#FFA726',
+    borderRadius: 12,
+    padding: 16,
+    minHeight: 60,
+    position: 'relative',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  cardText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+    textAlign: 'center',
+    paddingRight: 20,
+  },
+  removeButton: {
+    position: 'absolute',
+    top: -8,
+    right: -8,
+    backgroundColor: colors.surface,
+    margin: 0,
+    width: 24,
+    height: 24,
+  },
+  bottomSection: {
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    paddingHorizontal: 20,
+    paddingVertical: 20,
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    gap: 16,
+  },
+  inputSection: {
+    flex: 1,
+  },
+  inputContainer: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     gap: 12,
@@ -454,109 +416,71 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'transparent',
   },
-  addFAB: {
+  addButton: {
     marginTop: 8,
+    borderRadius: 20,
   },
-  previewCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 12,
-    padding: 20,
-    marginBottom: 16,
+  addButtonContent: {
+    height: 40,
+    paddingHorizontal: 16,
   },
-  previewHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
+  errorText: {
+    color: colors.error,
+    marginTop: 4,
   },
-  previewCardsContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
+  acceptButton: {
+    borderRadius: 20,
+    minWidth: 120,
   },
-  previewCardChip: {
-    backgroundColor: colors.tertiary,
-  },
-  previewCardText: {
-    color: colors.textLight,
-    fontWeight: '500',
-  },
-  cardsListCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 12,
-    padding: 20,
-    marginBottom: 16,
-  },
-  cardsListHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  divider: {
-    backgroundColor: '#E0E0E0',
-    marginBottom: 16,
-  },
-  cardsContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  cardChip: {
-    backgroundColor: colors.primary,
-    marginBottom: 4,
-  },
-  tipsCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 12,
-    padding: 20,
-    marginBottom: 16,
-    borderLeftWidth: 4,
-    borderLeftColor: colors.warning,
-  },
-  tipsHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  tipsTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.text,
-    marginLeft: 8,
-  },
-  tipsText: {
-    fontSize: 14,
-    color: colors.text,
-    lineHeight: 22,
-    opacity: 0.8,
-  },
-  saveButtonContainer: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: 'transparent',
-    paddingHorizontal: 20,
-    paddingBottom: 20,
-    paddingTop: 10,
-  },
-  saveButton: {
-    backgroundColor: colors.success,
-    borderRadius: 25,
-    elevation: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-  },
-  saveButtonContent: {
+  acceptButtonContent: {
     height: 50,
+    paddingHorizontal: 24,
   },
-  saveButtonLabel: {
+  acceptButtonLabel: {
     fontSize: 16,
     fontWeight: 'bold',
     color: colors.textLight,
+  },
+  modalContainer: {
+    justifyContent: 'center',
+    paddingHorizontal: 20,
+  },
+  modalContent: {
+    backgroundColor: colors.surface,
+    borderRadius: 20,
+    padding: 24,
+    maxWidth: 400,
+    alignSelf: 'center',
+    width: '100%',
+  },
+  modalTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: colors.text,
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  modalSubtitle: {
+    fontSize: 16,
+    color: colors.text,
+    textAlign: 'center',
+    opacity: 0.8,
+    marginBottom: 24,
+  },
+  modalInput: {
+    backgroundColor: 'transparent',
+    marginBottom: 8,
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    gap: 12,
+    marginTop: 16,
+  },
+  modalButton: {
+    flex: 1,
+  },
+  modalSaveButton: {
+    backgroundColor: colors.success,
   },
 });
 
