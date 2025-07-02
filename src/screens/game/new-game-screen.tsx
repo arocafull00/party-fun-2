@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { View, StyleSheet, ScrollView, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useNavigation } from "@react-navigation/native";
-import { StackNavigationProp } from "@react-navigation/stack";
+import { router } from "expo-router";
 
 import { database, Bateria } from "../../database/database";
 import { useGameStore, Player } from "../../store/game-store";
@@ -15,19 +14,7 @@ import {
 } from "./components";
 import { GamePhase, TeamColor } from "./interfaces/types";
 
-type RootStackParamList = {
-  Home: undefined;
-  NewGame: undefined;
-  GameTurn: undefined;
-};
-
-type NewGameScreenNavigationProp = StackNavigationProp<
-  RootStackParamList,
-  "NewGame"
->;
-
 const NewGameScreen: React.FC = () => {
-  const navigation = useNavigation<NewGameScreenNavigationProp>();
   const {
     batteries,
     setBatteries,
@@ -39,6 +26,7 @@ const NewGameScreen: React.FC = () => {
     removePlayerFromTeam,
     movePlayerToTeam,
     clearTeams,
+    loadLastGamePlayers,
     startGame,
   } = useGameStore();
 
@@ -47,8 +35,17 @@ const NewGameScreen: React.FC = () => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    loadBatteries();
-    clearTeams(); // Reset teams when entering new game screen
+    const initializeScreen = async () => {
+      await loadBatteries();
+      
+      // Only clear teams if there are players configured, otherwise try to load last game players
+      const hasPlayers = teams.azul.players.length > 0 || teams.rojo.players.length > 0;
+      if (!hasPlayers) {
+        await loadLastGamePlayersAutomatically();
+      }
+    };
+    
+    initializeScreen();
   }, []);
 
   const loadBatteries = async () => {
@@ -57,8 +54,52 @@ const NewGameScreen: React.FC = () => {
       setBatteries(batteriesData);
     } catch (error) {
       console.error("Error loading batteries:", error);
-      Alert.alert("Error", "No se pudieron cargar las baterías");
     }
+  };
+
+  const loadLastGamePlayersAutomatically = async () => {
+    try {
+      console.log('Attempting to load last game players automatically...');
+      await loadLastGamePlayers();
+      console.log('Successfully loaded last game players automatically');
+    } catch (error) {
+      console.error('Error auto-loading last game players:', error);
+      // Don't show alert for automatic loading, just log the error
+    }
+  };
+
+  const handleLoadLastGamePlayers = async () => {
+    setLoading(true);
+    try {
+      await loadLastGamePlayers();
+      Alert.alert(
+        "Equipos Cargados", 
+        "Se han cargado los jugadores de la última partida"
+      );
+    } catch (error) {
+      console.error("Error loading last game players:", error);
+      Alert.alert(
+        "Error", 
+        "No se pudieron cargar los jugadores de la última partida"
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleClearTeams = () => {
+    Alert.alert(
+      "Limpiar Equipos",
+      "¿Estás seguro de que quieres eliminar todos los jugadores de los equipos?",
+      [
+        { text: "Cancelar", style: "cancel" },
+        { 
+          text: "Limpiar", 
+          style: "destructive",
+          onPress: () => clearTeams()
+        },
+      ]
+    );
   };
 
   const handleSelectBattery = async (battery: Bateria) => {
@@ -70,7 +111,6 @@ const NewGameScreen: React.FC = () => {
       setCurrentPhase("teams");
     } catch (error) {
       console.error("Error loading words:", error);
-      Alert.alert("Error", "No se pudieron cargar las palabras de la batería");
     }
   };
 
@@ -141,7 +181,7 @@ const NewGameScreen: React.FC = () => {
     try {
       const wordsList = useGameStore.getState().words.map((w) => w.texto);
       startGame(wordsList);
-      navigation.navigate("GameTurn");
+      router.push("/game-turn");
     } catch (error) {
       console.error("Error starting game:", error);
       Alert.alert("Error", "No se pudo iniciar el juego");
@@ -190,6 +230,9 @@ const NewGameScreen: React.FC = () => {
             onMovePlayer={handleMovePlayer}
             onRemovePlayer={removePlayerFromTeam}
             onContinue={handleContinueToSummary}
+            onLoadLastGamePlayers={handleLoadLastGamePlayers}
+            onClearTeams={handleClearTeams}
+            loading={loading}
           />
         );
       case "summary":

@@ -14,6 +14,9 @@ interface TeamConfigurationPhaseProps {
   onMovePlayer: (playerId: string, fromTeam: TeamColor) => void;
   onRemovePlayer: (team: TeamColor, playerId: string) => void;
   onContinue: () => void;
+  onLoadLastGamePlayers?: () => Promise<void>;
+  onClearTeams?: () => void;
+  loading?: boolean;
 }
 
 const TeamConfigurationPhase: React.FC<TeamConfigurationPhaseProps> = ({
@@ -24,7 +27,12 @@ const TeamConfigurationPhase: React.FC<TeamConfigurationPhaseProps> = ({
   onMovePlayer,
   onRemovePlayer,
   onContinue,
+  onLoadLastGamePlayers,
+  onClearTeams,
+  loading = false,
 }) => {
+  const hasPlayers = teams.azul.players.length > 0 || teams.rojo.players.length > 0;
+
   return (
     <View style={styles.phaseContainer}>
       <PlayerInput
@@ -32,6 +40,30 @@ const TeamConfigurationPhase: React.FC<TeamConfigurationPhaseProps> = ({
         onPlayerNameChange={onPlayerNameChange}
         onAddPlayer={onAddPlayer}
       />
+      
+      <View style={styles.actionsRow}>
+        {onLoadLastGamePlayers && (
+          <ButtonPrimaryAction
+            title={loading ? "Cargando..." : "Cargar Equipos Previos"}
+            onPress={onLoadLastGamePlayers}
+            variant="primary"
+            size="small"
+            disabled={loading}
+            style={styles.actionButton}
+          />
+        )}
+        
+        {onClearTeams && hasPlayers && (
+          <ButtonPrimaryAction
+            title="Limpiar Equipos"
+            onPress={onClearTeams}
+            variant="primary"
+            size="small"
+            disabled={loading}
+            style={styles.actionButton}
+          />
+        )}
+      </View>
       
       <View style={styles.teamsRow}>
         <TeamCard
@@ -80,6 +112,13 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     gap: 8,
     height: 250,
+  },
+  actionsRow: {
+    flexDirection: "row",
+    gap: 8,
+  },
+  actionButton: {
+    flex: 1,
   },
 });
 

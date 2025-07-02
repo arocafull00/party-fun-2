@@ -14,24 +14,15 @@ import {
   Surface
 } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
+import { router } from 'expo-router';
 
 import { database } from '../database/database';
 import { colors } from '../theme/theme';
-
-type RootStackParamList = {
-  Home: undefined;
-  CreateBattery: undefined;
-};
-
-type CreateBatteryScreenNavigationProp = StackNavigationProp<RootStackParamList, 'CreateBattery'>;
 
 const { width: screenWidth } = Dimensions.get('window');
 const isTablet = screenWidth > 600;
 
 const CreateBatteryScreen: React.FC = () => {
-  const navigation = useNavigation<CreateBatteryScreenNavigationProp>();
   const [batteryName, setBatteryName] = useState('');
   const [currentWord, setCurrentWord] = useState('');
   const [words, setWords] = useState<string[]>([]);
@@ -125,7 +116,7 @@ const CreateBatteryScreen: React.FC = () => {
       Alert.alert(
         'Batería creada',
         `Se ha creado la batería "${batteryName}" con ${words.length} palabras`,
-        [{ text: 'OK', onPress: () => navigation.goBack() }]
+        [{ text: 'OK', onPress: () => router.back() }]
       );
     } catch (error) {
       console.error('Error saving battery:', error);

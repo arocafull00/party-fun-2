@@ -10,24 +10,13 @@ import {
   Chip,
 } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useNavigation } from "@react-navigation/native";
-import { StackNavigationProp } from "@react-navigation/stack";
+import { router } from "expo-router";
 
 import { database, Bateria } from "../database/database";
 import { useGameStore } from "../store/game-store";
 import { colors } from "../theme/theme";
 
-type RootStackParamList = {
-  Home: undefined;
-  CreateBattery: undefined;
-  NewGame: undefined;
-  Statistics: undefined;
-};
-
-type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, "Home">;
-
 const HomeScreen: React.FC = () => {
-  const navigation = useNavigation<HomeScreenNavigationProp>();
   const { setBatteries, batteries } = useGameStore();
   const [loading, setLoading] = useState(true);
   const [hasOngoingGame, setHasOngoingGame] = useState(false);
@@ -90,7 +79,7 @@ const HomeScreen: React.FC = () => {
       );
       return;
     }
-    navigation.navigate("NewGame");
+    router.push("/new-game");
   };
 
   const handleContinueGame = async () => {
@@ -137,7 +126,7 @@ const HomeScreen: React.FC = () => {
         <View style={styles.actionButtons}>
           <Button
             mode="contained"
-            onPress={() => navigation.navigate("CreateBattery")}
+            onPress={() => router.push("/create-battery")}
             style={[styles.actionButton, { backgroundColor: colors.tertiary }]}
             contentStyle={styles.actionButtonContent}
             labelStyle={styles.actionButtonLabel}
@@ -148,7 +137,7 @@ const HomeScreen: React.FC = () => {
 
           <Button
             mode="contained"
-            onPress={() => navigation.navigate("Statistics")}
+            onPress={() => router.push("/statistics")}
             style={[styles.actionButton, { backgroundColor: colors.secondary }]}
             contentStyle={styles.actionButtonContent}
             labelStyle={styles.actionButtonLabel}

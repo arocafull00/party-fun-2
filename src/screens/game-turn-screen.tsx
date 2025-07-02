@@ -10,27 +10,14 @@ import {
   Surface,
 } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useNavigation, useFocusEffect } from "@react-navigation/native";
-import { StackNavigationProp } from "@react-navigation/stack";
+import { router, useFocusEffect } from "expo-router";
 
 import { useGameStore } from "../store/game-store";
 import { colors } from "../theme/theme";
 
-type RootStackParamList = {
-  Home: undefined;
-  NewGame: undefined;
-  GameTurn: undefined;
-  RoundResult: undefined;
-  GameEnd: undefined;
-};
 
-type GameTurnScreenNavigationProp = StackNavigationProp<
-  RootStackParamList,
-  "GameTurn"
->;
 
 const GameTurnScreen: React.FC = () => {
-  const navigation = useNavigation<GameTurnScreenNavigationProp>();
   const {
     currentRound,
     currentTeam,
@@ -133,7 +120,7 @@ const GameTurnScreen: React.FC = () => {
     if (!gameStarted) {
       return;
     }
-  }, [gameStarted, navigation]);
+  }, [gameStarted]);
 
   // Reset game phase when turn changes
   useEffect(() => {
@@ -197,7 +184,7 @@ const GameTurnScreen: React.FC = () => {
           text: "Finalizar Ronda",
           onPress: () => {
             endRound();
-            navigation.navigate("RoundResult");
+            router.push("/round-result");
           },
         },
       ]
@@ -218,10 +205,10 @@ const GameTurnScreen: React.FC = () => {
       if (isLastRound) {
         // End of game
         endGame();
-        navigation.navigate("GameEnd");
+        router.push("/game-end");
       } else {
         // Go to round results
-        navigation.navigate("RoundResult");
+        router.push("/round-result");
       }
     } else {
       // Continue with next turn - phase will reset due to useEffect
@@ -231,7 +218,7 @@ const GameTurnScreen: React.FC = () => {
 
   const handleExitGame = () => {
     setShowExitDialog(false);
-    navigation.navigate("Home");
+    router.push("/");
   };
 
   const formatTime = (seconds: number): string => {
@@ -245,7 +232,7 @@ const GameTurnScreen: React.FC = () => {
           <Text style={styles.errorText}>Error: Juego no iniciado</Text>
           <Button
             mode="contained"
-            onPress={() => navigation.navigate("NewGame")}
+            onPress={() => router.push("/new-game")}
             style={styles.button}
           >
             Volver a Nueva Partida

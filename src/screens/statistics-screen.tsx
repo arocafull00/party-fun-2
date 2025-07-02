@@ -11,7 +11,7 @@ import {
   ActivityIndicator
 } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation } from '@react-navigation/native';
+import { router } from 'expo-router';
 
 import { database } from '../database/database';
 import { colors } from '../theme/theme';
@@ -38,7 +38,6 @@ interface RecentGame {
 }
 
 const StatisticsScreen: React.FC = () => {
-  const navigation = useNavigation();
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [statistics, setStatistics] = useState<GameStatistics>({
@@ -223,7 +222,7 @@ const StatisticsScreen: React.FC = () => {
                 <Text style={styles.emptyText}>No hay partidas registradas</Text>
                 <Button
                   mode="contained"
-                  onPress={() => navigation.navigate('NewGame' as never)}
+                  onPress={() => router.push('/new-game')}
                   style={styles.playButton}
                   icon="play"
                 >
@@ -288,7 +287,7 @@ const StatisticsScreen: React.FC = () => {
               <View style={styles.actionsContainer}>
                 <Button
                   mode="contained"
-                  onPress={() => navigation.navigate('NewGame' as never)}
+                  onPress={() => router.push('/new-game')}
                   style={styles.actionButton}
                   icon="play"
                 >
@@ -297,7 +296,7 @@ const StatisticsScreen: React.FC = () => {
                 
                 <Button
                   mode="outlined"
-                  onPress={() => navigation.navigate('CreateBattery' as never)}
+                  onPress={() => router.push('/create-battery')}
                   style={styles.actionButton}
                   icon="plus"
                 >

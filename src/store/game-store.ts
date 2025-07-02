@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { Bateria, Palabra } from "../database/database";
+import { Bateria, Palabra, database } from "../database/database";
 
 export interface Player {
   id: string;
@@ -66,6 +66,8 @@ export interface GameState {
     toTeam: "azul" | "rojo"
   ) => void;
   clearTeams: () => void;
+  loadLastGamePlayers: () => Promise<void>;
+  saveCurrentTeamsToDatabase: () => Promise<void>;
 
   // Game flow
   startGame: (wordsList: string[]) => void;
@@ -79,12 +81,6 @@ export interface GameState {
   endGame: () => void;
   resetGame: () => void;
 }
-
-const ROUNDS = [
-  { number: 1, name: "Ronda 1", description: "Pista libre (menos sinónimos)" },
-  { number: 2, name: "Ronda 2", description: "Una sola palabra como pista" },
-  { number: 3, name: "Ronda 3", description: "Solo mímica" },
-];
 
 const TURN_TIME = 30; // 30 seconds per turn
 
@@ -123,16 +119,18 @@ export const useGameStore = create<GameState>((set, get) => ({
   setWords: (words) => set({ words }),
 
   // Team management
-  addPlayerToTeam: (team, player) =>
-    set((state) => ({
-      teams: {
-        ...state.teams,
-        [team]: {
-          ...state.teams[team],
-          players: [...state.teams[team].players, player],
-        },
+  addPlayerToTeam: (team, player) => {
+    const newTeams = {
+      ...get().teams,
+      [team]: {
+        ...get().teams[team],
+        players: [...get().teams[team].players, player],
       },
-    })),
+    };
+    console.log('Adding player to team:', team, player);
+    console.log('New teams state:', newTeams);
+    set({ teams: newTeams });
+  },
 
   removePlayerFromTeam: (team, playerId) =>
     set((state) => ({
@@ -169,16 +167,81 @@ export const useGameStore = create<GameState>((set, get) => ({
       };
     }),
 
-  clearTeams: () =>
-    set({
-      teams: {
-        azul: { players: [], score: 0 },
-        rojo: { players: [], score: 0 },
-      },
-    }),
+  clearTeams: () => {
+    const newTeams = {
+      azul: { players: [], score: 0 },
+      rojo: { players: [], score: 0 },
+    };
+    console.log('Clearing teams:', newTeams);
+    set({ teams: newTeams });
+  },
+
+  loadLastGamePlayers: async () => {
+    try {
+      console.log('Store: Starting to load last game players...');
+      const lastGamePlayers = await database.getLastGamePlayers();
+      console.log('Store: Last game players received:', lastGamePlayers);
+      
+      if (lastGamePlayers.length > 0) {
+        const azulPlayers: Player[] = [];
+        const rojoPlayers: Player[] = [];
+        
+        lastGamePlayers.forEach((dbPlayer) => {
+          console.log('Processing player:', dbPlayer);
+          const player: Player = {
+            id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
+            name: dbPlayer.nombre,
+          };
+          
+          if (dbPlayer.equipo === 'azul') {
+            azulPlayers.push(player);
+            console.log('Added to azul team:', player);
+          } else if (dbPlayer.equipo === 'rojo') {
+            rojoPlayers.push(player);
+            console.log('Added to rojo team:', player);
+          }
+        });
+        
+        console.log('Final teams - Azul:', azulPlayers, 'Rojo:', rojoPlayers);
+        
+        set({
+          teams: {
+            azul: { players: azulPlayers, score: 0 },
+            rojo: { players: rojoPlayers, score: 0 },
+          },
+        });
+        
+        console.log('Store: Teams updated successfully');
+      } else {
+        console.log('Store: No players found in last game');
+      }
+    } catch (error) {
+      console.error('Store: Error loading last game players:', error);
+      // Don't throw error, just continue with empty teams
+    }
+  },
+
+  saveCurrentTeamsToDatabase: async () => {
+    try {
+      console.log('Store: Starting to save current teams to database...');
+      const currentTeams = get().teams;
+      await database.saveTeams(currentTeams);
+      console.log('Store: Teams saved successfully');
+    } catch (error) {
+      console.error('Store: Error saving current teams to database:', error);
+    }
+  },
 
   // Game flow
   startGame: (wordsList: string[]) => {
+    // Save current teams to database before starting the game
+    const currentState = get();
+    if (currentState.teams.azul.players.length > 0 || currentState.teams.rojo.players.length > 0) {
+      currentState.saveCurrentTeamsToDatabase().catch((error) => {
+        console.error('Error saving teams before game start:', error);
+      });
+    }
+
     // Shuffle words for the game
     const shuffledWords = [...wordsList].sort(() => Math.random() - 0.5);
 

@@ -21,7 +21,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#4A90E2"
-      }
+      },
+      "package": "com.arocafull.partyfun2"
     },
     "web": {
       "favicon": "./assets/favicon.png",

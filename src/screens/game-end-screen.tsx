@@ -10,23 +10,15 @@ import {
   Chip
 } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
+import { router } from 'expo-router';
 
 import { useGameStore } from '../store/game-store';
 import { database } from '../database/database';
 import { colors } from '../theme/theme';
 
-type RootStackParamList = {
-  Home: undefined;
-  NewGame: undefined;
-  Statistics: undefined;
-};
 
-type GameEndScreenNavigationProp = StackNavigationProp<RootStackParamList>;
 
 const GameEndScreen: React.FC = () => {
-  const navigation = useNavigation<GameEndScreenNavigationProp>();
   const {
     teams,
     selectedBattery,
@@ -61,12 +53,12 @@ const GameEndScreen: React.FC = () => {
       // Create game record
       const gameData = {
         fecha: new Date().toISOString(),
-        bateria_id: selectedBattery?.id || 0,
-        equipo_ganador: winner === 'empate' ? null : winner,
-        puntuacion_azul: blueScore,
-        puntuacion_rojo: redScore,
-        total_palabras: totalWords,
-        palabras_correctas: totalCorrect,
+        bateriaId: selectedBattery?.id || 0,
+        equipoGanador: winner === 'empate' ? null : (winner as 'azul' | 'rojo'),
+        puntuacionAzul: blueScore,
+        puntuacionRojo: redScore,
+        totalPalabras: totalWords,
+        palabrasCorrectas: totalCorrect,
         precision: accuracy
       };
 
@@ -75,13 +67,14 @@ const GameEndScreen: React.FC = () => {
       // Save players
       const allPlayers = [...teams.azul.players, ...teams.rojo.players];
       for (const player of allPlayers) {
+        const equipo = teams.azul.players.includes(player) ? 'azul' : 'rojo';
         const playerData = {
           nombre: player.name,
-          equipo: teams.azul.players.includes(player) ? 'azul' : 'rojo'
+          equipo: equipo
         };
         
         const playerId = await database.createJugador(playerData);
-        await database.addPlayerToGame(gameId, playerId);
+        await database.addPlayerToGame(gameId, playerId, equipo as 'azul' | 'rojo');
       }
 
       setGameSaved(true);
@@ -96,16 +89,16 @@ const GameEndScreen: React.FC = () => {
 
   const handleNewGame = () => {
     resetGame();
-    navigation.navigate('NewGame');
+    router.push('/new-game');
   };
 
   const handleBackToHome = () => {
     resetGame();
-    navigation.navigate('Home');
+    router.push('/');
   };
 
   const handleViewStatistics = () => {
-    navigation.navigate('Statistics');
+    router.push('/statistics');
   };
 
   const getWinnerColor = () => {
@@ -129,7 +122,7 @@ const GameEndScreen: React.FC = () => {
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Winner Announcement */}
-        <Surface style={[styles.winnerContainer, { backgroundColor: getWinnerColor() + '20' }]} elevation={6}>
+        <Surface style={[styles.winnerContainer, { backgroundColor: getWinnerColor() + '20' }]} elevation={4}>
           <Text style={styles.winnerIcon}>{getWinnerIcon()}</Text>
           <Text style={[styles.winnerText, { color: getWinnerColor() }]}>
             {getWinnerText()}
@@ -359,7 +352,7 @@ const styles = StyleSheet.create({
   },
   teamPlayersText: {
     fontSize: 12,
-    color: colors.textSecondary,
+    color: colors.textLight,
     textAlign: 'center',
     lineHeight: 16,
   },
@@ -390,7 +383,7 @@ const styles = StyleSheet.create({
   },
   roundDescription: {
     fontSize: 14,
-    color: colors.textSecondary,
+    color: colors.textLight,
     marginBottom: 10,
     fontStyle: 'italic',
   },

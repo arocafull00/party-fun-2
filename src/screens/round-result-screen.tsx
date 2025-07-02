@@ -9,22 +9,14 @@ import {
   Chip
 } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
+import { router } from 'expo-router';
 
 import { useGameStore } from '../store/game-store';
 import { colors } from '../theme/theme';
 
-type RootStackParamList = {
-  RoundResult: undefined;
-  GameTurn: undefined;
-  GameEnd: undefined;
-};
 
-type RoundResultScreenNavigationProp = StackNavigationProp<RootStackParamList, 'RoundResult'>;
 
 const RoundResultScreen: React.FC = () => {
-  const navigation = useNavigation<RoundResultScreenNavigationProp>();
   const { currentRound, teams, gameHistory, currentRoundWords, endGame } = useGameStore();
 
   // Get current round results
@@ -36,9 +28,9 @@ const RoundResultScreen: React.FC = () => {
   const handleNextRound = () => {
     if (currentRound >= 3) {
       endGame();
-      navigation.navigate('GameEnd');
+      router.push('/game-end');
     } else {
-      navigation.navigate('GameTurn');
+      router.push('/game-turn');
     }
   };
 
