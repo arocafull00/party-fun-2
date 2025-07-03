@@ -8,29 +8,38 @@ import Svg, {
   Polyline 
 } from 'react-native-svg';
 
-const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
-
 interface BackgroundProps {
   children?: React.ReactNode;
 }
 
-export const Background: React.FC<BackgroundProps> = ({ children }) => {
-  // Calculate scale to fit the screen while maintaining aspect ratio
-  const originalWidth = 1080;
-  const originalHeight = 1920;
-  const scaleX = screenWidth / originalWidth;
-  const scaleY = screenHeight / originalHeight;
-  const scale = Math.max(scaleX, scaleY);
+const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
 
-  const scaledWidth = originalWidth * scale;
-  const scaledHeight = originalHeight * scale;
+export const Background: React.FC<BackgroundProps> = ({ children }) => {
+  // Calculate aspect ratio to maintain proper scaling
+  const aspectRatio = screenWidth / screenHeight;
+  const baseWidth = 1080;
+  const baseHeight = 1920;
+  const baseAspectRatio = baseWidth / baseHeight;
+  
+  // Adjust viewBox based on screen aspect ratio
+  let viewBoxWidth = baseWidth;
+  let viewBoxHeight = baseHeight;
+  
+  if (aspectRatio > baseAspectRatio) {
+    // Screen is wider than base design
+    viewBoxWidth = baseHeight * aspectRatio;
+  } else {
+    // Screen is taller than base design
+    viewBoxHeight = baseWidth / aspectRatio;
+  }
 
   return (
     <View style={styles.container}>
       <Svg
-        width={scaledWidth}
-        height={scaledHeight}
-        viewBox={`0 0 ${originalWidth} ${originalHeight}`}
+        width="100%"
+        height="100%"
+        viewBox={`0 0 ${viewBoxWidth} ${viewBoxHeight}`}
+        preserveAspectRatio="xMidYMid slice"
         style={styles.svg}
       >
         {/* Background rectangle */}
@@ -138,29 +147,36 @@ export const Background: React.FC<BackgroundProps> = ({ children }) => {
         <Circle cx="617" cy="495" fill="#000000" fillOpacity="0.08" r="10" />
         <Circle cx="806" cy="1592" fill="#000000" fillOpacity="0.08" r="8" />
       </Svg>
-      
-      {/* Content overlay */}
-      {children && (
-        <View style={styles.contentOverlay}>
-          {children}
-        </View>
-      )}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    position: 'relative',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: -100,
+    width: '100%',
+    height: '100%',
   },
   svg: {
     position: 'absolute',
     top: 0,
     left: 0,
+    right: 0,
+    bottom: 0,
+    width: '100%',
+    height: '100%',
   },
   contentOverlay: {
-    flex: 1,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     zIndex: 1,
   },
 });

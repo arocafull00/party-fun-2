@@ -1,26 +1,52 @@
-import React from 'react';
-import { View, StyleSheet, ViewStyle } from 'react-native';
-import Background from './background';
+import React from "react";
+import { View, ViewStyle, Platform } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { colors } from "../../theme/theme";
+import Background from "./background";
 
 interface CustomScreenProps {
   children: React.ReactNode;
-  styles?: ViewStyle;
+  contentStyle?: ViewStyle;
+  containerStyle?: ViewStyle;
 }
 
-export const CustomScreen: React.FC<CustomScreenProps> = ({ children, styles }) => {
+export function CustomScreen({
+  children,
+  contentStyle,
+  containerStyle,
+}: CustomScreenProps) {
   return (
-    <Background>
-      <View style={[defaultStyles.container, styles]}>
-        {children}
-      </View>
-    </Background>
+    <View style={{ flex: 1}}>
+      {/* Background that covers the entire screen */}
+      <Background />
+      
+      {/* Safe area content */}
+      <SafeAreaView
+        style={[
+          containerStyle,
+          {
+            flex: 1,
+            width: "100%",
+            height: "100%",
+            position: "relative",
+            backgroundColor: "transparent",
+          },
+        ]}
+      >
+        <View
+          style={[
+            {
+              flex: 1,
+              width: "100%",
+              paddingHorizontal: 16,
+              backgroundColor: "transparent",
+            },
+            contentStyle,
+          ]}
+        >
+          {children}
+        </View>
+      </SafeAreaView>
+    </View>
   );
-};
-
-const defaultStyles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-});
-
-export default CustomScreen; 
+}

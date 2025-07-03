@@ -7,7 +7,7 @@ import { View, Text, StyleSheet, ActivityIndicator } from "react-native";
 
 import { database } from "../src/database/database";
 import { theme } from "../src/theme/theme";
-import CustomScreen from "../src/shared/components/CustomScreen";
+import { CustomScreen } from "../src/shared/components/CustomScreen";
 
 export default function RootLayout() {
   const [isReady, setIsReady] = useState(false);
@@ -31,7 +31,7 @@ export default function RootLayout() {
     return (
       <SafeAreaProvider>
         <PaperProvider theme={theme}>
-          <CustomScreen styles={styles.errorContainer}>
+          <CustomScreen containerStyle={styles.errorContainer}>
             <Text style={styles.errorTitle}>Error de Inicialización</Text>
             <Text style={styles.errorMessage}>{error}</Text>
             <Text style={styles.errorSubtitle}>
@@ -48,7 +48,7 @@ export default function RootLayout() {
     return (
       <SafeAreaProvider>
         <PaperProvider theme={theme}>
-          <CustomScreen styles={styles.loadingContainer}>
+          <CustomScreen containerStyle={styles.loadingContainer}>
             <ActivityIndicator size="large" color={theme.colors.primary} />
             <Text style={styles.loadingText}>Inicializando PartyFun...</Text>
           </CustomScreen>
@@ -61,7 +61,6 @@ export default function RootLayout() {
   return (
     <SafeAreaProvider>
       <PaperProvider theme={theme}>
-        <CustomScreen>
           <Stack
             screenOptions={{
               headerStyle: {
@@ -100,7 +99,6 @@ export default function RootLayout() {
             />
             <Stack.Screen name="statistics" options={{ title: "Estadísticas" }} />
           </Stack>
-        </CustomScreen>
         <StatusBar style="light" />
       </PaperProvider>
     </SafeAreaProvider>

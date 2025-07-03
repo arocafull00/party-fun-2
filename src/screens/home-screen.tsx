@@ -11,7 +11,6 @@ import {
   Surface,
   Icon,
 } from "react-native-paper";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { router, useRouter } from "expo-router";
 
 import { database, Mazo } from "../database/database";
@@ -114,7 +113,7 @@ export const HomeScreen: React.FC = () => {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>PARTY FUN</Text>
         <Text style={styles.subtitle}>Game</Text>
@@ -173,14 +172,14 @@ export const HomeScreen: React.FC = () => {
           </Button>
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: "transparent",
   },
   header: {
     alignItems: "center",
