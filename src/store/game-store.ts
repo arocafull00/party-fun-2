@@ -74,6 +74,8 @@ export interface GameState {
   startTimer: () => void;
   stopTimer: () => void;
   resetTimer: () => void;
+  decrementTimer: () => boolean;
+  reduceTimerForSkip: () => void;
   markCardCorrect: (card: string) => void;
   markCardIncorrect: (card: string) => void;
   updateCurrentRoundCards: (correct: string[], incorrect: string[]) => void;
@@ -269,19 +271,42 @@ export const useGameStore = create<GameState>((set, get) => ({
   },
 
   startTimer: () =>
-    set((state) => ({
-      isTimerRunning: false,
-    })),
+    set({
+      isTimerRunning: true,
+    }),
 
   stopTimer: () =>
-    set((state) => ({
+    set({
       isTimerRunning: false,
-    })),
+    }),
 
   resetTimer: () =>
     set({
       timer: TURN_TIME,
     }),
+
+  // Function to decrement timer by 1 second
+  decrementTimer: () => {
+    const state = get();
+    const newTime = state.timer - 1;
+    
+    if (newTime <= 0) {
+      set({ timer: 0, isTimerRunning: false });
+      return false; // Timer reached zero
+    } else {
+      set({ timer: newTime });
+      return true; // Timer still running
+    }
+  },
+
+  // New function to reduce timer by 5 seconds in round 1
+  reduceTimerForSkip: () => {
+    const state = get();
+    if (state.currentRound === 1) {
+      const newTime = Math.max(0, state.timer - 5);
+      set({ timer: newTime });
+    }
+  },
 
   markCardCorrect: (card: string) => {
     const state = get();
@@ -361,6 +386,14 @@ export const useGameStore = create<GameState>((set, get) => ({
 
   nextTurn: () => {
     const state = get();
+    
+    // Check if all cards have been played in this round
+    const totalPlayedCards = state.currentRoundCards.correct.length + state.currentRoundCards.incorrect.length;
+    if (totalPlayedCards >= state.roundCards.length) {
+      // All cards have been played, no more turns in this round
+      return false;
+    }
+    
     const currentTeamPlayers = state.teams[state.currentTeam].players;
     const nextPlayerIndex = state.currentPlayerIndex + 1;
 
@@ -404,6 +437,22 @@ export const useGameStore = create<GameState>((set, get) => ({
     const newGameHistory = [...state.gameHistory, roundHistory];
     const nextRound = state.currentRound + 1;
 
+    // Get all cards that were played in this round
+    const allPlayedCards = [...state.currentRoundCards.correct, ...state.currentRoundCards.incorrect];
+    
+    // Remove played cards from the round cards pool
+    const remainingCards = state.roundCards.filter(card => !allPlayedCards.includes(card));
+    
+    // If no cards remain, the game should end
+    if (remainingCards.length === 0) {
+      set({
+        gameHistory: newGameHistory,
+        gameStarted: false,
+        isTimerRunning: false,
+      });
+      return;
+    }
+
     set({
       gameHistory: newGameHistory,
       currentRound: nextRound,
@@ -413,8 +462,8 @@ export const useGameStore = create<GameState>((set, get) => ({
       timer: TURN_TIME,
       isTimerRunning: false,
       currentRoundCards: { correct: [], incorrect: [] },
-      // Reset round cards (same cards, different order)
-      roundCards: [...state.roundCards].sort(() => Math.random() - 0.5),
+      // Use remaining cards, shuffled for the next round
+      roundCards: [...remainingCards].sort(() => Math.random() - 0.5),
     });
   },
 

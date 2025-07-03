@@ -46,6 +46,14 @@ const TurnReviewScreen: React.FC = () => {
       // No more turns in this round, end the round
       endRound();
 
+      // Check if the game ended due to no remaining cards
+      const gameState = useGameStore.getState();
+      if (!gameState.gameStarted) {
+        // Game ended because no cards remain
+        router.push("/game-end");
+        return;
+      }
+
       if (currentRound >= 3) {
         // Game is over after round 3
         endGame();

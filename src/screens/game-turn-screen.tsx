@@ -16,8 +16,6 @@ import { useGameStore } from "../store/game-store";
 import { colors } from "../theme/theme";
 import { CustomScreen } from "../shared/components/CustomScreen";
 
-
-
 const GameTurnScreen: React.FC = () => {
   const {
     currentRound,
@@ -31,11 +29,10 @@ const GameTurnScreen: React.FC = () => {
     startTimer,
     stopTimer,
     resetTimer,
+    decrementTimer,
+    reduceTimerForSkip,
     markCardCorrect,
     markCardIncorrect,
-    nextTurn,
-    endRound,
-    endGame,
     gameStarted,
   } = useGameStore();
 
@@ -64,19 +61,6 @@ const GameTurnScreen: React.FC = () => {
     }
   };
 
-  const getRoundInstructions = (round: number): string => {
-    switch (round) {
-      case 1:
-        return "Puedes dar cualquier pista excepto sinónimos de la palabra.";
-      case 2:
-        return "Solo puedes decir UNA palabra como pista.";
-      case 3:
-        return "Solo puedes usar mímica, sin hablar.";
-      default:
-        return "";
-    }
-  };
-
   // Prevent back button
   useFocusEffect(
     useCallback(() => {
@@ -100,10 +84,9 @@ const GameTurnScreen: React.FC = () => {
 
     if (isTimerRunning && timer > 0) {
       interval = setInterval(() => {
-        const newTime = useGameStore.getState().timer - 1;
-        useGameStore.setState({ timer: newTime });
+        const timerStillRunning = decrementTimer();
 
-        if (newTime === 0) {
+        if (!timerStillRunning) {
           handleTimeUp();
         }
       }, 1000);
@@ -114,7 +97,7 @@ const GameTurnScreen: React.FC = () => {
         clearInterval(interval);
       }
     };
-  }, [isTimerRunning, timer]);
+  }, [isTimerRunning, timer, decrementTimer]);
 
   // Check if game should redirect
   useEffect(() => {
@@ -163,6 +146,11 @@ const GameTurnScreen: React.FC = () => {
     if (!currentCard) return;
 
     markCardIncorrect(currentCard);
+
+    // In round 1, reduce timer by 5 seconds when skipping a word
+    if (currentRound === 1) {
+      reduceTimerForSkip();
+    }
 
     // Check if all cards are done
     if (currentCardIndex >= roundCards.length - 1) {
@@ -223,7 +211,7 @@ const GameTurnScreen: React.FC = () => {
             <Text style={styles.roundText}>Ronda {currentRound}</Text>
           </View>
           <View style={styles.headerRight}>
-                            <Text style={styles.wordsRemainingNumber}>x{cardsRemaining}</Text>
+            <Text style={styles.wordsRemainingNumber}>x{cardsRemaining}</Text>
           </View>
         </View>
 
@@ -307,7 +295,7 @@ const GameTurnScreen: React.FC = () => {
         </View>
         <View style={styles.timerHeaderRight}>
           <Text style={styles.teamNameSmall}>Restantes</Text>
-                          <Text style={styles.wordsRemainingNumberSmall}>{cardsRemaining}</Text>
+          <Text style={styles.wordsRemainingNumberSmall}>{cardsRemaining}</Text>
         </View>
       </View>
 
@@ -327,7 +315,7 @@ const GameTurnScreen: React.FC = () => {
           {/* Word card */}
           <Card style={styles.wordCard}>
             <Card.Content style={styles.wordCardContent}>
-                                <Text style={styles.wordText}>{currentCard}</Text>
+              <Text style={styles.wordText}>{currentCard}</Text>
             </Card.Content>
           </Card>
 
@@ -341,8 +329,6 @@ const GameTurnScreen: React.FC = () => {
             />
           </Surface>
         </View>
-
-        <Text style={styles.gameInstruction}>¡UNA PALABRA!</Text>
       </View>
 
       {/* Exit Dialog */}
