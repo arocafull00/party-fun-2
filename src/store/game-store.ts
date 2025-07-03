@@ -438,19 +438,24 @@ export const useGameStore = create<GameState>((set, get) => ({
     const newGameHistory = [...state.gameHistory, roundHistory];
 
     // Calculate remaining cards for next turn:
-    // 1. Cards that were not seen yet (from currentCardIndex to end of phaseCards)
-    // 2. Cards that were marked as incorrect (go back to the pool)
-    // 3. Cards that were marked as correct are removed from the pool
+    // 1. Remove correct cards from the current phase pool
+    // 2. Keep incorrect cards and unseen cards in the pool
     
     const correctCards = state.currentTurnCards.correct;
     const incorrectCards = state.currentTurnCards.incorrect;
-    const unseenCards = state.phaseCards.slice(state.currentCardIndex);
     
-    // New phase cards = unseen cards + incorrect cards (shuffled)
-    const newPhaseCards = [...unseenCards, ...incorrectCards].sort(() => Math.random() - 0.5);
+    // Get all cards that were seen this turn (correct + incorrect)
+    const seenCards = [...correctCards, ...incorrectCards];
+    
+    // Remove only the correct cards from the phase pool
+    // (incorrect cards stay in the pool, unseen cards stay in the pool)
+    const newPhaseCards = state.phaseCards.filter(card => !correctCards.includes(card));
+    
+    // Shuffle the remaining cards
+    const shuffledPhaseCards = [...newPhaseCards].sort(() => Math.random() - 0.5);
     
     // Check if phase is complete (no more cards to guess in this phase)
-    if (newPhaseCards.length === 0) {
+    if (shuffledPhaseCards.length === 0) {
       // Phase complete, move to next phase or end game
       const nextPhase = state.currentPhase + 1;
       
@@ -481,7 +486,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       // Continue current phase with remaining cards
       set({
         gameHistory: newGameHistory,
-        phaseCards: newPhaseCards,
+        phaseCards: shuffledPhaseCards,
         currentCardIndex: 0,
         currentTurnCards: { correct: [], incorrect: [] },
       });
