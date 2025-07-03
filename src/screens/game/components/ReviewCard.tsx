@@ -55,8 +55,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
     elevation: 6,
     borderRadius: 16,
-    width: screenWidth * 0.7,
-    minHeight: 200,
+    width: screenWidth * 0.25,
   },
   cardContent: {
     flexDirection: 'row',

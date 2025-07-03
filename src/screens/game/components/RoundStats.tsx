@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { Text, Card } from 'react-native-paper';
+import { Text } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../../../theme/theme';
 
@@ -14,78 +14,46 @@ export const RoundStats: React.FC<RoundStatsProps> = ({
   incorrectCount 
 }) => {
   return (
-    <Card style={styles.card}>
-      <Card.Content style={styles.content}>
-        <View style={styles.statItem}>
-          <View style={styles.iconContainer}>
-            <Ionicons 
-              name="checkmark-circle" 
-              size={24} 
-              color={colors.success} 
-            />
-          </View>
-          <View style={styles.textContainer}>
-            <Text style={styles.label}>ACERTADAS</Text>
-            <Text style={[styles.count, { color: colors.success }]}>
-              {correctCount}
-            </Text>
-          </View>
-        </View>
-        
-        <View style={styles.divider} />
-        
-        <View style={styles.statItem}>
-          <View style={styles.iconContainer}>
-            <Ionicons 
-              name="close-circle" 
-              size={24} 
-              color={colors.error} 
-            />
-          </View>
-          <View style={styles.textContainer}>
-            <Text style={styles.label}>PASADAS</Text>
-            <Text style={[styles.count, { color: colors.error }]}>
-              {incorrectCount}
-            </Text>
-          </View>
-        </View>
-      </Card.Content>
-    </Card>
+    <View style={styles.container}>
+      <View style={styles.statItem}>
+        <Ionicons 
+          name="checkmark-circle" 
+          size={20} 
+          color={colors.success} 
+        />
+        <Text style={styles.count}>
+          {correctCount}
+        </Text>
+      </View>
+      
+      <View style={styles.statItem}>
+        <Ionicons 
+          name="close-circle" 
+          size={20} 
+          color={colors.error} 
+        />
+        <Text style={styles.count}>
+          {incorrectCount}
+        </Text>
+      </View>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  card: {
-    backgroundColor: colors.surface,
-    elevation: 4,
-  },
-  content: {
-    paddingVertical: 16,
+  container: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 20,
   },
   statItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 8,
-  },
-  iconContainer: {
-    marginRight: 12,
-  },
-  textContainer: {
-    flex: 1,
-  },
-  label: {
-    fontSize: 12,
-    fontWeight: 'bold',
-    color: colors.text,
-    marginBottom: 2,
+    gap: 6,
   },
   count: {
-    fontSize: 24,
+    fontSize: 18,
     fontWeight: 'bold',
-  },
-  divider: {
-    height: 1,
-    backgroundColor: colors.text + '20',
-    marginVertical: 8,
+    color: colors.textLight,
   },
 }); 

@@ -131,26 +131,20 @@ const TurnReviewScreen: React.FC = () => {
 
         {/* Bottom Row */}
         <View style={styles.bottomRow}>
-          {/* Left - Round Stats */}
-          <View style={styles.statsContainer}>
-            <RoundStats
-              correctCount={correctCount}
-              incorrectCount={incorrectCount}
-            />
-          </View>
-
-          {/* Right - Next Turn Button */}
-          <View style={styles.buttonContainer}>
-            <Button
-              mode="contained"
-              onPress={handleNextTurn}
-              style={styles.nextButton}
-              contentStyle={styles.nextButtonContent}
-              labelStyle={styles.nextButtonLabel}
-            >
-              SIGUIENTE TURNO
-            </Button>
-          </View>
+          <RoundStats
+            correctCount={correctCount}
+            incorrectCount={incorrectCount}
+          />
+          
+          <Button
+            mode="contained"
+            onPress={handleNextTurn}
+            style={styles.nextButton}
+            contentStyle={styles.nextButtonContent}
+            labelStyle={styles.nextButtonLabel}
+          >
+            SIGUIENTE TURNO
+          </Button>
         </View>
       </View>
     </CustomScreen>
@@ -199,7 +193,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    minHeight: 250,
   },
   instructionText: {
     fontSize: 14,
@@ -218,22 +211,19 @@ const styles = StyleSheet.create({
   },
   bottomRow: {
     flexDirection: "row",
-    gap: 15,
-    minHeight: 120,
-  },
-  statsContainer: {
-    flex: 1,
-  },
-  buttonContainer: {
-    flex: 1,
-    justifyContent: "flex-end",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingVertical: 20,
+    paddingLeft: 25,
+    marginTop: 'auto',
   },
   nextButton: {
     backgroundColor: colors.primary,
-    height: 60,
+    height: 50,
+    minWidth: 180,
   },
   nextButtonContent: {
-    height: 60,
+    height: 50,
     justifyContent: "center",
   },
   nextButtonLabel: {
