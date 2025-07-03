@@ -76,6 +76,9 @@ export interface GameState {
   resetTimer: () => void;
   markCardCorrect: (card: string) => void;
   markCardIncorrect: (card: string) => void;
+  updateCurrentRoundCards: (correct: string[], incorrect: string[]) => void;
+  getCurrentPlayer: () => Player | null;
+  getNextPlayer: () => Player | null;
   nextTurn: () => boolean;
   endRound: () => void;
   endGame: () => void;
@@ -310,6 +313,50 @@ export const useGameStore = create<GameState>((set, get) => ({
         incorrect: newIncorrect,
       },
     });
+  },
+
+  updateCurrentRoundCards: (correct: string[], incorrect: string[]) => {
+    const state = get();
+    const oldCorrectCount = state.currentRoundCards.correct.length;
+    const newCorrectCount = correct.length;
+    const scoreDifference = newCorrectCount - oldCorrectCount;
+    
+    const newTeamScore = Math.max(0, state.teams[state.currentTeam].score + scoreDifference);
+
+    set({
+      currentRoundCards: {
+        correct,
+        incorrect,
+      },
+      teams: {
+        ...state.teams,
+        [state.currentTeam]: {
+          ...state.teams[state.currentTeam],
+          score: newTeamScore,
+        },
+      },
+    });
+  },
+
+  getCurrentPlayer: () => {
+    const state = get();
+    const currentTeamPlayers = state.teams[state.currentTeam].players;
+    return currentTeamPlayers[state.currentPlayerIndex] || null;
+  },
+
+  getNextPlayer: () => {
+    const state = get();
+    const currentTeamPlayers = state.teams[state.currentTeam].players;
+    const nextPlayerIndex = state.currentPlayerIndex + 1;
+
+    if (nextPlayerIndex >= currentTeamPlayers.length) {
+      // Next player is from the other team
+      const nextTeam = state.currentTeam === "azul" ? "rojo" : "azul";
+      const nextTeamPlayers = state.teams[nextTeam].players;
+      return nextTeamPlayers[0] || null;
+    } else {
+      return currentTeamPlayers[nextPlayerIndex] || null;
+    }
   },
 
   nextTurn: () => {

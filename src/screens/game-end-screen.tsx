@@ -15,6 +15,7 @@ import { router } from 'expo-router';
 import { useGameStore } from '../store/game-store';
 import { database } from '../database/database';
 import { colors } from '../theme/theme';
+import { CustomScreen } from '../shared/components/CustomScreen';
 
 
 
@@ -119,7 +120,7 @@ const GameEndScreen: React.FC = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <CustomScreen contentStyle={styles.container}>
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Winner Announcement */}
         <Surface style={[styles.winnerContainer, { backgroundColor: getWinnerColor() + '20' }]} elevation={4}>
@@ -282,14 +283,14 @@ const GameEndScreen: React.FC = () => {
           </View>
         )}
       </ScrollView>
-    </SafeAreaView>
+    </CustomScreen>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    paddingTop: 20,
   },
   content: {
     flex: 1,

@@ -8,16 +8,14 @@ import {
   Divider,
   Chip
 } from 'react-native-paper';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 
 import { useGameStore } from '../store/game-store';
 import { colors } from '../theme/theme';
-
-
+import { CustomScreen } from '../shared/components/CustomScreen';
 
 const RoundResultScreen: React.FC = () => {
-  const { currentRound, teams, gameHistory, currentRoundCards, endGame } = useGameStore();
+  const { currentRound, teams, gameHistory, currentRoundCards, endGame, endRound } = useGameStore();
 
   // Get current round results
   const azulCorrect = currentRoundCards.correct.slice(0, Math.floor(currentRoundCards.correct.length / 2));
@@ -30,6 +28,8 @@ const RoundResultScreen: React.FC = () => {
       endGame();
       router.push('/game-end');
     } else {
+      // Move to next round
+      endRound();
       router.push('/game-turn');
     }
   };
@@ -85,7 +85,7 @@ const RoundResultScreen: React.FC = () => {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <CustomScreen contentStyle={styles.container}>
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Round Header */}
         <Card style={styles.headerCard}>
@@ -125,7 +125,7 @@ const RoundResultScreen: React.FC = () => {
 
         {/* Team Results */}
         <View style={styles.resultsContainer}>
-          <Text style={styles.sectionTitle}>Resultados por Equipo</Text>
+          <Text style={[styles.sectionTitle, { color: colors.textLight }]}>Resultados por Equipo</Text>
           
           <View style={styles.teamsResultsRow}>
             {/* Blue Team */}
@@ -199,14 +199,14 @@ const RoundResultScreen: React.FC = () => {
           {currentRound >= 3 ? 'VER RESULTADOS FINALES' : 'SIGUIENTE RONDA'}
         </Button>
       </ScrollView>
-    </SafeAreaView>
+    </CustomScreen>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    paddingTop: 20,
   },
   content: {
     flex: 1,

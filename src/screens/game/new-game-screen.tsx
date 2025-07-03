@@ -173,7 +173,7 @@ const NewGameScreen: React.FC = () => {
           icon="arrow-left"
           size={24}
           iconColor={colors.textLight}
-          onPress={() => router.back()}
+          onPress={() => router.push("/")}
         />
         <Text style={styles.headerTitle}>NUEVA PARTIDA</Text>
         <IconButton

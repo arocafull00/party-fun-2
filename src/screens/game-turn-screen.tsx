@@ -14,6 +14,7 @@ import { router, useFocusEffect } from "expo-router";
 
 import { useGameStore } from "../store/game-store";
 import { colors } from "../theme/theme";
+import { CustomScreen } from "../shared/components/CustomScreen";
 
 
 
@@ -181,10 +182,9 @@ const GameTurnScreen: React.FC = () => {
       "Se han completado todas las cartas de esta ronda.",
       [
         {
-          text: "Finalizar Ronda",
+          text: "Revisar Turno",
           onPress: () => {
-            endRound();
-            router.push("/round-result");
+            router.push("/turn-review");
           },
         },
       ]
@@ -195,25 +195,8 @@ const GameTurnScreen: React.FC = () => {
     stopTimer();
     resetTimer();
 
-    const isLastRound = currentRound === 3;
-    const hasMoreTurns = nextTurn();
-
-    if (!hasMoreTurns) {
-      // End of round
-      endRound();
-
-      if (isLastRound) {
-        // End of game
-        endGame();
-        router.push("/game-end");
-      } else {
-        // Go to round results
-        router.push("/round-result");
-      }
-    } else {
-      // Continue with next turn - phase will reset due to useEffect
-      setGamePhase("preparation");
-    }
+    // Always go to turn review screen after a turn ends
+    router.push("/turn-review");
   };
 
   const handleExitGame = () => {
@@ -245,7 +228,7 @@ const GameTurnScreen: React.FC = () => {
   // Preparation Phase - Show player info and start button
   if (gamePhase === "preparation") {
     return (
-      <SafeAreaView style={styles.container}>
+      <CustomScreen contentStyle={styles.container}>
         {/* Header with exit button */}
         <View style={styles.header}>
           <View style={styles.headerLeft}>
@@ -314,13 +297,13 @@ const GameTurnScreen: React.FC = () => {
             </Dialog.Actions>
           </Dialog>
         </Portal>
-      </SafeAreaView>
+      </CustomScreen>
     );
   }
 
   // Playing Phase - Show word and action buttons
   return (
-    <SafeAreaView style={styles.container}>
+    <CustomScreen contentStyle={styles.container}>
       {/* Timer at top */}
       <View style={styles.timerHeader}>
         <View style={styles.timerHeaderLeft}>
@@ -395,14 +378,14 @@ const GameTurnScreen: React.FC = () => {
           </Dialog.Actions>
         </Dialog>
       </Portal>
-    </SafeAreaView>
+    </CustomScreen>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    paddingTop: 20,
   },
   header: {
     flexDirection: "row",
