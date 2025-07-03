@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
+import { View, StyleSheet, FlatList } from 'react-native';
 import { Text, Button } from 'react-native-paper';
 import { router } from 'expo-router';
 
@@ -7,7 +7,7 @@ import { useGameStore } from '../store/game-store';
 import { colors } from '../theme/theme';
 import { CustomScreen } from '../shared/components/CustomScreen';
 import { ReviewCard, RoundStats, PlayerInfo } from './game/components';
-import { useCardReview } from './game/hooks/useCardReview';
+import { useCardReview, ReviewCard as ReviewCardType } from './game/hooks/useCardReview';
 
 const TurnReviewScreen: React.FC = () => {
   const { 
@@ -70,6 +70,15 @@ const TurnReviewScreen: React.FC = () => {
   const correctCount = getCorrectCards().length;
   const incorrectCount = getIncorrectCards().length;
 
+  const renderCard = ({ item, index }: { item: ReviewCardType; index: number }) => (
+    <ReviewCard
+      text={item.text}
+      isCorrect={item.isCorrect}
+      onToggle={() => toggleCard(index)}
+      horizontal={true}
+    />
+  );
+
   return (
     <CustomScreen contentStyle={styles.container}>
       <View style={styles.content}>
@@ -87,21 +96,23 @@ const TurnReviewScreen: React.FC = () => {
           />
         </View>
 
-        {/* Main Content - Cards List */}
+        {/* Main Content - Horizontal Cards List */}
         <View style={styles.mainContent}>
-          <ScrollView 
-            style={styles.cardsContainer}
-            showsVerticalScrollIndicator={false}
-          >
-            {reviewCards.map((card, index) => (
-              <ReviewCard
-                key={index}
-                text={card.text}
-                isCorrect={card.isCorrect}
-                onToggle={() => toggleCard(index)}
-              />
-            ))}
-          </ScrollView>
+          <Text style={styles.instructionText}>
+            Toca las cartas para cambiar entre acertada (✓) y fallada (✗)
+          </Text>
+          <FlatList
+            data={reviewCards}
+            renderItem={renderCard}
+            keyExtractor={(item, index) => `${item.text}-${index}`}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.cardsContainer}
+            ItemSeparatorComponent={() => <View style={styles.cardSeparator} />}
+            snapToInterval={280}
+            decelerationRate="fast"
+            snapToAlignment="center"
+          />
         </View>
 
         {/* Bottom Row */}
@@ -163,10 +174,22 @@ const styles = StyleSheet.create({
   },
   mainContent: {
     flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  instructionText: {
+    fontSize: 14,
+    color: colors.textLight,
+    textAlign: 'center',
     marginBottom: 20,
+    paddingHorizontal: 20,
   },
   cardsContainer: {
-    flex: 1,
+    alignItems: 'center',
+    paddingHorizontal: 20,
+  },
+  cardSeparator: {
+    width: 15,
   },
   bottomRow: {
     flexDirection: 'row',
