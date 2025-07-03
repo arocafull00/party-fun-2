@@ -1,7 +1,6 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { Text, Card } from 'react-native-paper';
-import { Ionicons } from '@expo/vector-icons';
+import { Text } from 'react-native-paper';
 import { colors } from '../../../theme/theme';
 
 interface PlayerInfoProps {
@@ -14,64 +13,26 @@ export const PlayerInfo: React.FC<PlayerInfoProps> = ({
   nextPlayer 
 }) => {
   return (
-    <Card style={styles.card}>
-      <Card.Content style={styles.content}>
-        <View style={styles.playerRow}>
-          <Text style={styles.currentPlayerText}>{currentPlayer}</Text>
-          <View style={styles.crownContainer}>
-            <Ionicons 
-              name="trophy" 
-              size={24} 
-              color={colors.primary} 
-            />
-          </View>
-        </View>
-        
-        <View style={styles.nextPlayerContainer}>
-          <Text style={styles.nextLabel}>SIGUIENTE:</Text>
-          <Text style={styles.nextPlayerText}>{nextPlayer}</Text>
-        </View>
-      </Card.Content>
-    </Card>
+    <View style={styles.container}>
+      <Text style={styles.currentPlayerText}>{currentPlayer}</Text>
+      <Text style={styles.nextPlayerText}>Siguiente: {nextPlayer}</Text>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  card: {
-    backgroundColor: colors.surface,
-    elevation: 4,
-  },
-  content: {
-    paddingVertical: 12,
-  },
-  playerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 8,
+  container: {
+    alignItems: 'flex-start',
   },
   currentPlayerText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: colors.text,
-    flex: 1,
-  },
-  crownContainer: {
-    marginLeft: 8,
-  },
-  nextPlayerContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  nextLabel: {
-    fontSize: 12,
-    fontWeight: 'bold',
-    color: colors.text,
-    marginRight: 8,
+    fontSize: 14,
+    color: colors.textLight,
+    marginBottom: 2,
+    opacity: 0.7,
   },
   nextPlayerText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: colors.primary,
+    fontSize: 16,
+    color: colors.textLight,
+    fontWeight: 'bold',
   },
 }); 

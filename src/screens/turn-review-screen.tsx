@@ -91,37 +91,42 @@ const TurnReviewScreen: React.FC = () => {
   return (
     <CustomScreen contentStyle={styles.container}>
       <View style={styles.content}>
-        {/* Header */}
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>{getRoundTitle(currentRound)}</Text>
-          <Text style={styles.headerSubtitle}>REVISIÓN DE TURNO</Text>
-        </View>
-
-        {/* Top Row - Player Info */}
-        <View style={styles.topRow}>
-          <PlayerInfo
-            currentPlayer={currentPlayer?.name || "Jugador Actual"}
-            nextPlayer={nextPlayer?.name || "Siguiente Jugador"}
-          />
+        {/* Header Row with PlayerInfo on the left */}
+        <View style={styles.headerRow}>
+          <View style={styles.playerInfoContainer}>
+            <PlayerInfo
+              currentPlayer={currentPlayer?.name || "Jugador Actual"}
+              nextPlayer={nextPlayer?.name || "Siguiente Jugador"}
+            />
+          </View>
+          <View style={styles.headerCenter}>
+            <Text style={styles.headerTitle}>{getRoundTitle(currentRound)}</Text>
+            <Text style={styles.headerSubtitle}>REVISIÓN DE TURNO</Text>
+          </View>
+          <View style={styles.headerSpacer} />
         </View>
 
         {/* Main Content - Horizontal Cards List */}
         <View style={styles.mainContent}>
-          <Text style={styles.instructionText}>
-            Toca las cartas para cambiar entre acertada (✓) y fallada (✗)
-          </Text>
-          <FlatList
-            data={reviewCards}
-            renderItem={renderCard}
-            keyExtractor={(item, index) => `${item.text}-${index}`}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.cardsContainer}
-            ItemSeparatorComponent={() => <View style={styles.cardSeparator} />}
-            snapToInterval={280}
-            decelerationRate="fast"
-            snapToAlignment="center"
-          />
+          {reviewCards.length > 0 ? (
+            <FlatList
+              data={reviewCards}
+              renderItem={renderCard}
+              keyExtractor={(item, index) => `${item.text}-${index}`}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.cardsContainer}
+              ItemSeparatorComponent={() => <View style={styles.cardSeparator} />}
+              snapToInterval={280}
+              decelerationRate="fast"
+              snapToAlignment="center"
+              style={styles.flatListStyle}
+            />
+          ) : (
+            <View style={styles.noCardsContainer}>
+              <Text style={styles.noCardsText}>No hay cartas para revisar</Text>
+            </View>
+          )}
         </View>
 
         {/* Bottom Row */}
@@ -162,9 +167,21 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 15,
   },
-  header: {
-    alignItems: "center",
+  headerRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
     marginBottom: 20,
+  },
+  playerInfoContainer: {
+    flex: 1,
+    paddingTop: 5,
+  },
+  headerCenter: {
+    flex: 2,
+    alignItems: "center",
+  },
+  headerSpacer: {
+    flex: 1,
   },
   headerTitle: {
     fontSize: 24,
@@ -178,13 +195,11 @@ const styles = StyleSheet.create({
     color: colors.textLight,
     textAlign: "center",
   },
-  topRow: {
-    marginBottom: 20,
-  },
   mainContent: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    minHeight: 250,
   },
   instructionText: {
     fontSize: 14,
@@ -196,6 +211,7 @@ const styles = StyleSheet.create({
   cardsContainer: {
     alignItems: "center",
     paddingHorizontal: 20,
+    height: 220,
   },
   cardSeparator: {
     width: 15,
@@ -224,6 +240,21 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     color: colors.textLight,
+  },
+  flatListStyle: {
+    height: 220,
+    width: '100%',
+  },
+  noCardsContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 40,
+  },
+  noCardsText: {
+    fontSize: 16,
+    color: colors.textLight,
+    textAlign: 'center',
   },
 });
 
