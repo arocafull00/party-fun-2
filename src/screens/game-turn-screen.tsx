@@ -176,19 +176,7 @@ const GameTurnScreen: React.FC = () => {
   const handleAllCardsCompleted = () => {
     stopTimer();
     setGamePhase("preparation");
-
-    Alert.alert(
-      "¡Todas las cartas completadas!",
-      "Se han completado todas las cartas de esta ronda.",
-      [
-        {
-          text: "Revisar Turno",
-          onPress: () => {
-            router.push("/turn-review");
-          },
-        },
-      ]
-    );
+    router.push("/turn-review");
   };
 
   const handleEndTurn = () => {

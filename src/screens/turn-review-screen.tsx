@@ -1,36 +1,35 @@
-import React from 'react';
-import { View, StyleSheet, FlatList } from 'react-native';
-import { Text, Button } from 'react-native-paper';
-import { router } from 'expo-router';
+import React from "react";
+import { View, StyleSheet, FlatList } from "react-native";
+import { Text, Button } from "react-native-paper";
+import { router } from "expo-router";
 
-import { useGameStore } from '../store/game-store';
-import { colors } from '../theme/theme';
-import { CustomScreen } from '../shared/components/CustomScreen';
-import { ReviewCard, RoundStats, PlayerInfo } from './game/components';
-import { useCardReview, ReviewCard as ReviewCardType } from './game/hooks/useCardReview';
+import { useGameStore } from "../store/game-store";
+import { colors } from "../theme/theme";
+import { CustomScreen } from "../shared/components/CustomScreen";
+import { ReviewCard, RoundStats, PlayerInfo } from "./game/components";
+import {
+  useCardReview,
+  ReviewCard as ReviewCardType,
+} from "./game/hooks/useCardReview";
 
 const TurnReviewScreen: React.FC = () => {
-  const { 
-    currentRound, 
-    currentRoundCards, 
+  const {
+    currentRound,
+    currentRoundCards,
     updateCurrentRoundCards,
     getCurrentPlayer,
     getNextPlayer,
     nextTurn,
     endRound,
-    endGame 
+    endGame,
   } = useGameStore();
 
   const currentPlayer = getCurrentPlayer();
   const nextPlayer = getNextPlayer();
 
-  const {
-    reviewCards,
-    toggleCard,
-    getCorrectCards,
-    getIncorrectCards,
-  } = useCardReview(currentRoundCards.correct, currentRoundCards.incorrect);
-
+  const { reviewCards, toggleCard, getCorrectCards, getIncorrectCards } =
+    useCardReview(currentRoundCards.correct, currentRoundCards.incorrect);
+  console.log(reviewCards);
   const handleNextTurn = () => {
     // Update the store with the reviewed cards
     const updatedCorrect = getCorrectCards();
@@ -39,38 +38,48 @@ const TurnReviewScreen: React.FC = () => {
 
     // Move to next turn
     const hasNextTurn = nextTurn();
-    
+
     if (hasNextTurn) {
       // There's another turn, go to game turn screen
-      router.push('/game-turn');
+      router.push("/game-turn");
     } else {
       // No more turns in this round, end the round
       endRound();
-      
+
       if (currentRound >= 3) {
         // Game is over after round 3
         endGame();
-        router.push('/game-end');
+        router.push("/game-end");
       } else {
         // Go to round summary
-        router.push('/round-result');
+        router.push("/round-result");
       }
     }
   };
 
   const getRoundTitle = (round: number): string => {
     switch (round) {
-      case 1: return 'RONDA 1 - PISTA LIBRE';
-      case 2: return 'RONDA 2 - UNA PALABRA';
-      case 3: return 'RONDA 3 - MÍMICA';
-      default: return `RONDA ${round}`;
+      case 1:
+        return "RONDA 1 - PISTA LIBRE";
+      case 2:
+        return "RONDA 2 - UNA PALABRA";
+      case 3:
+        return "RONDA 3 - MÍMICA";
+      default:
+        return `RONDA ${round}`;
     }
   };
 
   const correctCount = getCorrectCards().length;
   const incorrectCount = getIncorrectCards().length;
 
-  const renderCard = ({ item, index }: { item: ReviewCardType; index: number }) => (
+  const renderCard = ({
+    item,
+    index,
+  }: {
+    item: ReviewCardType;
+    index: number;
+  }) => (
     <ReviewCard
       text={item.text}
       isCorrect={item.isCorrect}
@@ -90,9 +99,9 @@ const TurnReviewScreen: React.FC = () => {
 
         {/* Top Row - Player Info */}
         <View style={styles.topRow}>
-          <PlayerInfo 
-            currentPlayer={currentPlayer?.name || 'Jugador Actual'}
-            nextPlayer={nextPlayer?.name || 'Siguiente Jugador'}
+          <PlayerInfo
+            currentPlayer={currentPlayer?.name || "Jugador Actual"}
+            nextPlayer={nextPlayer?.name || "Siguiente Jugador"}
           />
         </View>
 
@@ -119,7 +128,7 @@ const TurnReviewScreen: React.FC = () => {
         <View style={styles.bottomRow}>
           {/* Left - Round Stats */}
           <View style={styles.statsContainer}>
-            <RoundStats 
+            <RoundStats
               correctCount={correctCount}
               incorrectCount={incorrectCount}
             />
@@ -154,45 +163,45 @@ const styles = StyleSheet.create({
     paddingTop: 15,
   },
   header: {
-    alignItems: 'center',
+    alignItems: "center",
     marginBottom: 20,
   },
   headerTitle: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     color: colors.textLight,
-    textAlign: 'center',
+    textAlign: "center",
     marginBottom: 4,
   },
   headerSubtitle: {
     fontSize: 16,
     color: colors.textLight,
-    textAlign: 'center',
+    textAlign: "center",
   },
   topRow: {
     marginBottom: 20,
   },
   mainContent: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   instructionText: {
     fontSize: 14,
     color: colors.textLight,
-    textAlign: 'center',
+    textAlign: "center",
     marginBottom: 20,
     paddingHorizontal: 20,
   },
   cardsContainer: {
-    alignItems: 'center',
+    alignItems: "center",
     paddingHorizontal: 20,
   },
   cardSeparator: {
     width: 15,
   },
   bottomRow: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 15,
     minHeight: 120,
   },
@@ -201,7 +210,7 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     flex: 1,
-    justifyContent: 'flex-end',
+    justifyContent: "flex-end",
   },
   nextButton: {
     backgroundColor: colors.primary,
@@ -209,13 +218,13 @@ const styles = StyleSheet.create({
   },
   nextButtonContent: {
     height: 60,
-    justifyContent: 'center',
+    justifyContent: "center",
   },
   nextButtonLabel: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     color: colors.textLight,
   },
 });
 
-export default TurnReviewScreen; 
+export default TurnReviewScreen;

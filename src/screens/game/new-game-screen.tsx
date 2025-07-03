@@ -126,7 +126,7 @@ const NewGameScreen: React.FC = () => {
 
   const handleStartGame = () => {
     if (!selectedDeck) {
-      Alert.alert("Mazo requerido", "Selecciona un mazo para jugar");
+      router.push("/deck-selection");
       return;
     }
 
@@ -134,19 +134,6 @@ const NewGameScreen: React.FC = () => {
       Alert.alert(
         "Equipos incompletos",
         "Cada equipo debe tener al menos un jugador"
-      );
-      return;
-    }
-
-    const totalPlayers = teams.azul.players.length + teams.rojo.players.length;
-    if (totalPlayers < 4) {
-      Alert.alert(
-        "Pocos jugadores",
-        "Se recomienda tener al menos 4 jugadores para una mejor experiencia. ¿Quieres continuar?",
-        [
-          { text: "Cancelar", style: "cancel" },
-          { text: "Continuar", onPress: startGameConfirmed },
-        ]
       );
       return;
     }
