@@ -28,7 +28,7 @@ export const equipos = sqliteTable('equipos', {
 export const jugadores = sqliteTable('jugadores', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   nombre: text('nombre').notNull(),
-  equipo: text('equipo', { enum: ['azul', 'rojo', 'azul_temp', 'rojo_temp'] }).notNull(),
+  equipo: text('equipo', { enum: ['azul', 'rojo'] }).notNull(),
   createdAt: text('created_at').default(sql`CURRENT_TIMESTAMP`),
 });
 

@@ -417,15 +417,11 @@ class DatabaseManager {
       console.log('No previous game players found, checking for temporary team data...');
       const tempPlayers = await this.db.select({
         id: schema.jugadores.id,
-        nombre: schema.jugadores.nombre,
-        equipo: sql<string>`CASE 
-          WHEN ${schema.jugadores.equipo} = 'azul_temp' THEN 'azul'
-          WHEN ${schema.jugadores.equipo} = 'rojo_temp' THEN 'rojo'
-          ELSE ${schema.jugadores.equipo}
-        END`.as('equipo'),
+        nombre: sql<string>`SUBSTR(${schema.jugadores.nombre}, 6)`.as('nombre'), // Remove 'TEMP_' prefix
+        equipo: schema.jugadores.equipo,
       })
       .from(schema.jugadores)
-      .where(sql`${schema.jugadores.equipo} IN ('azul_temp', 'rojo_temp')`)
+      .where(sql`${schema.jugadores.nombre} LIKE 'TEMP_%'`)
       .orderBy(schema.jugadores.equipo, schema.jugadores.nombre);
       
       console.log('Temporary players found:', tempPlayers);
@@ -447,25 +443,29 @@ class DatabaseManager {
     try {
       console.log('Saving current teams to database...');
       
-      // Clear any existing temporary team data
-      await this.db.delete(schema.jugadores).where(sql`${schema.jugadores.equipo} IN ('azul_temp', 'rojo_temp')`);
+      // For now, instead of using temp team values that cause constraint issues,
+      // we'll save them with regular team values and use a different approach
+      // to identify them as temporary records
       
-      // Prepare all players data
+      // Clear any existing players with names starting with "TEMP_"
+      await this.db.delete(schema.jugadores).where(sql`${schema.jugadores.nombre} LIKE 'TEMP_%'`);
+      
+      // Prepare all players data with temporary naming convention
       const playersData: Omit<NewJugador, 'createdAt'>[] = [];
       
-      // Add blue team players
+      // Add blue team players with TEMP_ prefix to identify them as temporary
       for (const player of teams.azul.players) {
         playersData.push({
-          nombre: player.name,
-          equipo: 'azul_temp',
+          nombre: `TEMP_${player.name}`,
+          equipo: 'azul',
         });
       }
       
-      // Add red team players
+      // Add red team players with TEMP_ prefix to identify them as temporary
       for (const player of teams.rojo.players) {
         playersData.push({
-          nombre: player.name,
-          equipo: 'rojo_temp',
+          nombre: `TEMP_${player.name}`,
+          equipo: 'rojo',
         });
       }
       
