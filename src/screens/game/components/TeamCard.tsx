@@ -10,8 +10,9 @@ interface TeamCardProps {
   title: string;
   backgroundColor: string;
   players: Player[];
-  onMovePlayer: (playerId: string, fromTeam: TeamColor) => void;
+  onMovePlayer: (playerId: string, fromTeam: TeamColor, toTeam: TeamColor) => void;
   onRemovePlayer: (team: TeamColor, playerId: string) => void;
+  onAddPlayer: () => void;
 }
 
 const TeamCard: React.FC<TeamCardProps> = ({
@@ -21,7 +22,13 @@ const TeamCard: React.FC<TeamCardProps> = ({
   players,
   onMovePlayer,
   onRemovePlayer,
+  onAddPlayer,
 }) => {
+  const handleMovePlayer = (playerId: string) => {
+    const toTeam: TeamColor = team === "azul" ? "rojo" : "azul";
+    onMovePlayer(playerId, team, toTeam);
+  };
+
   return (
     <Card style={[styles.teamCard, { borderColor: backgroundColor }]}>
       <Card.Content style={{ height: "100%" }}>
@@ -40,37 +47,54 @@ const TeamCard: React.FC<TeamCardProps> = ({
                 styles.addPlayerIcon,
                 { backgroundColor: backgroundColor + "20" },
               ]}
+              onPress={onAddPlayer}
             />
             <Text style={styles.emptyTeamText}>AÑADIR JUGADOR</Text>
           </View>
         ) : (
-          players.map((player) => (
-            <View key={player.id} style={styles.playerItem}>
-              <Chip
+          <>
+            {players.map((player) => (
+              <View key={player.id} style={styles.playerItem}>
+                <Chip
+                  style={[
+                    styles.playerChip,
+                    { backgroundColor: backgroundColor + "20" },
+                  ]}
+                  textStyle={{ color: backgroundColor, fontWeight: "bold" }}
+                >
+                  {player.name}
+                </Chip>
+                <View style={styles.playerActions}>
+                  <IconButton
+                    icon="swap-horizontal"
+                    size={20}
+                    iconColor={colors.primary}
+                    onPress={() => handleMovePlayer(player.id)}
+                  />
+                  <IconButton
+                    icon="close"
+                    size={20}
+                    iconColor={colors.error}
+                    onPress={() => onRemovePlayer(team, player.id)}
+                  />
+                </View>
+              </View>
+            ))}
+            
+            {/* Add player button when there are existing players */}
+            <View style={styles.addMoreContainer}>
+              <IconButton
+                icon="plus"
+                size={24}
+                iconColor={backgroundColor}
                 style={[
-                  styles.playerChip,
+                  styles.addMoreIcon,
                   { backgroundColor: backgroundColor + "20" },
                 ]}
-                textStyle={{ color: backgroundColor, fontWeight: "bold" }}
-              >
-                {player.name}
-              </Chip>
-              <View style={styles.playerActions}>
-                <IconButton
-                  icon="swap-horizontal"
-                  size={20}
-                  iconColor={colors.primary}
-                  onPress={() => onMovePlayer(player.id, team)}
-                />
-                <IconButton
-                  icon="close"
-                  size={20}
-                  iconColor={colors.error}
-                  onPress={() => onRemovePlayer(team, player.id)}
-                />
-              </View>
+                onPress={onAddPlayer}
+              />
             </View>
-          ))
+          </>
         )}
       </Card.Content>
     </Card>
@@ -125,6 +149,13 @@ const styles = StyleSheet.create({
   },
   playerActions: {
     flexDirection: "row",
+  },
+  addMoreContainer: {
+    alignItems: "center",
+    marginTop: 10,
+  },
+  addMoreIcon: {
+    alignSelf: "center",
   },
 });
 

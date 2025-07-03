@@ -1,18 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { View, StyleSheet, ScrollView, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { Text, Button, IconButton, Portal, Modal, TextInput } from "react-native-paper";
 import { router } from "expo-router";
 
 import { database, Mazo } from "../../database/database";
 import { useGameStore, Player } from "../../store/game-store";
 import { colors } from "../../theme/theme";
-import {
-  DeckSelectionPhase,
-  TeamConfigurationPhase,
-  GameSummaryPhase,
-  NewGameHeader,
-} from "./components";
-import { GamePhase, TeamColor } from "./interfaces/types";
+import { TeamCard } from "./components";
+import { TeamColor } from "./interfaces/types";
 
 const NewGameScreen: React.FC = () => {
   const {
@@ -30,8 +26,9 @@ const NewGameScreen: React.FC = () => {
     startGame,
   } = useGameStore();
 
-  const [currentPhase, setCurrentPhase] = useState<GamePhase>("deck");
+  const [showPlayerModal, setShowPlayerModal] = useState(false);
   const [newPlayerName, setNewPlayerName] = useState("");
+  const [selectedTeamForPlayer, setSelectedTeamForPlayer] = useState<TeamColor>("azul");
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -64,61 +61,37 @@ const NewGameScreen: React.FC = () => {
       console.log('Successfully loaded last game players automatically');
     } catch (error) {
       console.error('Error auto-loading last game players:', error);
-      // Don't show alert for automatic loading, just log the error
     }
   };
 
-  const handleLoadLastGamePlayers = async () => {
-    setLoading(true);
-    try {
-      await loadLastGamePlayers();
-      Alert.alert(
-        "Equipos Cargados", 
-        "Se han cargado los jugadores de la última partida"
-      );
-    } catch (error) {
-      console.error("Error loading last game players:", error);
-      Alert.alert(
-        "Error", 
-        "No se pudieron cargar los jugadores de la última partida"
-      );
-    } finally {
-      setLoading(false);
+  const handleShufflePlayers = () => {
+    const allPlayers = [...teams.azul.players, ...teams.rojo.players];
+    if (allPlayers.length < 2) {
+      Alert.alert("Pocos jugadores", "Necesitas al menos 2 jugadores para mezclar");
+      return;
     }
+
+    // Shuffle array
+    const shuffled = [...allPlayers].sort(() => Math.random() - 0.5);
+    
+    // Clear teams first
+    clearTeams();
+    
+    // Distribute players alternately
+    shuffled.forEach((player, index) => {
+      const team: TeamColor = index % 2 === 0 ? "azul" : "rojo";
+      addPlayerToTeam(team, player);
+    });
+
+    Alert.alert("¡Jugadores mezclados!", "Los equipos han sido reorganizados aleatoriamente");
   };
 
-  const handleClearTeams = () => {
-    Alert.alert(
-      "Limpiar Equipos",
-      "¿Estás seguro de que quieres eliminar todos los jugadores de los equipos?",
-      [
-        { text: "Cancelar", style: "cancel" },
-        { 
-          text: "Limpiar", 
-          style: "destructive",
-          onPress: () => clearTeams()
-        },
-      ]
-    );
+  const handleAddPlayerPress = (team: TeamColor) => {
+    setSelectedTeamForPlayer(team);
+    setShowPlayerModal(true);
   };
 
-  const handleSelectDeck = async (deck: Mazo) => {
-    setSelectedDeck(deck);
-
-    try {
-      const cards = await database.getCartasByMazo(deck.id);
-      setCards(cards);
-      setCurrentPhase("teams");
-    } catch (error) {
-      console.error("Error loading cards:", error);
-    }
-  };
-
-  const generatePlayerId = (): string => {
-    return Date.now().toString() + Math.random().toString(36).substr(2, 9);
-  };
-
-  const handleAddPlayer = (team: TeamColor) => {
+  const handleAddPlayer = () => {
     if (!newPlayerName.trim()) {
       Alert.alert("Nombre requerido", "Ingresa el nombre del jugador");
       return;
@@ -137,20 +110,25 @@ const NewGameScreen: React.FC = () => {
     }
 
     const newPlayer: Player = {
-      id: generatePlayerId(),
+      id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
       name: newPlayerName.trim(),
     };
 
-    addPlayerToTeam(team, newPlayer);
+    addPlayerToTeam(selectedTeamForPlayer, newPlayer);
     setNewPlayerName("");
+    setShowPlayerModal(false);
   };
 
-  const handleMovePlayer = (playerId: string, fromTeam: TeamColor) => {
-    const toTeam: TeamColor = fromTeam === "azul" ? "rojo" : "azul";
-    movePlayerToTeam(playerId, fromTeam, toTeam);
+  const handleOpenDeckSelection = () => {
+    router.push("/deck-selection");
   };
 
-  const handleContinueToSummary = () => {
+  const handleStartGame = () => {
+    if (!selectedDeck) {
+      Alert.alert("Mazo requerido", "Selecciona un mazo para jugar");
+      return;
+    }
+
     if (teams.azul.players.length === 0 || teams.rojo.players.length === 0) {
       Alert.alert(
         "Equipos incompletos",
@@ -166,18 +144,16 @@ const NewGameScreen: React.FC = () => {
         "Se recomienda tener al menos 4 jugadores para una mejor experiencia. ¿Quieres continuar?",
         [
           { text: "Cancelar", style: "cancel" },
-          { text: "Continuar", onPress: () => setCurrentPhase("summary") },
+          { text: "Continuar", onPress: startGameConfirmed },
         ]
       );
       return;
     }
 
-    setCurrentPhase("summary");
+    startGameConfirmed();
   };
 
-  const handleStartGame = () => {
-    if (!selectedDeck) return;
-
+  const startGameConfirmed = () => {
     try {
       const cardsList = useGameStore.getState().cards.map((c) => c.texto);
       startGame(cardsList);
@@ -188,78 +164,130 @@ const NewGameScreen: React.FC = () => {
     }
   };
 
-  const handleBackPress = () => {
-    if (currentPhase === "deck") {
-      router.back();
-    } else if (currentPhase === "teams") {
-      setCurrentPhase("deck");
-    } else if (currentPhase === "summary") {
-      setCurrentPhase("teams");
-    }
-  };
-
-  const getPhaseTitle = () => {
-    switch (currentPhase) {
-      case "deck":
-        return "Seleccionar Mazo";
-      case "teams":
-        return "Configurar Equipos";
-      case "summary":
-        return "Resumen del Juego";
-      default:
-        return "";
-    }
-  };
-
-  const renderCurrentPhase = () => {
-    switch (currentPhase) {
-      case "deck":
-        return (
-          <DeckSelectionPhase
-            decks={decks}
-            onSelectDeck={handleSelectDeck}
-          />
-        );
-      case "teams":
-        return (
-          <TeamConfigurationPhase
-            teams={teams}
-            playerName={newPlayerName}
-            onPlayerNameChange={setNewPlayerName}
-            onAddPlayer={handleAddPlayer}
-            onMovePlayer={handleMovePlayer}
-            onRemovePlayer={removePlayerFromTeam}
-            onContinue={handleContinueToSummary}
-            onLoadLastGamePlayers={handleLoadLastGamePlayers}
-            onClearTeams={handleClearTeams}
-            loading={loading}
-          />
-        );
-      case "summary":
-        return (
-          <GameSummaryPhase
-            selectedDeck={selectedDeck}
-            teams={teams}
-            onStartGame={handleStartGame}
-          />
-        );
-      default:
-        return (
-          <DeckSelectionPhase
-            decks={decks}
-            onSelectDeck={handleSelectDeck}
-          />
-        );
-    }
-  };
-
   return (
     <SafeAreaView style={styles.container}>
-      <NewGameHeader title={getPhaseTitle()} onBackPress={handleBackPress} />
+      {/* Header */}
+      <View style={styles.header}>
+        <IconButton
+          icon="arrow-left"
+          size={24}
+          iconColor={colors.textLight}
+          onPress={() => router.back()}
+        />
+        <Text style={styles.headerTitle}>NUEVA PARTIDA</Text>
+        <IconButton
+          icon="shuffle"
+          size={24}
+          iconColor={colors.textLight}
+          onPress={handleShufflePlayers}
+        />
+      </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        {renderCurrentPhase()}
+        {/* Teams Section */}
+        <View style={styles.teamsContainer}>
+          <TeamCard
+            team="azul"
+            title="EQUIPO AZUL"
+            backgroundColor={colors.teamBlue}
+            players={teams.azul.players}
+            onMovePlayer={movePlayerToTeam}
+            onRemovePlayer={removePlayerFromTeam}
+            onAddPlayer={() => handleAddPlayerPress("azul")}
+          />
+
+          <TeamCard
+            team="rojo"
+            title="EQUIPO ROJO"
+            backgroundColor={colors.teamRed}
+            players={teams.rojo.players}
+            onMovePlayer={movePlayerToTeam}
+            onRemovePlayer={removePlayerFromTeam}
+            onAddPlayer={() => handleAddPlayerPress("rojo")}
+          />
+        </View>
+
+        {/* Deck Selection Info */}
+        <View style={styles.deckInfo}>
+          <Text style={styles.deckLabel}>
+            Mazos: {selectedDeck ? "1 seleccionado" : "0 seleccionados"}
+          </Text>
+        </View>
       </ScrollView>
+
+      {/* Bottom Actions */}
+      <View style={styles.bottomActions}>
+        <Button
+          mode="outlined"
+          onPress={handleOpenDeckSelection}
+          style={styles.deckButton}
+          labelStyle={styles.deckButtonLabel}
+          contentStyle={styles.deckButtonContent}
+        >
+          {selectedDeck ? selectedDeck.nombre : "Seleccionar Mazo"}
+        </Button>
+
+        <Button
+          mode="contained"
+          onPress={handleStartGame}
+          style={styles.startButton}
+          labelStyle={styles.startButtonLabel}
+          contentStyle={styles.startButtonContent}
+        >
+          ¡EMPEZAR!
+        </Button>
+      </View>
+
+      {/* Player Modal */}
+      <Portal>
+        <Modal
+          visible={showPlayerModal}
+          onDismiss={() => {
+            setShowPlayerModal(false);
+            setNewPlayerName("");
+          }}
+          contentContainerStyle={styles.modalContainer}
+        >
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Añadir Jugador</Text>
+            <Text style={styles.modalSubtitle}>
+              Equipo {selectedTeamForPlayer === "azul" ? "Azul" : "Rojo"}
+            </Text>
+            
+            <TextInput
+              label="Nombre del jugador"
+              value={newPlayerName}
+              onChangeText={setNewPlayerName}
+              mode="outlined"
+              style={styles.textInput}
+              autoFocus
+            />
+
+            <View style={styles.modalActions}>
+              <Button
+                mode="outlined"
+                onPress={() => {
+                  setShowPlayerModal(false);
+                  setNewPlayerName("");
+                }}
+                style={styles.modalButton}
+              >
+                Cancelar
+              </Button>
+              <Button
+                mode="contained"
+                onPress={handleAddPlayer}
+                style={styles.modalButton}
+                disabled={!newPlayerName.trim()}
+              >
+                Añadir
+              </Button>
+            </View>
+          </View>
+        </Modal>
+      </Portal>
+
+      
     </SafeAreaView>
   );
 };
@@ -269,10 +297,101 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
+  header: {
+    paddingBottom: 5,
+    height: 50,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 10,
+  },
+  headerTitle: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: colors.textLight,
+  },
   content: {
     flex: 1,
-    paddingHorizontal: 5,
-    paddingTop: 15,
+    paddingHorizontal: 20,
+    paddingTop: 20,
+  },
+  teamsContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 20,
+    height: 300,
+  },
+  deckInfo: {
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  deckLabel: {
+    fontSize: 14,
+    color: colors.textLight,
+    backgroundColor: colors.textLight + "20",
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+  },
+  bottomActions: {
+    flexDirection: "row",
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+    gap: 12,
+  },
+  deckButton: {
+    flex: 1,
+    borderColor: colors.textLight,
+  },
+  deckButtonLabel: {
+    color: colors.textLight,
+    fontSize: 14,
+  },
+  deckButtonContent: {
+    height: 48,
+  },
+  startButton: {
+    backgroundColor: colors.textLight,
+  },
+  startButtonLabel: {
+    color: colors.background,
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  startButtonContent: {
+    height: 48,
+    paddingHorizontal: 24,
+  },
+  modalContainer: {
+    backgroundColor: "white",
+    margin: 20,
+    borderRadius: 20,
+    padding: 20,
+  },
+  modalContent: {
+    alignItems: "center",
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 8,
+    color: colors.text,
+  },
+  modalSubtitle: {
+    fontSize: 16,
+    marginBottom: 20,
+    color: colors.text,
+  },
+  textInput: {
+    width: "100%",
+    marginBottom: 20,
+  },
+  modalActions: {
+    flexDirection: "row",
+    gap: 12,
+  },
+  modalButton: {
+    minWidth: 100,
   },
 });
 

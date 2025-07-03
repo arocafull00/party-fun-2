@@ -31,6 +31,7 @@ export const colors = {
   success: '#4CAF50',
   error: '#FF4444',
   warning: '#FFA726',
+  outline: '#CCCCCC',
   teamBlue: '#4A90E2',
   teamRed: '#FF6B6B',
   gradient: {
