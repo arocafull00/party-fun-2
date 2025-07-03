@@ -50,29 +50,6 @@ export const HomeScreen: React.FC = () => {
     }
   };
 
-  const handleDeleteDeck = async (deck: Mazo) => {
-    Alert.alert(
-      "Eliminar Mazo",
-      `¿Estás seguro de que quieres eliminar "${deck.nombre}"?`,
-      [
-        { text: "Cancelar", style: "cancel" },
-        {
-          text: "Eliminar",
-          style: "destructive",
-          onPress: async () => {
-            try {
-              await database.deleteMazo(deck.id);
-              await loadDecks();
-            } catch (error) {
-              console.error("Error deleting deck:", error);
-              Alert.alert("Error", "No se pudo eliminar el mazo");
-            }
-          },
-        },
-      ]
-    );
-  };
-
   const handleNewGame = () => {
     if (decks.length === 0) {
       Alert.alert(
@@ -92,7 +69,7 @@ export const HomeScreen: React.FC = () => {
 
   if (decks.length === 0) {
     return (
-      <ScrollView style={styles.container} contentContainerStyle={styles.emptyContainer}>
+      <View style={styles.emptyContainer}>
         <Surface style={styles.emptyCard} elevation={2}>
           <Icon source="cards-outline" size={80} />
           <Text style={styles.emptyTitle}>Sin mazos</Text>
@@ -108,7 +85,7 @@ export const HomeScreen: React.FC = () => {
             CREAR CARTAS
           </Button>
         </Surface>
-      </ScrollView>
+      </View>
     );
   }
 
@@ -180,6 +157,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "transparent",
+    width: "100%",
+    height: "100%",
   },
   header: {
     alignItems: "center",
@@ -264,11 +243,11 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "transparent",
   },
   emptyCard: {
     padding: 20,
     borderRadius: 10,
-    backgroundColor: colors.background,
     alignItems: "center",
   },
   emptyTitle: {

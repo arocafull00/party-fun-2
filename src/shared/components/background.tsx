@@ -12,7 +12,7 @@ interface BackgroundProps {
   children?: React.ReactNode;
 }
 
-const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
+const { width: screenWidth, height: screenHeight } = Dimensions.get("screen");
 
 export const Background: React.FC<BackgroundProps> = ({ children }) => {
   // Calculate aspect ratio to maintain proper scaling
@@ -147,6 +147,13 @@ export const Background: React.FC<BackgroundProps> = ({ children }) => {
         <Circle cx="617" cy="495" fill="#000000" fillOpacity="0.08" r="10" />
         <Circle cx="806" cy="1592" fill="#000000" fillOpacity="0.08" r="8" />
       </Svg>
+      
+      {/* Content overlay */}
+      {children && (
+        <View style={styles.contentOverlay}>
+          {children}
+        </View>
+      )}
     </View>
   );
 };
@@ -161,6 +168,7 @@ const styles = StyleSheet.create({
     zIndex: -100,
     width: '100%',
     height: '100%',
+    minHeight: '100%',
   },
   svg: {
     position: 'absolute',
@@ -170,6 +178,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     width: '100%',
     height: '100%',
+    minHeight: '100%',
   },
   contentOverlay: {
     position: 'absolute',

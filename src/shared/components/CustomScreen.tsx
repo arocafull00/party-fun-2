@@ -13,40 +13,25 @@ interface CustomScreenProps {
 export function CustomScreen({
   children,
   contentStyle,
-  containerStyle,
 }: CustomScreenProps) {
   return (
-    <View style={{ flex: 1}}>
+    <View style={{ flex: 1 }}>
       {/* Background that covers the entire screen */}
       <Background />
-      
-      {/* Safe area content */}
-      <SafeAreaView
+
+      <View
         style={[
-          containerStyle,
           {
             flex: 1,
             width: "100%",
-            height: "100%",
-            position: "relative",
+            paddingHorizontal: 16,
             backgroundColor: "transparent",
           },
+          contentStyle,
         ]}
       >
-        <View
-          style={[
-            {
-              flex: 1,
-              width: "100%",
-              paddingHorizontal: 16,
-              backgroundColor: "transparent",
-            },
-            contentStyle,
-          ]}
-        >
-          {children}
-        </View>
-      </SafeAreaView>
+        {children}
+      </View>
     </View>
   );
 }

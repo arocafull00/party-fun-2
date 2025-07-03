@@ -61,6 +61,7 @@ export default function RootLayout() {
   return (
     <SafeAreaProvider>
       <PaperProvider theme={theme}>
+        <CustomScreen containerStyle={styles.errorContainer}>
           <Stack
             screenOptions={{
               headerStyle: {
@@ -74,32 +75,41 @@ export default function RootLayout() {
             }}
           >
             <Stack.Screen name="index" options={{ title: "PartyFun" }} />
-            <Stack.Screen name="create-deck" options={{ title: "Crear Mazo" }} />
-            <Stack.Screen name="new-game" options={{ title: "Nueva Partida" }} />
-            <Stack.Screen 
-              name="game-turn" 
-              options={{ 
+            <Stack.Screen
+              name="create-deck"
+              options={{ title: "Crear Mazo" }}
+            />
+            <Stack.Screen
+              name="new-game"
+              options={{ title: "Nueva Partida" }}
+            />
+            <Stack.Screen
+              name="game-turn"
+              options={{
                 title: "Juego",
-                headerLeft: () => null 
-              }} 
+                headerLeft: () => null,
+              }}
             />
-            <Stack.Screen 
-              name="round-result" 
-              options={{ 
+            <Stack.Screen
+              name="round-result"
+              options={{
                 title: "Resultados de Ronda",
-                headerLeft: () => null 
-              }} 
+                headerLeft: () => null,
+              }}
             />
-            <Stack.Screen 
-              name="game-end" 
-              options={{ 
+            <Stack.Screen
+              name="game-end"
+              options={{
                 title: "Fin del Juego",
-                headerLeft: () => null 
-              }} 
+                headerLeft: () => null,
+              }}
             />
-            <Stack.Screen name="statistics" options={{ title: "Estadísticas" }} />
+            <Stack.Screen
+              name="statistics"
+              options={{ title: "Estadísticas" }}
+            />
           </Stack>
-        <StatusBar style="light" />
+        </CustomScreen>
       </PaperProvider>
     </SafeAreaProvider>
   );
@@ -141,4 +151,4 @@ const styles = StyleSheet.create({
     color: theme.colors.onSurfaceVariant,
     textAlign: "center",
   },
-}); 
+});
