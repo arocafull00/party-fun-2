@@ -7,6 +7,7 @@ import { View, Text, StyleSheet, ActivityIndicator } from "react-native";
 
 import { database } from "../src/database/database";
 import { theme } from "../src/theme/theme";
+import CustomScreen from "../src/shared/components/CustomScreen";
 
 export default function RootLayout() {
   const [isReady, setIsReady] = useState(false);
@@ -30,13 +31,13 @@ export default function RootLayout() {
     return (
       <SafeAreaProvider>
         <PaperProvider theme={theme}>
-          <View style={styles.errorContainer}>
+          <CustomScreen styles={styles.errorContainer}>
             <Text style={styles.errorTitle}>Error de Inicialización</Text>
             <Text style={styles.errorMessage}>{error}</Text>
             <Text style={styles.errorSubtitle}>
               Por favor, reinicia la aplicación
             </Text>
-          </View>
+          </CustomScreen>
           <StatusBar style="light" />
         </PaperProvider>
       </SafeAreaProvider>
@@ -47,10 +48,10 @@ export default function RootLayout() {
     return (
       <SafeAreaProvider>
         <PaperProvider theme={theme}>
-          <View style={styles.loadingContainer}>
+          <CustomScreen styles={styles.loadingContainer}>
             <ActivityIndicator size="large" color={theme.colors.primary} />
             <Text style={styles.loadingText}>Inicializando PartyFun...</Text>
-          </View>
+          </CustomScreen>
           <StatusBar style="light" />
         </PaperProvider>
       </SafeAreaProvider>
@@ -60,44 +61,46 @@ export default function RootLayout() {
   return (
     <SafeAreaProvider>
       <PaperProvider theme={theme}>
-        <Stack
-          screenOptions={{
-            headerStyle: {
-              backgroundColor: theme.colors.primary,
-            },
-            headerTintColor: theme.colors.onPrimary,
-            headerTitleStyle: {
-              fontWeight: "bold",
-            },
-            headerShown: false,
-          }}
-        >
-          <Stack.Screen name="index" options={{ title: "PartyFun" }} />
-          <Stack.Screen name="create-deck" options={{ title: "Crear Mazo" }} />
-          <Stack.Screen name="new-game" options={{ title: "Nueva Partida" }} />
-          <Stack.Screen 
-            name="game-turn" 
-            options={{ 
-              title: "Juego",
-              headerLeft: () => null 
-            }} 
-          />
-          <Stack.Screen 
-            name="round-result" 
-            options={{ 
-              title: "Resultados de Ronda",
-              headerLeft: () => null 
-            }} 
-          />
-          <Stack.Screen 
-            name="game-end" 
-            options={{ 
-              title: "Fin del Juego",
-              headerLeft: () => null 
-            }} 
-          />
-          <Stack.Screen name="statistics" options={{ title: "Estadísticas" }} />
-        </Stack>
+        <CustomScreen>
+          <Stack
+            screenOptions={{
+              headerStyle: {
+                backgroundColor: theme.colors.primary,
+              },
+              headerTintColor: theme.colors.onPrimary,
+              headerTitleStyle: {
+                fontWeight: "bold",
+              },
+              headerShown: false,
+            }}
+          >
+            <Stack.Screen name="index" options={{ title: "PartyFun" }} />
+            <Stack.Screen name="create-deck" options={{ title: "Crear Mazo" }} />
+            <Stack.Screen name="new-game" options={{ title: "Nueva Partida" }} />
+            <Stack.Screen 
+              name="game-turn" 
+              options={{ 
+                title: "Juego",
+                headerLeft: () => null 
+              }} 
+            />
+            <Stack.Screen 
+              name="round-result" 
+              options={{ 
+                title: "Resultados de Ronda",
+                headerLeft: () => null 
+              }} 
+            />
+            <Stack.Screen 
+              name="game-end" 
+              options={{ 
+                title: "Fin del Juego",
+                headerLeft: () => null 
+              }} 
+            />
+            <Stack.Screen name="statistics" options={{ title: "Estadísticas" }} />
+          </Stack>
+        </CustomScreen>
         <StatusBar style="light" />
       </PaperProvider>
     </SafeAreaProvider>
@@ -109,7 +112,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: theme.colors.background,
   },
   loadingText: {
     marginTop: 20,
@@ -121,7 +123,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: theme.colors.background,
     padding: 20,
   },
   errorTitle: {

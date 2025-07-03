@@ -313,13 +313,14 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     paddingHorizontal: 20,
-    paddingTop: 20,
+    paddingTop: 10,
   },
   teamsContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 20,
-    height: 300,
+    marginBottom: 40,
+    height: 230,
+    gap: 12,
   },
   deckInfo: {
     alignItems: "center",
@@ -335,12 +336,12 @@ const styles = StyleSheet.create({
   },
   bottomActions: {
     flexDirection: "row",
+    justifyContent: "space-between",
     paddingHorizontal: 20,
     paddingBottom: 20,
     gap: 12,
   },
   deckButton: {
-    flex: 1,
     borderColor: colors.textLight,
   },
   deckButtonLabel: {
