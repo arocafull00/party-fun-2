@@ -1,7 +1,5 @@
 import React from "react";
-import { View, ViewStyle, Platform } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { colors } from "../../theme/theme";
+import { View, ViewStyle } from "react-native";
 import Background from "./background";
 
 interface CustomScreenProps {

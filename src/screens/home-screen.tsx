@@ -90,7 +90,7 @@ export const HomeScreen: React.FC = () => {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: 'rgba(0,0,0,0)' } ]}>
       <View style={styles.header}>
         <Text style={styles.title}>PARTY FUN</Text>
         <Text style={styles.subtitle}>Game</Text>
@@ -156,9 +156,9 @@ export const HomeScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "transparent",
     width: "100%",
     height: "100%",
+    position: "relative",
   },
   header: {
     alignItems: "center",
@@ -184,6 +184,7 @@ const styles = StyleSheet.create({
     paddingTop: 40,
     maxWidth: 600,
     alignSelf: "center",
+    backgroundColor: colors.transparent,
   },
   mainCard: {
     marginBottom: 30,

@@ -17,6 +17,7 @@ export const theme = {
     success: '#4CAF50',
     teamBlue: '#4A90E2',
     teamRed: '#FF6B6B',
+    transparent: 'transparent',
   },
 };
 
@@ -34,6 +35,7 @@ export const colors = {
   outline: '#CCCCCC',
   teamBlue: '#4A90E2',
   teamRed: '#FF6B6B',
+  transparent: 'transparent',
   gradient: {
     blue: ['#4A90E2', '#357ABD'],
     red: ['#FF6B6B', '#E55555'],
