@@ -52,7 +52,6 @@ export const partidaJugadores = sqliteTable('partida_jugadores', {
   partidaId: integer('partida_id').notNull().references(() => partidas.id, { onDelete: 'cascade' }),
   jugadorId: integer('jugador_id').notNull().references(() => jugadores.id, { onDelete: 'cascade' }),
   equipo: text('equipo', { enum: ['azul', 'rojo'] }).notNull(),
-  createdAt: text('created_at').default(sql`CURRENT_TIMESTAMP`),
 });
 
 // Partida actual table (for current game state)

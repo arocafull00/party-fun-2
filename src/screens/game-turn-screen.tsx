@@ -18,14 +18,14 @@ import { CustomScreen } from "../shared/components/CustomScreen";
 
 const GameTurnScreen: React.FC = () => {
   const {
-    currentRound,
+    currentPhase,
     currentTeam,
     currentPlayerIndex,
     teams,
     timer,
     isTimerRunning,
     currentCardIndex,
-    roundCards,
+    phaseCards,
     startTimer,
     stopTimer,
     resetTimer,
@@ -44,12 +44,12 @@ const GameTurnScreen: React.FC = () => {
   // Current player and team info
   const currentTeamData = teams[currentTeam];
   const currentPlayer = currentTeamData.players[currentPlayerIndex];
-  const currentCard = roundCards[currentCardIndex];
-  const cardsRemaining = roundCards.length - currentCardIndex;
+  const currentCard = phaseCards[currentCardIndex];
+  const cardsRemaining = phaseCards.length - currentCardIndex;
 
-  // Round descriptions
-  const getRoundDescription = (round: number): string => {
-    switch (round) {
+  // Phase descriptions
+  const getPhaseDescription = (phase: number): string => {
+    switch (phase) {
       case 1:
         return "COGE EL MÓVIL";
       case 2:
@@ -57,7 +57,7 @@ const GameTurnScreen: React.FC = () => {
       case 3:
         return "MÍMICA";
       default:
-        return "RONDA " + round;
+        return "FASE " + phase;
     }
   };
 
@@ -134,7 +134,7 @@ const GameTurnScreen: React.FC = () => {
     markCardCorrect(currentCard);
 
     // Check if all cards are done
-    if (currentCardIndex >= roundCards.length - 1) {
+    if (currentCardIndex >= phaseCards.length - 1) {
       handleAllCardsCompleted();
     } else {
       // Continue with next card
@@ -147,13 +147,13 @@ const GameTurnScreen: React.FC = () => {
 
     markCardIncorrect(currentCard);
 
-    // In round 1, reduce timer by 5 seconds when skipping a word
-    if (currentRound === 1) {
+    // In phase 1, reduce timer by 5 seconds when skipping a word
+    if (currentPhase === 1) {
       reduceTimerForSkip();
     }
 
     // Check if all cards are done
-    if (currentCardIndex >= roundCards.length - 1) {
+    if (currentCardIndex >= phaseCards.length - 1) {
       handleAllCardsCompleted();
     } else {
       // Continue with next card
@@ -208,7 +208,7 @@ const GameTurnScreen: React.FC = () => {
         {/* Header with exit button */}
         <View style={styles.header}>
           <View style={styles.headerLeft}>
-            <Text style={styles.roundText}>Ronda {currentRound}</Text>
+            <Text style={styles.roundText}>Fase {currentPhase}</Text>
           </View>
           <View style={styles.headerRight}>
             <Text style={styles.wordsRemainingNumber}>x{cardsRemaining}</Text>
@@ -232,9 +232,9 @@ const GameTurnScreen: React.FC = () => {
             </Text>
           </Surface>
 
-          {/* Round description */}
+          {/* Phase description */}
           <Text style={styles.roundDescription}>
-            TURNO {currentPlayerIndex + 1} - {getRoundDescription(currentRound)}
+            TURNO {currentPlayerIndex + 1} - {getPhaseDescription(currentPhase)}
           </Text>
 
           {/* Player name */}

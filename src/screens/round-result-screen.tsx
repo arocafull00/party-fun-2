@@ -15,16 +15,16 @@ import { colors } from '../theme/theme';
 import { CustomScreen } from '../shared/components/CustomScreen';
 
 const RoundResultScreen: React.FC = () => {
-  const { currentRound, teams, gameHistory, currentRoundCards, endGame, endRound } = useGameStore();
+  const { currentPhase, teams, gameHistory, currentTurnCards, endGame, endRound } = useGameStore();
 
   // Get current round results
-  const azulCorrect = currentRoundCards.correct.slice(0, Math.floor(currentRoundCards.correct.length / 2));
-  const azulIncorrect = currentRoundCards.incorrect.slice(0, Math.floor(currentRoundCards.incorrect.length / 2));
-  const rojoCorrect = currentRoundCards.correct.slice(Math.floor(currentRoundCards.correct.length / 2));
-  const rojoIncorrect = currentRoundCards.incorrect.slice(Math.floor(currentRoundCards.incorrect.length / 2));
+  const azulCorrect = currentTurnCards.correct.slice(0, Math.floor(currentTurnCards.correct.length / 2));
+  const azulIncorrect = currentTurnCards.incorrect.slice(0, Math.floor(currentTurnCards.incorrect.length / 2));
+  const rojoCorrect = currentTurnCards.correct.slice(Math.floor(currentTurnCards.correct.length / 2));
+  const rojoIncorrect = currentTurnCards.incorrect.slice(Math.floor(currentTurnCards.incorrect.length / 2));
 
   const handleNextRound = () => {
-    if (currentRound >= 3) {
+    if (currentPhase >= 3) {
       endGame();
       router.push('/game-end');
     } else {
@@ -91,7 +91,7 @@ const RoundResultScreen: React.FC = () => {
         <Card style={styles.headerCard}>
           <Card.Content style={styles.headerContent}>
             <Text style={styles.roundTitle}>
-              {getRoundTitle(currentRound)}
+              {getRoundTitle(currentPhase)}
             </Text>
             <Text style={styles.completedText}>¡Ronda Completada!</Text>
           </Card.Content>
@@ -194,9 +194,9 @@ const RoundResultScreen: React.FC = () => {
           style={styles.continueButton}
           contentStyle={styles.continueButtonContent}
           labelStyle={styles.continueButtonLabel}
-          icon={currentRound >= 3 ? "trophy" : "arrow-right"}
+          icon={currentPhase >= 3 ? "trophy" : "arrow-right"}
         >
-          {currentRound >= 3 ? 'VER RESULTADOS FINALES' : 'SIGUIENTE RONDA'}
+          {currentPhase >= 3 ? 'VER RESULTADOS FINALES' : 'SIGUIENTE RONDA'}
         </Button>
       </ScrollView>
     </CustomScreen>

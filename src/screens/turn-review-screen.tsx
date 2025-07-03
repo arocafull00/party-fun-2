@@ -14,12 +14,13 @@ import {
 
 const TurnReviewScreen: React.FC = () => {
   const {
-    currentRound,
-    currentRoundCards,
+    currentPhase,
+    currentTurnCards,
     updateCurrentRoundCards,
     getCurrentPlayer,
     getNextPlayer,
     nextTurn,
+    endTurn,
     endRound,
     endGame,
   } = useGameStore();
@@ -28,7 +29,7 @@ const TurnReviewScreen: React.FC = () => {
   const nextPlayer = getNextPlayer();
 
   const { reviewCards, toggleCard, getCorrectCards, getIncorrectCards } =
-    useCardReview(currentRoundCards.correct, currentRoundCards.incorrect);
+    useCardReview(currentTurnCards.correct, currentTurnCards.incorrect);
   console.log(reviewCards);
   const handleNextTurn = () => {
     // Update the store with the reviewed cards
@@ -36,45 +37,44 @@ const TurnReviewScreen: React.FC = () => {
     const updatedIncorrect = getIncorrectCards();
     updateCurrentRoundCards(updatedCorrect, updatedIncorrect);
 
-    // Move to next turn
+    // Process the end of this turn (handle cards and check for phase/game completion)
+    const { phaseComplete, gameComplete } = endTurn();
+
+    if (gameComplete) {
+      // Game ended because all phases are complete
+      router.push("/game-end");
+      return;
+    }
+
+    if (phaseComplete) {
+      // Phase completed, go to phase summary
+      router.push("/round-result");
+      return;
+    }
+
+    // Phase continues, try to move to next turn
     const hasNextTurn = nextTurn();
 
     if (hasNextTurn) {
       // There's another turn, go to game turn screen
       router.push("/game-turn");
     } else {
-      // No more turns in this round, end the round
-      endRound();
-
-      // Check if the game ended due to no remaining cards
-      const gameState = useGameStore.getState();
-      if (!gameState.gameStarted) {
-        // Game ended because no cards remain
-        router.push("/game-end");
-        return;
-      }
-
-      if (currentRound >= 3) {
-        // Game is over after round 3
-        endGame();
-        router.push("/game-end");
-      } else {
-        // Go to round summary
-        router.push("/round-result");
-      }
+      // No more players available, but phase is not complete
+      // This shouldn't happen with proper team setup, but handle gracefully
+      router.push("/game-turn");
     }
   };
 
-  const getRoundTitle = (round: number): string => {
-    switch (round) {
+  const getPhaseTitle = (phase: number): string => {
+    switch (phase) {
       case 1:
-        return "RONDA 1 - PISTA LIBRE";
+        return "FASE 1 - PISTA LIBRE";
       case 2:
-        return "RONDA 2 - UNA PALABRA";
+        return "FASE 2 - UNA PALABRA";
       case 3:
-        return "RONDA 3 - MÍMICA";
+        return "FASE 3 - MÍMICA";
       default:
-        return `RONDA ${round}`;
+        return `FASE ${phase}`;
     }
   };
 
@@ -108,7 +108,7 @@ const TurnReviewScreen: React.FC = () => {
             />
           </View>
           <View style={styles.headerCenter}>
-            <Text style={styles.headerTitle}>{getRoundTitle(currentRound)}</Text>
+            <Text style={styles.headerTitle}>{getPhaseTitle(currentPhase)}</Text>
             <Text style={styles.headerSubtitle}>REVISIÓN DE TURNO</Text>
           </View>
           <View style={styles.headerSpacer} />
