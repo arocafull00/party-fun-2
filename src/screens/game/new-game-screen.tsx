@@ -9,6 +9,7 @@ import { useGameStore, Player } from "../../store/game-store";
 import { colors } from "../../theme/theme";
 import { TeamCard } from "./components";
 import { TeamColor } from "./interfaces/types";
+import { CustomScreen } from "../../shared/components/CustomScreen";
 
 const NewGameScreen: React.FC = () => {
   const {
@@ -165,7 +166,7 @@ const NewGameScreen: React.FC = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <CustomScreen contentStyle={styles.container}>
       {/* Header */}
       <View style={styles.header}>
         <IconButton
@@ -286,16 +287,14 @@ const NewGameScreen: React.FC = () => {
           </View>
         </Modal>
       </Portal>
-
-      
-    </SafeAreaView>
+    </CustomScreen>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    paddingTop: 20,
   },
   header: {
     paddingBottom: 5,

@@ -245,7 +245,7 @@ class DatabaseManager {
     this.ensureInitialized();
     
     try {
-      const result = await this.db.insert(schema.jugadores).values(playerData as NewJugador).returning({ id: schema.jugadores.id });
+      const result = await this.db.insert(schema.jugadores).values(playerData).returning({ id: schema.jugadores.id });
       return result[0].id;
     } catch (error) {
       console.error('Error creating jugador:', error);
@@ -451,7 +451,7 @@ class DatabaseManager {
       await this.db.delete(schema.jugadores).where(sql`${schema.jugadores.equipo} IN ('azul_temp', 'rojo_temp')`);
       
       // Prepare all players data
-      const playersData: NewJugador[] = [];
+      const playersData: Omit<NewJugador, 'createdAt'>[] = [];
       
       // Add blue team players
       for (const player of teams.azul.players) {

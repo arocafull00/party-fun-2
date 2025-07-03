@@ -7,6 +7,7 @@ import { router } from "expo-router";
 import { database, Mazo } from "../../database/database";
 import { useGameStore } from "../../store/game-store";
 import { colors } from "../../theme/theme";
+import { CustomScreen } from "../../shared/components/CustomScreen";
 
 const { width } = Dimensions.get('window');
 const cardWidth = (width - 60) / 2; // 2 cards per row with margins
@@ -67,7 +68,7 @@ const DeckSelectionScreen: React.FC = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <CustomScreen contentStyle={styles.container}>
       {/* Header */}
       <View style={styles.header}>
         <IconButton
@@ -141,14 +142,14 @@ const DeckSelectionScreen: React.FC = () => {
           </View>
         )}
       </ScrollView>
-    </SafeAreaView>
+    </CustomScreen>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    paddingTop: 20,
   },
   header: {
     paddingBottom: 5,

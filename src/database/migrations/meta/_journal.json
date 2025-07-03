@@ -8,6 +8,13 @@
       "when": 1751471783333,
       "tag": "0001_stiff_deadpool",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1751472000000,
+      "tag": "0002_create_missing_tables",
+      "breakpoints": true
     }
   ]
 }

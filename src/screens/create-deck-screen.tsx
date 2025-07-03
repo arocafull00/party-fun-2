@@ -17,6 +17,7 @@ import { router } from "expo-router";
 import { database } from "../database/database";
 import { useGameStore } from "../store/game-store";
 import { colors } from "../theme/theme";
+import { CustomScreen } from "../shared/components/CustomScreen";
 
 const { width: screenWidth } = Dimensions.get("window");
 const isTablet = screenWidth > 600;
@@ -135,7 +136,7 @@ const CreateDeckScreen: React.FC = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <CustomScreen contentStyle={styles.container}>
       <View style={styles.backgroundView}>
         {/* Header Section */}
         <View style={styles.header}>
@@ -302,18 +303,16 @@ const CreateDeckScreen: React.FC = () => {
           </Surface>
         </Modal>
       </Portal>
-    </SafeAreaView>
+    </CustomScreen>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
   },
   backgroundView: {
     flex: 1,
-    backgroundColor: colors.background,
   },
   header: {
     flexDirection: "row",
@@ -387,7 +386,6 @@ const styles = StyleSheet.create({
     fontWeight: "500",
   },
   bottomSection: {
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
     paddingHorizontal: 20,
     paddingVertical: 20,
     flexDirection: "row",

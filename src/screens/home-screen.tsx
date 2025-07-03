@@ -16,6 +16,7 @@ import { router, useRouter } from "expo-router";
 import { database, Mazo } from "../database/database";
 import { useGameStore } from "../store/game-store";
 import { colors } from "../theme/theme";
+import { CustomScreen } from "../shared/components/CustomScreen";
 
 export const HomeScreen: React.FC = () => {
   const { setDecks, decks } = useGameStore();
@@ -69,87 +70,91 @@ export const HomeScreen: React.FC = () => {
 
   if (decks.length === 0) {
     return (
-      <View style={styles.emptyContainer}>
-        <Surface style={styles.emptyCard} elevation={2}>
-          <Icon source="cards-outline" size={80} />
-          <Text style={styles.emptyTitle}>Sin mazos</Text>
-          <Text style={styles.emptyDescription}>
-            Necesitas crear al menos un mazo de cartas para jugar
-          </Text>
-          <Button
-            mode="contained"
-            onPress={() => router.push("/create-deck")}
-            style={styles.createButton}
-            icon="plus"
-          >
-            CREAR CARTAS
-          </Button>
-        </Surface>
-      </View>
+      <CustomScreen>
+        <View style={styles.emptyContainer}>
+          <Surface style={styles.emptyCard} elevation={2}>
+            <Icon source="cards-outline" size={80} />
+            <Text style={styles.emptyTitle}>Sin mazos</Text>
+            <Text style={styles.emptyDescription}>
+              Necesitas crear al menos un mazo de cartas para jugar
+            </Text>
+            <Button
+              mode="contained"
+              onPress={() => router.push("/create-deck")}
+              style={styles.createButton}
+              icon="plus"
+            >
+              CREAR CARTAS
+            </Button>
+          </Surface>
+        </View>
+      </CustomScreen>
     );
   }
 
   return (
-    <View style={[styles.container, { backgroundColor: 'rgba(0,0,0,0)' } ]}>
-      <View style={styles.header}>
-        <Text style={styles.title}>PARTY FUN</Text>
-        <Text style={styles.subtitle}>Game</Text>
-      </View>
+    <CustomScreen>
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <Text style={styles.title}>PARTY FUN</Text>
+          <Text style={styles.subtitle}>Game</Text>
+        </View>
 
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        {/* Main Game Button */}
-        <View style={styles.mainCard}>
-          <Button
-            mode="contained"
-            onPress={handleNewGame}
-            style={styles.playButton}
-            contentStyle={styles.playButtonContent}
-            labelStyle={styles.playButtonLabel}
-            icon="play"
-          >
-            NUEVO JUEGO
-          </Button>
-
-          {hasOngoingGame && (
+        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+          {/* Main Game Button */}
+          <View style={styles.mainCard}>
             <Button
-              mode="outlined"
-              onPress={handleContinueGame}
-              style={styles.continueButton}
-              contentStyle={styles.continueButtonContent}
-              labelStyle={styles.continueButtonLabel}
-              icon="play-circle-outline"
+              mode="contained"
+              onPress={handleNewGame}
+              style={styles.playButton}
+              contentStyle={styles.playButtonContent}
+              labelStyle={styles.playButtonLabel}
+              icon="play"
             >
-              CONTINUAR PARTIDA
+              NUEVO JUEGO
             </Button>
-          )}
-        </View>
 
-        {/* Action Buttons */}
-        <View style={styles.actionButtons}>
-          <Button
-            mode="contained"
-            onPress={() => router.push("/create-deck")}
-            style={[styles.actionButton, { backgroundColor: colors.tertiary }]}
-            contentStyle={styles.actionButtonContent}
-            labelStyle={styles.actionButtonLabel}
-            icon="cards"
-          >
-            CREAR CARTAS
-          </Button>
+            {hasOngoingGame && (
+              <Button
+                mode="outlined"
+                onPress={handleContinueGame}
+                style={styles.continueButton}
+                contentStyle={styles.continueButtonContent}
+                labelStyle={styles.continueButtonLabel}
+                icon="play-circle-outline"
+              >
+                CONTINUAR PARTIDA
+              </Button>
+            )}
+          </View>
 
-          <Button
-            mode="contained"
-            onPress={() => router.push("/statistics")}
-            style={[styles.actionButton, { backgroundColor: colors.secondary }]}
-            contentStyle={styles.actionButtonContent}
-            labelStyle={styles.actionButtonLabel}
-            icon="chart-line"
-          >
-            ESTADÍSTICAS
-          </Button>
-        </View>
-      </ScrollView>
-    </View>
+          {/* Action Buttons */}
+          <View style={styles.actionButtons}>
+            <Button
+              mode="contained"
+              onPress={() => router.push("/create-deck")}
+              style={[styles.actionButton, { backgroundColor: colors.tertiary }]}
+              contentStyle={styles.actionButtonContent}
+              labelStyle={styles.actionButtonLabel}
+              icon="cards"
+            >
+              CREAR CARTAS
+            </Button>
+
+            <Button
+              mode="contained"
+              onPress={() => router.push("/statistics")}
+              style={[styles.actionButton, { backgroundColor: colors.secondary }]}
+              contentStyle={styles.actionButtonContent}
+              labelStyle={styles.actionButtonLabel}
+              icon="chart-line"
+            >
+              ESTADÍSTICAS
+            </Button>
+          </View>
+        </ScrollView>
+      </View>
+    </CustomScreen>
   );
 };
 
@@ -159,6 +164,7 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
     position: "relative",
+    backgroundColor: "transparent",
   },
   header: {
     alignItems: "center",
@@ -244,7 +250,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "transparent",
   },
   emptyCard: {
     padding: 20,
