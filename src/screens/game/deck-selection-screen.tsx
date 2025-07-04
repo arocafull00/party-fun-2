@@ -42,10 +42,8 @@ const DeckSelectionScreen: React.FC = () => {
 
   const handleSelectDeck = async (deck: Mazo) => {
     try {
-      console.log("Selecting deck:", deck);
       setSelectedDeck(deck);
       const cards = await database.getCartasByMazo(deck.id);
-      console.log("Loaded cards for deck:", cards.length);
       setCards(cards);
       router.back();
     } catch (error) {

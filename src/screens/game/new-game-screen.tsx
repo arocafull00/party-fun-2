@@ -57,9 +57,7 @@ const NewGameScreen: React.FC = () => {
 
   const loadLastGamePlayersAutomatically = async () => {
     try {
-      console.log('Attempting to load last game players automatically...');
       await loadLastGamePlayers();
-      console.log('Successfully loaded last game players automatically');
     } catch (error) {
       console.error('Error auto-loading last game players:', error);
     }

@@ -30,7 +30,6 @@ const TurnReviewScreen: React.FC = () => {
 
   const { reviewCards, toggleCard, getCorrectCards, getIncorrectCards } =
     useCardReview(currentTurnCards.correct, currentTurnCards.incorrect);
-  console.log(reviewCards);
   const handleNextTurn = () => {
     // Update the store with the reviewed cards
     const updatedCorrect = getCorrectCards();
