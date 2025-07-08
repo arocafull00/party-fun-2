@@ -229,7 +229,6 @@ const NewGameScreen: React.FC = () => {
             ¡EMPEZAR!
           </Button>
         </View>
-      </SafeAreaView>
       {/* Player Modal */}
       <Portal>
         <Modal
@@ -278,6 +277,7 @@ const NewGameScreen: React.FC = () => {
           </View>
         </Modal>
       </Portal>
+      </SafeAreaView>
     </CustomScreen>
   );
 };

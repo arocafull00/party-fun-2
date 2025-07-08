@@ -3,7 +3,13 @@ import { Stack } from "expo-router";
 import { PaperProvider } from "react-native-paper";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
-import { View, Text, StyleSheet, ActivityIndicator } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ActivityIndicator,
+  SafeAreaView,
+} from "react-native";
 
 import { database } from "../src/database/database";
 import { theme } from "../src/theme/theme";
@@ -61,49 +67,58 @@ export default function RootLayout() {
   return (
     <SafeAreaProvider>
       <PaperProvider theme={theme}>
-        <Stack
-          screenOptions={{
-            headerStyle: {
-              backgroundColor: theme.colors.primary,
-            },
-            headerTintColor: theme.colors.onPrimary,
-            headerTitleStyle: {
-              fontWeight: "bold",
-            },
-            headerShown: false,
-          }}
-        >
-          <Stack.Screen name="index" options={{ title: "PartyFun" }} />
-          <Stack.Screen name="create-deck" options={{ title: "Crear Mazo" }} />
-          <Stack.Screen
-            name="deck-management"
-            options={{ title: "Mis Mazos" }}
-          />
-          <Stack.Screen name="new-game" options={{ title: "Nueva Partida" }} />
-          <Stack.Screen
-            name="game-turn"
-            options={{
-              title: "Juego",
-              headerLeft: () => null,
+          <Stack
+            screenOptions={{
+              headerStyle: {
+                backgroundColor: theme.colors.primary,
+              },
+              headerTintColor: theme.colors.text,
+              headerTitleStyle: {
+                fontWeight: "bold",
+              },
+              headerShown: false,
             }}
-          />
-          <Stack.Screen
-            name="round-result"
-            options={{
-              title: "Resultados de Ronda",
-              headerLeft: () => null,
-            }}
-          />
-          <Stack.Screen
-            name="game-end"
-            options={{
-              title: "Fin del Juego",
-              headerLeft: () => null,
-            }}
-          />
-          <Stack.Screen name="statistics" options={{ title: "Estadísticas" }} />
-        </Stack>
-        <StatusBar style="light" hidden={true} />
+          >
+            <Stack.Screen name="index" options={{ title: "PartyFun" }} />
+            <Stack.Screen
+              name="create-deck"
+              options={{ title: "Crear Mazo" }}
+            />
+            <Stack.Screen
+              name="deck-management"
+              options={{ title: "Mis Mazos" }}
+            />
+            <Stack.Screen
+              name="new-game"
+              options={{ title: "Nueva Partida" }}
+            />
+            <Stack.Screen
+              name="game-turn"
+              options={{
+                title: "Juego",
+                headerLeft: () => null,
+              }}
+            />
+            <Stack.Screen
+              name="round-result"
+              options={{
+                title: "Resultados de Ronda",
+                headerLeft: () => null,
+              }}
+            />
+            <Stack.Screen
+              name="game-end"
+              options={{
+                title: "Fin del Juego",
+                headerLeft: () => null,
+              }}
+            />
+            <Stack.Screen
+              name="statistics"
+              options={{ title: "Estadísticas" }}
+            />
+          </Stack>
+          <StatusBar style="light" hidden={true} />
       </PaperProvider>
     </SafeAreaProvider>
   );
@@ -118,7 +133,7 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 20,
     fontSize: 18,
-    color: theme.colors.onBackground,
+    color: theme.colors.text,
     fontWeight: "500",
   },
   errorContainer: {
@@ -130,19 +145,19 @@ const styles = StyleSheet.create({
   errorTitle: {
     fontSize: 24,
     fontWeight: "bold",
-    color: theme.colors.error,
+    color: theme.colors.text,
     marginBottom: 10,
     textAlign: "center",
   },
   errorMessage: {
     fontSize: 16,
-    color: theme.colors.onBackground,
+    color: theme.colors.text,
     textAlign: "center",
     marginBottom: 10,
   },
   errorSubtitle: {
     fontSize: 14,
-    color: theme.colors.onSurfaceVariant,
+    color: theme.colors.text,
     textAlign: "center",
   },
 });
