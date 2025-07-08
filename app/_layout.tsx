@@ -117,6 +117,14 @@ export default function RootLayout() {
               name="statistics"
               options={{ title: "Estadísticas" }}
             />
+            <Stack.Screen
+              name="deck-selection"
+              options={{ title: "Seleccionar Mazo" }}
+            />
+            <Stack.Screen
+              name="turn-review"
+              options={{ title: "Revisar Turno" }}
+            />
           </Stack>
           <StatusBar style="light" hidden={true} />
       </PaperProvider>

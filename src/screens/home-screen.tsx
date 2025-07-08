@@ -174,7 +174,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     fontWeight: "bold",
-    color: colors.text.inverse,
+    color: colors.textLight,
     textAlign: "center",
   },
   subtitle: {
@@ -213,7 +213,7 @@ const styles = StyleSheet.create({
   playButtonLabel: {
     fontSize: 18,
     fontWeight: "bold",
-    color: colors.text.inverse,
+    color: colors.textLight,
   },
   continueButton: {
     borderColor: colors.primary,
@@ -244,7 +244,7 @@ const styles = StyleSheet.create({
   actionButtonLabel: {
     fontSize: 16,
     fontWeight: "bold",
-    color: colors.text.inverse,
+    color: colors.textLight,
   },
   emptyContainer: {
     flex: 1,
@@ -259,12 +259,12 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 24,
     fontWeight: "bold",
-    color: colors.text.inverse,
+    color: colors.textLight,
     marginBottom: 10,
   },
   emptyDescription: {
     fontSize: 16,
-    color: colors.text.inverse,
+    color: colors.textLight,
     textAlign: "center",
   },
   createButton: {
