@@ -17,6 +17,7 @@ import { database, Mazo } from "../database/database";
 import { useGameStore } from "../store/game-store";
 import { colors } from "../theme/theme";
 import { CustomScreen } from "../shared/components/CustomScreen";
+import GlassCard from "../shared/components/GlassCard";
 
 export const HomeScreen: React.FC = () => {
   const { setDecks, decks } = useGameStore();
@@ -72,7 +73,7 @@ export const HomeScreen: React.FC = () => {
     return (
       <CustomScreen>
         <View style={styles.emptyContainer}>
-          <Surface style={styles.emptyCard} elevation={2}>
+          <GlassCard style={styles.emptyCard}>
             <Icon source="cards-outline" size={80} />
             <Text style={styles.emptyTitle}>Sin mazos</Text>
             <Text style={styles.emptyDescription}>
@@ -86,7 +87,7 @@ export const HomeScreen: React.FC = () => {
             >
               CREAR MAZOS
             </Button>
-          </Surface>
+          </GlassCard>
         </View>
       </CustomScreen>
     );
@@ -102,7 +103,7 @@ export const HomeScreen: React.FC = () => {
 
         <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
           {/* Main Game Button */}
-          <View style={styles.mainCard}>
+          <GlassCard style={styles.mainCard}>
             <Button
               mode="contained"
               onPress={handleNewGame}
@@ -126,10 +127,10 @@ export const HomeScreen: React.FC = () => {
                 CONTINUAR PARTIDA
               </Button>
             )}
-          </View>
+          </GlassCard>
 
           {/* Action Buttons */}
-          <View style={styles.actionButtons}>
+          <GlassCard style={styles.actionButtons}>
             <Button
               mode="contained"
               onPress={() => router.push("/deck-management")}
@@ -151,7 +152,7 @@ export const HomeScreen: React.FC = () => {
             >
               ESTADÍSTICAS
             </Button>
-          </View>
+          </GlassCard>
         </ScrollView>
       </View>
     </CustomScreen>
@@ -172,14 +173,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   title: {
-    fontSize: 32,
-    fontWeight: "bold",
+    fontSize: 40,
+    fontWeight: "900",
     color: colors.textLight,
     textAlign: "center",
+    letterSpacing: 2,
   },
   subtitle: {
-    fontSize: 20,
-    color: "#FFD700",
+    fontSize: 18,
+    color: colors.tertiary,
     fontStyle: "italic",
     textAlign: "center",
     marginTop: 5,
@@ -195,6 +197,9 @@ const styles = StyleSheet.create({
   mainCard: {
     marginBottom: 30,
     backgroundColor: "transparent",
+    borderRadius: 20,
+    padding: 20,
+    gap: 15,
   },
   mainCardContent: {
     paddingVertical: 30,
@@ -231,9 +236,11 @@ const styles = StyleSheet.create({
   },
   actionButtons: {
     gap: 20,
-    display: "flex",
     flexDirection: "row",
     justifyContent: "space-between",
+    alignItems: "center",
+    borderRadius: 20,
+    padding: 20,
   },
   actionButton: {
     borderRadius: 25,
@@ -253,8 +260,9 @@ const styles = StyleSheet.create({
   },
   emptyCard: {
     padding: 20,
-    borderRadius: 10,
+    borderRadius: 20,
     alignItems: "center",
+    gap: 10,
   },
   emptyTitle: {
     fontSize: 24,
@@ -270,6 +278,7 @@ const styles = StyleSheet.create({
   createButton: {
     backgroundColor: colors.primary,
     borderRadius: 25,
+    paddingHorizontal: 20,
   },
 });
 

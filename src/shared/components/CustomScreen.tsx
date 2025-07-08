@@ -1,6 +1,7 @@
 import React from "react";
-import { View, ViewStyle } from "react-native";
+import { View, ViewStyle, StyleSheet } from "react-native";
 import Background from "./background";
+import GlassCard from "./GlassCard";
 
 interface CustomScreenProps {
   children: React.ReactNode;
@@ -17,19 +18,15 @@ export function CustomScreen({
       {/* Background that covers the entire screen */}
       <Background />
 
-      <View
-        style={[
-          {
-            flex: 1,
-            width: "100%",
-            paddingHorizontal: 16,
-            backgroundColor: "transparent",
-          },
-          contentStyle,
-        ]}
-      >
-        {children}
-      </View>
+      <GlassCard style={[styles.glassContainer, contentStyle]}>{children}</GlassCard>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  glassContainer: {
+    flex: 1,
+    width: "100%",
+    paddingHorizontal: 16,
+  },
+});
