@@ -45,7 +45,18 @@ const DeckSelectionScreen: React.FC = () => {
       setSelectedDeck(deck);
       const cards = await database.getCartasByMazo(deck.id);
       setCards(cards);
-      router.back();
+      
+      // Check if we can start the game immediately
+      const currentState = useGameStore.getState();
+      if (currentState.teams.azul.players.length > 0 && currentState.teams.rojo.players.length > 0) {
+        // Start the game immediately
+        const cardsList = cards.map((c) => c.texto);
+        currentState.startGame(cardsList);
+        router.push("/game-turn");
+      } else {
+        // Go back to new game screen to configure teams
+        router.back();
+      }
     } catch (error) {
       console.error("Error loading cards:", error);
     }

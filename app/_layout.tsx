@@ -38,7 +38,7 @@ export default function RootLayout() {
               Por favor, reinicia la aplicación
             </Text>
           </CustomScreen>
-          <StatusBar style="light" />
+          <StatusBar style="light" hidden={true} />
         </PaperProvider>
       </SafeAreaProvider>
     );
@@ -52,7 +52,7 @@ export default function RootLayout() {
             <ActivityIndicator size="large" color={theme.colors.primary} />
             <Text style={styles.loadingText}>Inicializando PartyFun...</Text>
           </CustomScreen>
-          <StatusBar style="light" />
+          <StatusBar style="light" hidden={true} />
         </PaperProvider>
       </SafeAreaProvider>
     );
@@ -110,6 +110,7 @@ export default function RootLayout() {
             />
           </Stack>
         </CustomScreen>
+        <StatusBar style="light" hidden={true} />
       </PaperProvider>
     </SafeAreaProvider>
   );

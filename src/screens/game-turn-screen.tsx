@@ -258,17 +258,17 @@ const GameTurnScreen: React.FC = () => {
             visible={showExitDialog}
             onDismiss={() => setShowExitDialog(false)}
           >
-            <Dialog.Title>Salir del Juego</Dialog.Title>
+            <Dialog.Title>Terminar Partida</Dialog.Title>
             <Dialog.Content>
               <Text>
-                ¿Estás seguro de que quieres salir? Se perderá el progreso del
+                ¿Quieres terminar la partida? Se perderá todo el progreso del
                 juego.
               </Text>
             </Dialog.Content>
             <Dialog.Actions>
               <Button onPress={() => setShowExitDialog(false)}>Cancelar</Button>
               <Button onPress={handleExitGame} textColor={colors.error}>
-                Salir
+                Terminar
               </Button>
             </Dialog.Actions>
           </Dialog>
@@ -337,17 +337,17 @@ const GameTurnScreen: React.FC = () => {
           visible={showExitDialog}
           onDismiss={() => setShowExitDialog(false)}
         >
-          <Dialog.Title>Salir del Juego</Dialog.Title>
+          <Dialog.Title>Terminar Partida</Dialog.Title>
           <Dialog.Content>
             <Text>
-              ¿Estás seguro de que quieres salir? Se perderá el progreso del
+              ¿Quieres terminar la partida? Se perderá todo el progreso del
               juego.
             </Text>
           </Dialog.Content>
           <Dialog.Actions>
             <Button onPress={() => setShowExitDialog(false)}>Cancelar</Button>
             <Button onPress={handleExitGame} textColor={colors.error}>
-              Salir
+              Terminar
             </Button>
           </Dialog.Actions>
         </Dialog>
