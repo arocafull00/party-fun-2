@@ -24,14 +24,9 @@ const RoundResultScreen: React.FC = () => {
   const rojoIncorrect = currentTurnCards.incorrect.slice(Math.floor(currentTurnCards.incorrect.length / 2));
 
   const handleNextRound = () => {
-    if (currentPhase >= 3) {
-      endGame();
-      router.push('/game-end');
-    } else {
-      // Move to next round
-      endRound();
-      router.push('/game-turn');
-    }
+    // The phase transition is already handled by endTurn() in turn-review-screen
+    // We just need to continue to the next turn
+    router.push('/game-turn');
   };
 
   const getRoundTitle = (round: number): string => {
@@ -194,9 +189,9 @@ const RoundResultScreen: React.FC = () => {
           style={styles.continueButton}
           contentStyle={styles.continueButtonContent}
           labelStyle={styles.continueButtonLabel}
-          icon={currentPhase >= 3 ? "trophy" : "arrow-right"}
+          icon="arrow-right"
         >
-          {currentPhase >= 3 ? 'VER RESULTADOS FINALES' : 'SIGUIENTE RONDA'}
+          CONTINUAR
         </Button>
       </ScrollView>
     </CustomScreen>

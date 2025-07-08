@@ -84,7 +84,7 @@ export const HomeScreen: React.FC = () => {
               style={styles.createButton}
               icon="plus"
             >
-              CREAR CARTAS
+              CREAR MAZOS
             </Button>
           </Surface>
         </View>
@@ -132,13 +132,13 @@ export const HomeScreen: React.FC = () => {
           <View style={styles.actionButtons}>
             <Button
               mode="contained"
-              onPress={() => router.push("/create-deck")}
+              onPress={() => router.push("/deck-management")}
               style={[styles.actionButton, { backgroundColor: colors.tertiary }]}
               contentStyle={styles.actionButtonContent}
               labelStyle={styles.actionButtonLabel}
               icon="cards"
             >
-              CREAR CARTAS
+              MIS MAZOS
             </Button>
 
             <Button

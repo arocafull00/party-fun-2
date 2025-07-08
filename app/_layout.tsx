@@ -80,6 +80,10 @@ export default function RootLayout() {
               options={{ title: "Crear Mazo" }}
             />
             <Stack.Screen
+              name="deck-management"
+              options={{ title: "Mis Mazos" }}
+            />
+            <Stack.Screen
               name="new-game"
               options={{ title: "Nueva Partida" }}
             />

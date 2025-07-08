@@ -111,6 +111,19 @@ class DatabaseManager {
     }
   }
 
+  async updateMazo(id: number, nombre: string): Promise<void> {
+    this.ensureInitialized();
+    
+    try {
+      await this.db.update(schema.mazos)
+        .set({ nombre })
+        .where(eq(schema.mazos.id, id));
+    } catch (error) {
+      console.error('Error updating mazo:', error);
+      throw error;
+    }
+  }
+
   // Carta methods
   async addCarta(mazo_id: number, texto: string): Promise<number> {
     this.ensureInitialized();
