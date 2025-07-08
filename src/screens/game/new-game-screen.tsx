@@ -1,7 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { View, StyleSheet, ScrollView, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Text, Button, IconButton, Portal, Modal, TextInput } from "react-native-paper";
+import {
+  Text,
+  Button,
+  IconButton,
+  Portal,
+  Modal,
+  TextInput,
+} from "react-native-paper";
 import { router } from "expo-router";
 
 import { database, Mazo } from "../../database/database";
@@ -29,20 +36,22 @@ const NewGameScreen: React.FC = () => {
 
   const [showPlayerModal, setShowPlayerModal] = useState(false);
   const [newPlayerName, setNewPlayerName] = useState("");
-  const [selectedTeamForPlayer, setSelectedTeamForPlayer] = useState<TeamColor>("azul");
+  const [selectedTeamForPlayer, setSelectedTeamForPlayer] =
+    useState<TeamColor>("azul");
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const initializeScreen = async () => {
       await loadDecks();
-      
+
       // Only clear teams if there are players configured, otherwise try to load last game players
-      const hasPlayers = teams.azul.players.length > 0 || teams.rojo.players.length > 0;
+      const hasPlayers =
+        teams.azul.players.length > 0 || teams.rojo.players.length > 0;
       if (!hasPlayers) {
         await loadLastGamePlayersAutomatically();
       }
     };
-    
+
     initializeScreen();
   }, []);
 
@@ -59,30 +68,36 @@ const NewGameScreen: React.FC = () => {
     try {
       await loadLastGamePlayers();
     } catch (error) {
-      console.error('Error auto-loading last game players:', error);
+      console.error("Error auto-loading last game players:", error);
     }
   };
 
   const handleShufflePlayers = () => {
     const allPlayers = [...teams.azul.players, ...teams.rojo.players];
     if (allPlayers.length < 2) {
-      Alert.alert("Pocos jugadores", "Necesitas al menos 2 jugadores para mezclar");
+      Alert.alert(
+        "Pocos jugadores",
+        "Necesitas al menos 2 jugadores para mezclar"
+      );
       return;
     }
 
     // Shuffle array
     const shuffled = [...allPlayers].sort(() => Math.random() - 0.5);
-    
+
     // Clear teams first
     clearTeams();
-    
+
     // Distribute players alternately
     shuffled.forEach((player, index) => {
       const team: TeamColor = index % 2 === 0 ? "azul" : "rojo";
       addPlayerToTeam(team, player);
     });
 
-    Alert.alert("¡Jugadores mezclados!", "Los equipos han sido reorganizados aleatoriamente");
+    Alert.alert(
+      "¡Jugadores mezclados!",
+      "Los equipos han sido reorganizados aleatoriamente"
+    );
   };
 
   const handleAddPlayerPress = (team: TeamColor) => {
@@ -168,62 +183,53 @@ const NewGameScreen: React.FC = () => {
           onPress={handleShufflePlayers}
         />
       </View>
+      <SafeAreaView style={{ flex: 1 }}>
+        <View style={styles.content}>
+          {/* Teams Section */}
+          <View style={styles.teamsContainer}>
+            <TeamCard
+              team="azul"
+              title="EQUIPO AZUL"
+              backgroundColor={colors.primary}
+              players={teams.azul.players}
+              onMovePlayer={movePlayerToTeam}
+              onRemovePlayer={removePlayerFromTeam}
+              onAddPlayer={() => handleAddPlayerPress("azul")}
+            />
 
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        {/* Teams Section */}
-        <View style={styles.teamsContainer}>
-          <TeamCard
-            team="azul"
-            title="EQUIPO AZUL"
-            backgroundColor={colors.primary}
-            players={teams.azul.players}
-            onMovePlayer={movePlayerToTeam}
-            onRemovePlayer={removePlayerFromTeam}
-            onAddPlayer={() => handleAddPlayerPress("azul")}
-          />
-
-          <TeamCard
-            team="rojo"
-            title="EQUIPO ROJO"
-            backgroundColor={colors.secondary}
-            players={teams.rojo.players}
-            onMovePlayer={movePlayerToTeam}
-            onRemovePlayer={removePlayerFromTeam}
-            onAddPlayer={() => handleAddPlayerPress("rojo")}
-          />
+            <TeamCard
+              team="rojo"
+              title="EQUIPO ROJO"
+              backgroundColor={colors.secondary}
+              players={teams.rojo.players}
+              onMovePlayer={movePlayerToTeam}
+              onRemovePlayer={removePlayerFromTeam}
+              onAddPlayer={() => handleAddPlayerPress("rojo")}
+            />
+          </View>
         </View>
+        <View style={styles.bottomActions}>
+          <Button
+            mode="outlined"
+            onPress={handleOpenDeckSelection}
+            style={styles.deckButton}
+            labelStyle={styles.deckButtonLabel}
+            contentStyle={styles.deckButtonContent}
+          >
+            {selectedDeck ? selectedDeck.nombre : "Seleccionar Mazo"}
+          </Button>
 
-        {/* Deck Selection Info */}
-        <View style={styles.deckInfo}>
-          <Text style={styles.deckLabel}>
-            Mazos: {selectedDeck ? "1 seleccionado" : "0 seleccionados"}
-          </Text>
+          <Button
+            mode="contained"
+            onPress={handleStartGame}
+            style={styles.startButton}
+            labelStyle={styles.startButtonLabel}
+            contentStyle={styles.startButtonContent}
+          >
+            ¡EMPEZAR!
+          </Button>
         </View>
-      </ScrollView>
-
-      {/* Bottom Actions */}
-      <View style={styles.bottomActions}>
-        <Button
-          mode="outlined"
-          onPress={handleOpenDeckSelection}
-          style={styles.deckButton}
-          labelStyle={styles.deckButtonLabel}
-          contentStyle={styles.deckButtonContent}
-        >
-          {selectedDeck ? selectedDeck.nombre : "Seleccionar Mazo"}
-        </Button>
-
-        <Button
-          mode="contained"
-          onPress={handleStartGame}
-          style={styles.startButton}
-          labelStyle={styles.startButtonLabel}
-          contentStyle={styles.startButtonContent}
-        >
-          ¡EMPEZAR!
-        </Button>
-      </View>
-
+      </SafeAreaView>
       {/* Player Modal */}
       <Portal>
         <Modal
@@ -239,7 +245,7 @@ const NewGameScreen: React.FC = () => {
             <Text style={styles.modalSubtitle}>
               Equipo {selectedTeamForPlayer === "azul" ? "Azul" : "Rojo"}
             </Text>
-            
+
             <TextInput
               label="Nombre del jugador"
               value={newPlayerName}
@@ -295,7 +301,6 @@ const styles = StyleSheet.create({
     color: colors.text,
   },
   content: {
-    flex: 1,
     paddingHorizontal: 20,
     paddingTop: 10,
   },
@@ -326,17 +331,24 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   deckButton: {
-    borderColor: colors.text,
+    borderColor: colors.primary,
+    borderWidth: 2,
+    backgroundColor: colors.background,
+    borderRadius: 12,
+    elevation: 0,
   },
   deckButtonLabel: {
-    color: colors.text,
+    color: colors.primary,
     fontSize: 14,
+    fontWeight: "bold",
   },
   deckButtonContent: {
     height: 48,
   },
   startButton: {
-    backgroundColor: colors.text,
+    backgroundColor: colors.primary,
+    borderRadius: 12,
+    elevation: 0,
   },
   startButtonLabel: {
     color: colors.background,

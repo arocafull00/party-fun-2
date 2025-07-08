@@ -74,7 +74,7 @@ const TeamCard: React.FC<TeamCardProps> = ({
                   <IconButton
                     icon="close"
                     size={20}
-                    iconColor={colors.error}
+                    iconColor={colors.accent}
                     onPress={() => onRemovePlayer(team, player.id)}
                   />
                 </View>
@@ -104,10 +104,10 @@ const TeamCard: React.FC<TeamCardProps> = ({
 const styles = StyleSheet.create({
   teamCard: {
     flex: 1,
-    backgroundColor: colors.surface,
-    elevation: 4,
+    backgroundColor: colors.background,
     borderRadius: 20,
     width: "48%",
+    borderWidth: 2,
   },
   teamTitle: {
     fontSize: 20,
@@ -115,10 +115,12 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 15,
     letterSpacing: 1,
+    color: colors.text,
   },
   divider: {
-    backgroundColor: "#CCCCCC",
+    backgroundColor: colors.secondary,
     marginBottom: 20,
+    height: 2,
   },
   emptyTeamContainer: {
     alignItems: "center",
@@ -129,6 +131,7 @@ const styles = StyleSheet.create({
   },
   addPlayerIcon: {
     marginBottom: 15,
+    backgroundColor: colors.secondary + "20",
   },
   emptyTeamText: {
     textAlign: "center",
@@ -146,6 +149,7 @@ const styles = StyleSheet.create({
   playerChip: {
     flex: 1,
     marginRight: 8,
+    backgroundColor: colors.secondary + "20",
   },
   playerActions: {
     flexDirection: "row",
@@ -156,6 +160,7 @@ const styles = StyleSheet.create({
   },
   addMoreIcon: {
     alignSelf: "center",
+    backgroundColor: colors.secondary + "20",
   },
 });
 
