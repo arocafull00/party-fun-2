@@ -133,7 +133,7 @@ export const HomeScreen: React.FC = () => {
             <Button
               mode="contained"
               onPress={() => router.push("/deck-management")}
-              style={[styles.actionButton, { backgroundColor: colors.tertiary }]}
+              style={[styles.actionButton, { backgroundColor: colors.glass.card }]}
               contentStyle={styles.actionButtonContent}
               labelStyle={styles.actionButtonLabel}
               icon="cards"
@@ -144,7 +144,7 @@ export const HomeScreen: React.FC = () => {
             <Button
               mode="contained"
               onPress={() => router.push("/statistics")}
-              style={[styles.actionButton, { backgroundColor: colors.secondary }]}
+              style={[styles.actionButton, { backgroundColor: colors.glass.cardVariant }]}
               contentStyle={styles.actionButtonContent}
               labelStyle={styles.actionButtonLabel}
               icon="chart-line"
@@ -174,7 +174,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     fontWeight: "bold",
-    color: colors.textLight,
+    color: colors.text.inverse,
     textAlign: "center",
   },
   subtitle: {
@@ -190,7 +190,7 @@ const styles = StyleSheet.create({
     paddingTop: 40,
     maxWidth: 600,
     alignSelf: "center",
-    backgroundColor: colors.transparent,
+    backgroundColor: "transparent",
   },
   mainCard: {
     marginBottom: 30,
@@ -213,7 +213,7 @@ const styles = StyleSheet.create({
   playButtonLabel: {
     fontSize: 18,
     fontWeight: "bold",
-    color: colors.textLight,
+    color: colors.text.inverse,
   },
   continueButton: {
     borderColor: colors.primary,
@@ -244,7 +244,7 @@ const styles = StyleSheet.create({
   actionButtonLabel: {
     fontSize: 16,
     fontWeight: "bold",
-    color: colors.textLight,
+    color: colors.text.inverse,
   },
   emptyContainer: {
     flex: 1,
@@ -259,12 +259,12 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 24,
     fontWeight: "bold",
-    color: colors.textLight,
+    color: colors.text.inverse,
     marginBottom: 10,
   },
   emptyDescription: {
     fontSize: 16,
-    color: colors.textLight,
+    color: colors.text.inverse,
     textAlign: "center",
   },
   createButton: {
