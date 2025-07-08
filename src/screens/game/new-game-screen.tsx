@@ -157,14 +157,14 @@ const NewGameScreen: React.FC = () => {
         <IconButton
           icon="arrow-left"
           size={24}
-          iconColor={colors.textLight}
+          iconColor={colors.text}
           onPress={() => router.push("/")}
         />
         <Text style={styles.headerTitle}>NUEVA PARTIDA</Text>
         <IconButton
           icon="shuffle"
           size={24}
-          iconColor={colors.textLight}
+          iconColor={colors.text}
           onPress={handleShufflePlayers}
         />
       </View>
@@ -175,7 +175,7 @@ const NewGameScreen: React.FC = () => {
           <TeamCard
             team="azul"
             title="EQUIPO AZUL"
-            backgroundColor={colors.teamBlue}
+            backgroundColor={colors.primary}
             players={teams.azul.players}
             onMovePlayer={movePlayerToTeam}
             onRemovePlayer={removePlayerFromTeam}
@@ -185,7 +185,7 @@ const NewGameScreen: React.FC = () => {
           <TeamCard
             team="rojo"
             title="EQUIPO ROJO"
-            backgroundColor={colors.teamRed}
+            backgroundColor={colors.secondary}
             players={teams.rojo.players}
             onMovePlayer={movePlayerToTeam}
             onRemovePlayer={removePlayerFromTeam}
@@ -292,7 +292,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 16,
     fontWeight: "bold",
-    color: colors.textLight,
+    color: colors.text,
   },
   content: {
     flex: 1,
@@ -312,8 +312,8 @@ const styles = StyleSheet.create({
   },
   deckLabel: {
     fontSize: 14,
-    color: colors.textLight,
-    backgroundColor: colors.textLight + "20",
+    color: colors.text,
+    backgroundColor: colors.text + "20",
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
@@ -326,17 +326,17 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   deckButton: {
-    borderColor: colors.textLight,
+    borderColor: colors.text,
   },
   deckButtonLabel: {
-    color: colors.textLight,
+    color: colors.text,
     fontSize: 14,
   },
   deckButtonContent: {
     height: 48,
   },
   startButton: {
-    backgroundColor: colors.textLight,
+    backgroundColor: colors.text,
   },
   startButtonLabel: {
     color: colors.background,

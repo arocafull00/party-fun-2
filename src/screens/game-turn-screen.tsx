@@ -223,7 +223,7 @@ const GameTurnScreen: React.FC = () => {
               styles.teamBanner,
               {
                 backgroundColor:
-                  currentTeam === "azul" ? colors.teamBlue : colors.teamRed,
+                  currentTeam === "azul" ? colors.primary : colors.secondary,
               },
             ]}
           >
@@ -267,7 +267,7 @@ const GameTurnScreen: React.FC = () => {
             </Dialog.Content>
             <Dialog.Actions>
               <Button onPress={() => setShowExitDialog(false)}>Cancelar</Button>
-              <Button onPress={handleExitGame} textColor={colors.error}>
+              <Button onPress={handleExitGame} textColor={colors.accent}>
                 Terminar
               </Button>
             </Dialog.Actions>
@@ -306,7 +306,7 @@ const GameTurnScreen: React.FC = () => {
           <Surface style={styles.incorrectButton} elevation={4}>
             <IconButton
               icon="close"
-              iconColor={colors.textLight}
+              iconColor={colors.text}
               size={60}
               onPress={handleIncorrect}
             />
@@ -323,7 +323,7 @@ const GameTurnScreen: React.FC = () => {
           <Surface style={styles.correctButton} elevation={4}>
             <IconButton
               icon="check"
-              iconColor={colors.textLight}
+              iconColor={colors.text}
               size={60}
               onPress={handleCorrect}
             />
@@ -346,7 +346,7 @@ const GameTurnScreen: React.FC = () => {
           </Dialog.Content>
           <Dialog.Actions>
             <Button onPress={() => setShowExitDialog(false)}>Cancelar</Button>
-            <Button onPress={handleExitGame} textColor={colors.error}>
+            <Button onPress={handleExitGame} textColor={colors.accent}>
               Terminar
             </Button>
           </Dialog.Actions>
@@ -377,7 +377,7 @@ const styles = StyleSheet.create({
   roundText: {
     fontSize: 24,
     fontWeight: "bold",
-    color: colors.textLight,
+    color: colors.text,
   },
   wordsRemainingText: {
     fontSize: 14,
@@ -386,7 +386,7 @@ const styles = StyleSheet.create({
   wordsRemainingNumber: {
     fontSize: 24,
     fontWeight: "bold",
-    color: colors.textLight,
+    color: colors.text,
   },
   preparationContent: {
     flex: 1,
@@ -403,7 +403,7 @@ const styles = StyleSheet.create({
   teamBannerText: {
     fontSize: 20,
     fontWeight: "bold",
-    color: colors.textLight,
+    color: colors.text,
     textAlign: "center",
   },
   roundDescription: {
@@ -475,13 +475,13 @@ const styles = StyleSheet.create({
   },
   teamNameSmall: {
     fontSize: 14,
-    color: colors.textLight,
+    color: colors.text,
     fontWeight: "500",
   },
   playerNameSmall: {
     fontSize: 20,
     fontWeight: "bold",
-    color: colors.textLight,
+    color: colors.text,
   },
   timerCenter: {
     flex: 1,
@@ -492,7 +492,7 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: colors.surface,
+    backgroundColor: colors.background,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -514,7 +514,7 @@ const styles = StyleSheet.create({
   wordsRemainingNumberSmall: {
     fontSize: 24,
     fontWeight: "bold",
-    color: colors.textLight,
+    color: colors.text,
   },
   gameContent: {
     flex: 1,
@@ -534,7 +534,7 @@ const styles = StyleSheet.create({
   wordCard: {
     flex: 1,
     marginHorizontal: 20,
-    backgroundColor: colors.surface,
+    backgroundColor: colors.background,
     elevation: 8,
     borderRadius: 15,
     height: "100%",
@@ -571,7 +571,7 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
   incorrectButton: {
-    backgroundColor: colors.error,
+    backgroundColor: colors.accent,
     borderRadius: 60,
     width: 120,
     height: 120,
@@ -579,7 +579,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   correctButton: {
-    backgroundColor: colors.success,
+    backgroundColor: colors.primary,
     borderRadius: 60,
     width: 120,
     height: 120,
@@ -594,7 +594,7 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 18,
-    color: colors.error,
+    color: colors.accent,
     textAlign: "center",
     marginBottom: 20,
   },

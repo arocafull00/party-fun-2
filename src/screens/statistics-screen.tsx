@@ -105,8 +105,8 @@ const StatisticsScreen: React.FC = () => {
   };
 
   const getWinnerColor = (winner: string | null): string => {
-    if (winner === 'azul') return colors.teamBlue;
-    if (winner === 'rojo') return colors.teamRed;
+    if (winner === 'azul') return colors.primary;
+    if (winner === 'rojo') return colors.accent;
     return colors.text;
   };
 
@@ -154,12 +154,12 @@ const StatisticsScreen: React.FC = () => {
                 <Text style={styles.statLabel}>Partidas</Text>
               </Surface>
               
-              <Surface style={[styles.statItem, { backgroundColor: colors.success + '20' }]} elevation={2}>
+              <Surface style={[styles.statItem, { backgroundColor: colors.secondary + '20' }]} elevation={2}>
                 <Text style={styles.statNumber}>{statistics.totalWords}</Text>
                 <Text style={styles.statLabel}>Palabras</Text>
               </Surface>
               
-              <Surface style={[styles.statItem, { backgroundColor: colors.warning + '20' }]} elevation={2}>
+              <Surface style={[styles.statItem, { backgroundColor: colors.accent + '20' }]} elevation={2}>
                 <Text style={styles.statNumber}>{statistics.averageAccuracy}%</Text>
                 <Text style={styles.statLabel}>Precisión</Text>
               </Surface>
@@ -173,12 +173,12 @@ const StatisticsScreen: React.FC = () => {
             <Text style={styles.sectionTitle}>Victorias por Equipo</Text>
             
             <View style={styles.winStatsContainer}>
-              <View style={[styles.teamWinStat, { backgroundColor: colors.teamBlue + '20' }]}>
-                <Text style={[styles.teamWinNumber, { color: colors.teamBlue }]}>
+              <View style={[styles.teamWinStat, { backgroundColor: colors.primary + '20' }]}>
+                <Text style={[styles.teamWinNumber, { color: colors.primary }]}>
                   {statistics.gamesWonByBlue}
                 </Text>
                 <Text style={styles.teamWinLabel}>Equipo Azul</Text>
-                <Text style={[styles.teamWinPercentage, { color: colors.teamBlue }]}>
+                <Text style={[styles.teamWinPercentage, { color: colors.primary }]}>
                   {winPercentages.blue}%
                 </Text>
               </View>
@@ -187,12 +187,12 @@ const StatisticsScreen: React.FC = () => {
                 <Text style={styles.vsText}>VS</Text>
               </View>
               
-              <View style={[styles.teamWinStat, { backgroundColor: colors.teamRed + '20' }]}>
-                <Text style={[styles.teamWinNumber, { color: colors.teamRed }]}>
+              <View style={[styles.teamWinStat, { backgroundColor: colors.accent + '20' }]}>
+                <Text style={[styles.teamWinNumber, { color: colors.accent }]}>
                   {statistics.gamesWonByRed}
                 </Text>
                 <Text style={styles.teamWinLabel}>Equipo Rojo</Text>
-                <Text style={[styles.teamWinPercentage, { color: colors.teamRed }]}>
+                <Text style={[styles.teamWinPercentage, { color: colors.accent }]}>
                   {winPercentages.red}%
                 </Text>
               </View>
@@ -251,8 +251,8 @@ const StatisticsScreen: React.FC = () => {
                         </Text>
                         <View style={styles.gameStats}>
                           <Chip 
-                            style={[styles.gameStatChip, { backgroundColor: colors.success + '20' }]}
-                            textStyle={{ color: colors.success, fontSize: 12 }}
+                            style={[styles.gameStatChip, { backgroundColor: colors.secondary + '20' }]}
+                            textStyle={{ color: colors.secondary, fontSize: 12 }}
                           >
                             {game.palabras_correctas}/{game.total_palabras} palabras
                           </Chip>
@@ -328,7 +328,7 @@ const StatisticsScreen: React.FC = () => {
                     ? `Equipo Rojo (${winPercentages.red}% victorias)`
                     : 'Empate perfecto'
                 }
-                left={props => <List.Icon {...props} icon="trophy" color={colors.warning} />}
+                left={props => <List.Icon {...props} icon="trophy" color={colors.accent} />}
               />
               
               <List.Item
@@ -340,7 +340,7 @@ const StatisticsScreen: React.FC = () => {
                     ? 'Muy competitivo (alta precisión)'
                     : 'Diversión garantizada'
                 }
-                left={props => <List.Icon {...props} icon="chart-line" color={colors.success} />}
+                left={props => <List.Icon {...props} icon="chart-line" color={colors.secondary} />}
               />
             </Card.Content>
           </Card>
@@ -453,7 +453,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   playButton: {
-    backgroundColor: colors.success,
+    backgroundColor: colors.secondary,
   },
   gameHeader: {
     flexDirection: 'row',

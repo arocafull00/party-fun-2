@@ -103,8 +103,8 @@ const GameEndScreen: React.FC = () => {
   };
 
   const getWinnerColor = () => {
-    if (winner === 'azul') return colors.teamBlue;
-    if (winner === 'rojo') return colors.teamRed;
+    if (winner === 'azul') return colors.primary + '20';
+    if (winner === 'rojo') return colors.secondary + '20';
     return colors.text;
   };
 
@@ -123,7 +123,7 @@ const GameEndScreen: React.FC = () => {
     <CustomScreen contentStyle={styles.container}>
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Winner Announcement */}
-        <Surface style={[styles.winnerContainer, { backgroundColor: getWinnerColor() + '20' }]} elevation={4}>
+        <Surface style={[styles.winnerContainer, { backgroundColor: getWinnerColor() }]} elevation={4}>
           <Text style={styles.winnerIcon}>{getWinnerIcon()}</Text>
           <Text style={[styles.winnerText, { color: getWinnerColor() }]}>
             {getWinnerText()}
@@ -141,9 +141,9 @@ const GameEndScreen: React.FC = () => {
             <Text style={styles.sectionTitle}>Puntuación Final</Text>
             
             <View style={styles.scoreRow}>
-              <View style={[styles.teamScore, { backgroundColor: colors.teamBlue + '20' }]}>
-                <Text style={[styles.teamName, { color: colors.teamBlue }]}>AZUL</Text>
-                <Text style={[styles.teamScoreText, { color: colors.teamBlue }]}>{blueScore}</Text>
+              <View style={[styles.teamScore, { backgroundColor: colors.primary + '20' }]}>
+                <Text style={[styles.teamName, { color: colors.primary }]}>AZUL</Text>
+                <Text style={[styles.teamScoreText, { color: colors.primary }]}>{blueScore}</Text>
                 <Text style={styles.teamPlayersText}>
                   {teams.azul.players.map(p => p.name).join(', ')}
                 </Text>
@@ -151,9 +151,9 @@ const GameEndScreen: React.FC = () => {
               
               <Text style={styles.vs}>VS</Text>
               
-              <View style={[styles.teamScore, { backgroundColor: colors.teamRed + '20' }]}>
-                <Text style={[styles.teamName, { color: colors.teamRed }]}>ROJO</Text>
-                <Text style={[styles.teamScoreText, { color: colors.teamRed }]}>{redScore}</Text>
+              <View style={[styles.teamScore, { backgroundColor: colors.secondary + '20' }]}>
+                <Text style={[styles.teamName, { color: colors.secondary }]}>ROJO</Text>
+                <Text style={[styles.teamScoreText, { color: colors.secondary }]}>{redScore}</Text>
                 <Text style={styles.teamPlayersText}>
                   {teams.rojo.players.map(p => p.name).join(', ')}
                 </Text>
@@ -182,7 +182,7 @@ const GameEndScreen: React.FC = () => {
             <List.Item
               title="Cartas correctas"
               description={`${totalCorrect} aciertos`}
-              left={props => <List.Icon {...props} icon="check-circle" color={colors.success} />}
+              left={props => <List.Icon {...props} icon="check-circle" color={colors.primary} />}
             />
             
             <List.Item
@@ -216,15 +216,15 @@ const GameEndScreen: React.FC = () => {
                 <View style={styles.roundStats}>
                   <Chip 
                     icon="check" 
-                    style={[styles.statChip, { backgroundColor: colors.success + '20' }]}
-                    textStyle={{ color: colors.success }}
+                    style={[styles.statChip, { backgroundColor: colors.primary + '20' }]}
+                    textStyle={{ color: colors.primary }}
                   >
                     {round.correctCards.length} correctas
                   </Chip>
                   <Chip 
                     icon="close" 
-                    style={[styles.statChip, { backgroundColor: colors.error + '20' }]}
-                    textStyle={{ color: colors.error }}
+                    style={[styles.statChip, { backgroundColor: colors.accent + '20' }]}
+                    textStyle={{ color: colors.accent }}
                   >
                     {round.incorrectCards.length} incorrectas
                   </Chip>
@@ -276,7 +276,7 @@ const GameEndScreen: React.FC = () => {
             <Chip 
               icon="check-circle" 
               style={styles.savedChip}
-              textStyle={{ color: colors.success }}
+              textStyle={{ color: colors.primary }}
             >
               Partida guardada
             </Chip>
@@ -320,7 +320,7 @@ const styles = StyleSheet.create({
   },
   scoresCard: {
     marginBottom: 20,
-    backgroundColor: colors.surface,
+    backgroundColor: colors.background,
     elevation: 4,
   },
   sectionTitle: {
@@ -353,7 +353,7 @@ const styles = StyleSheet.create({
   },
   teamPlayersText: {
     fontSize: 12,
-    color: colors.textLight,
+    color: colors.text,
     textAlign: 'center',
     lineHeight: 16,
   },
@@ -365,12 +365,12 @@ const styles = StyleSheet.create({
   },
   statsCard: {
     marginBottom: 20,
-    backgroundColor: colors.surface,
+    backgroundColor: colors.background,
     elevation: 4,
   },
   roundsCard: {
     marginBottom: 20,
-    backgroundColor: colors.surface,
+    backgroundColor: colors.background,
     elevation: 4,
   },
   roundResult: {
@@ -384,7 +384,7 @@ const styles = StyleSheet.create({
   },
   roundDescription: {
     fontSize: 14,
-    color: colors.textLight,
+    color: colors.text,
     marginBottom: 10,
     fontStyle: 'italic',
   },
@@ -404,7 +404,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   primaryButton: {
-    backgroundColor: colors.success,
+    backgroundColor: colors.primary,
   },
   secondaryButton: {
     borderColor: colors.primary,
@@ -419,14 +419,14 @@ const styles = StyleSheet.create({
   buttonLabel: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: colors.textLight,
+    color: colors.text,
   },
   saveStatus: {
     alignItems: 'center',
     marginBottom: 20,
   },
   savedChip: {
-    backgroundColor: colors.success + '20',
+    backgroundColor: colors.primary + '20',
   },
 });
 

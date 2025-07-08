@@ -83,14 +83,14 @@ const DeckSelectionScreen: React.FC = () => {
         <IconButton
           icon="close"
           size={24}
-          iconColor={colors.textLight}
+          iconColor={colors.text}
           onPress={() => router.back()}
         />
         <Text style={styles.headerTitle}>MAZOS</Text>
         <IconButton
           icon="refresh"
           size={24}
-          iconColor={colors.textLight}
+          iconColor={colors.text}
           onPress={loadDecks}
         />
       </View>
@@ -125,7 +125,7 @@ const DeckSelectionScreen: React.FC = () => {
                         <IconButton
                           icon="check"
                           size={20}
-                          iconColor={colors.textLight}
+                          iconColor={colors.text}
                         />
                       </View>
                     </View>
@@ -171,7 +171,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 18,
     fontWeight: "bold",
-    color: colors.textLight,
+    color: colors.text,
   },
   content: {
     flex: 1,
@@ -200,7 +200,7 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   selectedDeckCard: {
-    borderColor: colors.success,
+    borderColor: colors.primary,
     borderWidth: 3,
     elevation: 8,
   },
@@ -227,7 +227,7 @@ const styles = StyleSheet.create({
     right: 8,
   },
   checkCircle: {
-    backgroundColor: colors.success,
+    backgroundColor: colors.primary,
     borderRadius: 20,
     width: 32,
     height: 32,
@@ -243,13 +243,13 @@ const styles = StyleSheet.create({
   emptyStateText: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: colors.textLight,
+    color: colors.text,
     marginBottom: 8,
     textAlign: 'center',
   },
   emptyStateSubtext: {
     fontSize: 14,
-    color: colors.textLight + '80',
+    color: colors.text + '80',
     textAlign: 'center',
   },
   loadingState: {
@@ -260,7 +260,7 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     fontSize: 16,
-    color: colors.textLight,
+    color: colors.text,
     textAlign: 'center',
   },
 });

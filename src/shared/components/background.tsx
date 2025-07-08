@@ -8,6 +8,7 @@ const { width, height } = Dimensions.get('window');
 export const Background = () => {
   const animatedValue = useRef(new Animated.Value(0)).current;
   const scaleValue = useRef(new Animated.Value(1)).current;
+  const rotationValue = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     // Create floating animation
@@ -42,12 +43,23 @@ export const Background = () => {
       ])
     );
 
+    // Create rotation animation
+    const rotationAnimation = Animated.loop(
+      Animated.timing(rotationValue, {
+        toValue: 1,
+        duration: 15000,
+        useNativeDriver: true,
+      })
+    );
+
     floatingAnimation.start();
     scaleAnimation.start();
+    rotationAnimation.start();
 
     return () => {
       floatingAnimation.stop();
       scaleAnimation.stop();
+      rotationAnimation.stop();
     };
   }, []);
 
@@ -56,41 +68,34 @@ export const Background = () => {
     outputRange: [0, -20],
   });
 
+  const rotation = rotationValue.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0deg', '360deg'],
+  });
+
   return (
     <View style={styles.container}>
-      {/* Base gradient background */}
-      <LinearGradient
-        colors={colors.gradients.background as [string, string]}
-        style={styles.baseGradient}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-      />
+      {/* Base background color */}
+      <View style={[styles.baseBackground, { backgroundColor: colors.background }]} />
 
-      {/* Animated floating orbs */}
+      {/* Animated floating cards */}
       <Animated.View
         style={[
-          styles.orb,
-          styles.orb1,
+          styles.card,
+          styles.card1,
           {
             transform: [
               { translateY },
               { scale: scaleValue },
             ],
+            backgroundColor: colors.primary,
           },
         ]}
-      >
-        <LinearGradient
-          colors={colors.gradients.primary as [string, string]}
-          style={styles.orbGradient}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-        />
-      </Animated.View>
-
+      />
       <Animated.View
         style={[
-          styles.orb,
-          styles.orb2,
+          styles.card,
+          styles.card2,
           {
             transform: [
               { translateY: animatedValue.interpolate({
@@ -101,22 +106,16 @@ export const Background = () => {
                 inputRange: [0, 1],
                 outputRange: [1, 0.95],
               }) },
+              { rotate: '15deg' },
             ],
+            backgroundColor: colors.secondary,
           },
         ]}
-      >
-        <LinearGradient
-          colors={colors.gradients.secondary as [string, string]}
-          style={styles.orbGradient}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-        />
-      </Animated.View>
-
+      />
       <Animated.View
         style={[
-          styles.orb,
-          styles.orb3,
+          styles.card,
+          styles.card3,
           {
             transform: [
               { translateY: animatedValue.interpolate({
@@ -128,19 +127,70 @@ export const Background = () => {
                 outputRange: [1, 1.1],
               }) },
             ],
+            backgroundColor: colors.accent,
           },
         ]}
-      >
-        <LinearGradient
-          colors={colors.gradients.success as [string, string]}
-          style={styles.orbGradient}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-        />
-      </Animated.View>
-
-      {/* Glassmorphism overlay */}
-      <View style={styles.glassOverlay} />
+      />
+      <Animated.View
+        style={[
+          styles.card,
+          styles.card4,
+          {
+            transform: [
+              { translateY: animatedValue.interpolate({
+                inputRange: [0, 1],
+                outputRange: [0, 10],
+              }) },
+              { scale: scaleValue.interpolate({
+                inputRange: [0, 1],
+                outputRange: [1, 1.05],
+              }) },
+              { rotate: '-25deg' },
+            ],
+            backgroundColor: colors.primary,
+          },
+        ]}
+      />
+      <Animated.View
+        style={[
+          styles.card,
+          styles.card5,
+          {
+            transform: [
+              { translateY: animatedValue.interpolate({
+                inputRange: [0, 1],
+                outputRange: [0, -15],
+              }) },
+              { scale: scaleValue.interpolate({
+                inputRange: [0, 1],
+                outputRange: [1, 0.9],
+              }) },
+              { rotate: rotation },
+            ],
+            backgroundColor: colors.secondary,
+          },
+        ]}
+      />
+      <Animated.View
+        style={[
+          styles.card,
+          styles.card6,
+          {
+            transform: [
+              { translateY: animatedValue.interpolate({
+                inputRange: [0, 1],
+                outputRange: [0, 20],
+              }) },
+              { scale: scaleValue.interpolate({
+                inputRange: [0, 1],
+                outputRange: [1, 1.15],
+              }) },
+              { rotate: '45deg' },
+            ],
+            backgroundColor: colors.accent,
+          },
+        ]}
+      />
     </View>
   );
 };
@@ -152,40 +202,57 @@ const styles = StyleSheet.create({
     pointerEvents: 'none',
     zIndex: -1,
   },
-  baseGradient: {
+  baseBackground: {
     ...StyleSheet.absoluteFillObject,
   },
-  orb: {
+  card: {
     position: 'absolute',
-    borderRadius: 999,
-    opacity: 0.3,
+    borderRadius: 12,
+    opacity: 0.15,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
-  orb1: {
-    width: 200,
-    height: 200,
+  card1: {
+    width: 120,
+    height: 180,
     top: height * 0.1,
-    right: -50,
+    right: -30,
   },
-  orb2: {
-    width: 150,
+  card2: {
+    width: 100,
     height: 150,
     top: height * 0.6,
-    left: -30,
+    left: -20,
   },
-  orb3: {
-    width: 120,
+  card3: {
+    width: 80,
     height: 120,
     top: height * 0.3,
     left: width * 0.7,
   },
-  orbGradient: {
-    width: '100%',
-    height: '100%',
-    borderRadius: 999,
+  card4: {
+    width: 90,
+    height: 135,
+    top: height * 0.8,
+    right: width * 0.2,
   },
-  glassOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: colors.glass.backdrop,
+  card5: {
+    width: 70,
+    height: 105,
+    top: height * 0.15,
+    left: width * 0.3,
+  },
+  card6: {
+    width: 110,
+    height: 165,
+    top: height * 0.45,
+    right: width * 0.1,
   },
 });
 

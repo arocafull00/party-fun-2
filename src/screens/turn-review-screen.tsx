@@ -187,13 +187,13 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 24,
     fontWeight: "bold",
-    color: colors.textLight,
+    color: colors.text,
     textAlign: "center",
     marginBottom: 4,
   },
   headerSubtitle: {
     fontSize: 16,
-    color: colors.textLight,
+    color: colors.text,
     textAlign: "center",
   },
   mainContent: {
@@ -203,7 +203,7 @@ const styles = StyleSheet.create({
   },
   instructionText: {
     fontSize: 14,
-    color: colors.textLight,
+    color: colors.text,
     textAlign: "center",
     marginBottom: 20,
     paddingHorizontal: 20,
@@ -236,7 +236,7 @@ const styles = StyleSheet.create({
   nextButtonLabel: {
     fontSize: 16,
     fontWeight: "bold",
-    color: colors.textLight,
+    color: colors.text,
   },
   flatListStyle: {
     height: 220,
@@ -250,7 +250,7 @@ const styles = StyleSheet.create({
   },
   noCardsText: {
     fontSize: 16,
-    color: colors.textLight,
+    color: colors.text,
     textAlign: 'center',
   },
 });

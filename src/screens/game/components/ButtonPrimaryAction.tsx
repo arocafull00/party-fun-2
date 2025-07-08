@@ -77,9 +77,6 @@ const styles = StyleSheet.create({
   primaryButton: {
     backgroundColor: colors.primary,
   },
-  successButton: {
-    backgroundColor: colors.success,
-  },
   smallButtonContent: {
     height: 40,
   },
@@ -92,12 +89,12 @@ const styles = StyleSheet.create({
   defaultButtonLabel: {
     fontSize: 16,
     fontWeight: "bold",
-    color: colors.textLight,
+    color: colors.text,
   },
   largeButtonLabel: {
     fontSize: 18,
     fontWeight: "bold",
-    color: colors.textLight,
+    color: colors.text,
   },
 });
 

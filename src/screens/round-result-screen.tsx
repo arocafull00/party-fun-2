@@ -51,7 +51,7 @@ const RoundResultScreen: React.FC = () => {
           <Chip 
             icon={correct ? "check" : "close"}
             style={[styles.countChip, { backgroundColor: color }]}
-            textStyle={{ color: colors.textLight }}
+            textStyle={{ color: colors.text }}
           >
             {cards.length}
           </Chip>
@@ -98,19 +98,19 @@ const RoundResultScreen: React.FC = () => {
             <Text style={styles.sectionTitle}>Puntuación de la Ronda</Text>
             <View style={styles.scoresContainer}>
               <View style={styles.scoreItem}>
-                <Text style={[styles.teamName, { color: colors.teamBlue }]}>
+                <Text style={[styles.teamName, { color: colors.primary }]}>
                   EQUIPO AZUL
                 </Text>
-                <Text style={[styles.scoreText, { color: colors.teamBlue }]}>
+                <Text style={[styles.scoreText, { color: colors.primary }]}>
                   {azulCorrect.length}
                 </Text>
               </View>
               <Text style={styles.vsText}>VS</Text>
               <View style={styles.scoreItem}>
-                <Text style={[styles.teamName, { color: colors.teamRed }]}>
+                <Text style={[styles.teamName, { color: colors.secondary }]}>
                   EQUIPO ROJO
                 </Text>
-                <Text style={[styles.scoreText, { color: colors.teamRed }]}>
+                <Text style={[styles.scoreText, { color: colors.secondary }]}>
                   {rojoCorrect.length}
                 </Text>
               </View>
@@ -120,7 +120,7 @@ const RoundResultScreen: React.FC = () => {
 
         {/* Team Results */}
         <View style={styles.resultsContainer}>
-          <Text style={[styles.sectionTitle, { color: colors.textLight }]}>Resultados por Equipo</Text>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Resultados por Equipo</Text>
           
           <View style={styles.teamsResultsRow}>
             {/* Blue Team */}
@@ -128,13 +128,13 @@ const RoundResultScreen: React.FC = () => {
               <CardsList 
                 cards={azulCorrect}
                 title="Equipo Azul - Acertadas"
-                color={colors.success}
+                color={colors.primary}
                 correct={true}
               />
               <CardsList 
                 cards={azulIncorrect}
                 title="Equipo Azul - Falladas"
-                color={colors.error}
+                color={colors.accent}
                 correct={false}
               />
             </View>
@@ -144,13 +144,13 @@ const RoundResultScreen: React.FC = () => {
               <CardsList 
                 cards={rojoCorrect}
                 title="Equipo Rojo - Acertadas"
-                color={colors.success}
+                color={colors.primary}
                 correct={true}
               />
               <CardsList 
                 cards={rojoIncorrect}
                 title="Equipo Rojo - Falladas"
-                color={colors.error}
+                color={colors.accent}
                 correct={false}
               />
             </View>
@@ -164,16 +164,16 @@ const RoundResultScreen: React.FC = () => {
             <View style={styles.totalScoresContainer}>
               <View style={styles.totalScoreItem}>
                 <Chip 
-                  style={[styles.totalScoreChip, { backgroundColor: colors.teamBlue }]}
-                  textStyle={{ color: colors.textLight, fontSize: 18, fontWeight: 'bold' }}
+                  style={[styles.totalScoreChip, { backgroundColor: colors.primary }]}
+                  textStyle={{ color: colors.text, fontSize: 18, fontWeight: 'bold' }}
                 >
                   Azul: {teams.azul.score}
                 </Chip>
               </View>
               <View style={styles.totalScoreItem}>
                 <Chip 
-                  style={[styles.totalScoreChip, { backgroundColor: colors.teamRed }]}
-                  textStyle={{ color: colors.textLight, fontSize: 18, fontWeight: 'bold' }}
+                  style={[styles.totalScoreChip, { backgroundColor: colors.secondary }]}
+                  textStyle={{ color: colors.text, fontSize: 18, fontWeight: 'bold' }}
                 >
                   Rojo: {teams.rojo.score}
                 </Chip>
@@ -209,7 +209,7 @@ const styles = StyleSheet.create({
     paddingTop: 15,
   },
   headerCard: {
-    backgroundColor: colors.surface,
+    backgroundColor: colors.background,
     marginBottom: 15,
     elevation: 8,
   },
@@ -225,12 +225,12 @@ const styles = StyleSheet.create({
   },
   completedText: {
     fontSize: 16,
-    color: colors.success,
+    color: colors.primary,
     textAlign: 'center',
     marginTop: 8,
   },
   scoresCard: {
-    backgroundColor: colors.surface,
+    backgroundColor: colors.background,
     marginBottom: 15,
     elevation: 4,
   },
@@ -274,7 +274,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   wordsCard: {
-    backgroundColor: colors.surface,
+    backgroundColor: colors.background,
     marginBottom: 8,
     elevation: 4,
   },
@@ -302,7 +302,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
   },
   totalScoresCard: {
-    backgroundColor: colors.surface,
+    backgroundColor: colors.background,
     marginBottom: 15,
     elevation: 4,
   },
@@ -327,7 +327,7 @@ const styles = StyleSheet.create({
   continueButtonLabel: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: colors.textLight,
+    color: colors.text,
   },
 });
 

@@ -187,21 +187,21 @@ export const DeckManagementScreen: React.FC = () => {
                         <IconButton
                           icon="eye"
                           size={20}
-                          iconColor={colors.textLight}
+                          iconColor={colors.text}
                           onPress={() => handleViewCards(deck)}
                           style={styles.actionButton}
                         />
                         <IconButton
                           icon="pencil"
                           size={20}
-                          iconColor={colors.textLight}
+                          iconColor={colors.text}
                           onPress={() => handleEditDeck(deck)}
                           style={styles.actionButton}
                         />
                         <IconButton
                           icon="delete"
                           size={20}
-                          iconColor={colors.textLight}
+                          iconColor={colors.text}
                           onPress={() => handleDeleteDeck(deck)}
                           style={styles.actionButton}
                         />
@@ -331,12 +331,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     fontWeight: "bold",
-    color: colors.textLight,
+    color: colors.text,
     textAlign: "center",
   },
   subtitle: {
     fontSize: 16,
-    color: colors.textLight,
+    color: colors.text,
     textAlign: "center",
     marginTop: 5,
     opacity: 0.8,
@@ -353,7 +353,7 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     fontSize: 18,
-    color: colors.textLight,
+    color: colors.text,
   },
   emptyContainer: {
     flex: 1,
@@ -365,18 +365,18 @@ const styles = StyleSheet.create({
     padding: 30,
     borderRadius: 15,
     alignItems: "center",
-    backgroundColor: colors.surface,
+    backgroundColor: colors.background,
   },
   emptyTitle: {
     fontSize: 24,
     fontWeight: "bold",
-    color: colors.textLight,
+    color: colors.text,
     marginTop: 15,
     marginBottom: 10,
   },
   emptyDescription: {
     fontSize: 16,
-    color: colors.textLight,
+    color: colors.text,
     textAlign: "center",
     marginBottom: 20,
     opacity: 0.8,
@@ -404,7 +404,7 @@ const styles = StyleSheet.create({
   deckName: {
     fontSize: 16,
     fontWeight: "bold",
-    color: colors.textLight,
+    color: colors.text,
     textAlign: "center",
     marginBottom: 10,
   },
@@ -431,10 +431,10 @@ const styles = StyleSheet.create({
   createNewButtonLabel: {
     fontSize: 16,
     fontWeight: "bold",
-    color: colors.textLight,
+    color: colors.text,
   },
   modalContainer: {
-    backgroundColor: colors.surface,
+    backgroundColor: colors.background,
     margin: 20,
     borderRadius: 15,
     maxHeight: "80%",
@@ -445,12 +445,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 20,
     borderBottomWidth: 1,
-    borderBottomColor: colors.outline,
+    borderBottomColor: colors.primary,
   },
   modalTitle: {
     fontSize: 20,
     fontWeight: "bold",
-    color: colors.textLight,
+    color: colors.text,
     flex: 1,
   },
   cardsList: {
@@ -459,15 +459,15 @@ const styles = StyleSheet.create({
   },
   cardItem: {
     marginBottom: 10,
-    backgroundColor: colors.surfaceVariant,
+    backgroundColor: colors.background,
   },
   cardText: {
     fontSize: 16,
-    color: colors.textLight,
+    color: colors.text,
   },
   noCardsText: {
     fontSize: 16,
-    color: colors.textLight,
+    color: colors.text,
     textAlign: "center",
     fontStyle: "italic",
     opacity: 0.7,
@@ -477,11 +477,11 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     padding: 20,
     borderTopWidth: 1,
-    borderTopColor: colors.outline,
+    borderTopColor: colors.primary,
   },
   cardCount: {
     fontSize: 14,
-    color: colors.textLight,
+    color: colors.text,
     opacity: 0.7,
   },
   modalButton: {
@@ -492,10 +492,10 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   textInput: {
-    backgroundColor: colors.surfaceVariant,
+    backgroundColor: colors.background,
   },
   errorText: {
-    color: colors.error,
+    color: colors.accent,
     fontSize: 12,
     marginTop: 5,
   },

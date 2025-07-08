@@ -17,7 +17,7 @@ const NewGameHeader: React.FC<NewGameHeaderProps> = ({
       <IconButton
         icon="arrow-left"
         size={24}
-        iconColor={colors.textLight}
+        iconColor={colors.text}
         onPress={onBackPress}
       />
       <Text style={styles.headerTitle}>{title}</Text>
@@ -38,7 +38,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 16,
     fontWeight: "bold",
-    color: colors.textLight,
+    color: colors.text,
   },
 });
 

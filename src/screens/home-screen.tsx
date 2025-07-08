@@ -133,7 +133,7 @@ export const HomeScreen: React.FC = () => {
             <Button
               mode="contained"
               onPress={() => router.push("/deck-management")}
-              style={[styles.actionButton, { backgroundColor: colors.glass.card }]}
+              style={[styles.actionButton, { backgroundColor: colors.primary }]}
               contentStyle={styles.actionButtonContent}
               labelStyle={styles.actionButtonLabel}
               icon="cards"
@@ -144,7 +144,7 @@ export const HomeScreen: React.FC = () => {
             <Button
               mode="contained"
               onPress={() => router.push("/statistics")}
-              style={[styles.actionButton, { backgroundColor: colors.glass.cardVariant }]}
+              style={[styles.actionButton, { backgroundColor: colors.secondary }]}
               contentStyle={styles.actionButtonContent}
               labelStyle={styles.actionButtonLabel}
               icon="chart-line"
@@ -179,7 +179,7 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 20,
-    color: "#FFD700",
+    color: colors.accent,
     fontStyle: "italic",
     textAlign: "center",
     marginTop: 5,
@@ -202,7 +202,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   playButton: {
-    backgroundColor: colors.success,
+    backgroundColor: colors.primary,
     marginBottom: 15,
     width: "100%",
     borderRadius: 25,
