@@ -3,6 +3,14 @@ import { Stack } from "expo-router";
 import { PaperProvider } from "react-native-paper";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
+import { useFonts } from "expo-font";
+import {
+  PlusJakartaSans_800ExtraBold,
+} from "@expo-google-fonts/plus-jakarta-sans";
+import {
+  BeVietnamPro_400Regular,
+  BeVietnamPro_700Bold,
+} from "@expo-google-fonts/be-vietnam-pro";
 import {
   View,
   Text,
@@ -16,6 +24,11 @@ import { theme } from "../src/theme/theme";
 import { CustomScreen } from "../src/shared/components/CustomScreen";
 
 export default function RootLayout() {
+  const [fontsLoaded] = useFonts({
+    PlusJakartaSans_800ExtraBold,
+    BeVietnamPro_400Regular,
+    BeVietnamPro_700Bold,
+  });
   const [isReady, setIsReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -33,6 +46,10 @@ export default function RootLayout() {
     }
   };
 
+  if (!fontsLoaded) {
+    return null;
+  }
+
   if (error) {
     return (
       <SafeAreaProvider>
@@ -44,7 +61,7 @@ export default function RootLayout() {
               Por favor, reinicia la aplicación
             </Text>
           </CustomScreen>
-          <StatusBar style="light" hidden={true} />
+          <StatusBar style="dark" hidden={true} />
         </PaperProvider>
       </SafeAreaProvider>
     );
@@ -58,7 +75,7 @@ export default function RootLayout() {
             <ActivityIndicator size="large" color={theme.colors.primary} />
             <Text style={styles.loadingText}>Inicializando PartyFun...</Text>
           </CustomScreen>
-          <StatusBar style="light" hidden={true} />
+          <StatusBar style="dark" hidden={true} />
         </PaperProvider>
       </SafeAreaProvider>
     );
@@ -126,7 +143,7 @@ export default function RootLayout() {
               options={{ title: "Revisar Turno" }}
             />
           </Stack>
-          <StatusBar style="light" hidden={true} />
+          <StatusBar style="dark" hidden={true} />
       </PaperProvider>
     </SafeAreaProvider>
   );

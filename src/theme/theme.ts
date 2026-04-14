@@ -1,23 +1,37 @@
 import { MD3LightTheme } from 'react-native-paper';
 
-// Modern glassmorphism color palette
 export const colors = {
-  text: '#0a1110',
-  background: '#f9fcfc',
-  primary: '#4bbcaa',
-  secondary: '#9ae1d6',
-  accent: '#5bd9c5',
-  surface: '#ffffff',
-  error: '#ff6b6b',
-  success: '#51cf66',
-  warning: '#ffd43b',
-  textLight: '#ffffff',
-  onBackground: '#0a1110',
-  onSurface: '#0a1110',
-  onSurfaceVariant: '#666666',
+  primary: '#005ab2',
+  primaryContainer: '#2f78c2',
+  primaryDim: '#00478c',
+  secondary: '#b31e03',
+  secondaryContainer: '#d7654e',
+  tertiary: '#3f6600',
+  tertiaryContainer: '#cfe5a2',
+  onTertiaryContainer: '#2b4300',
+  background: '#fff5ec',
+  surface: '#fff5ec',
+  surfaceContainerLowest: '#fffdf9',
+  surfaceContainerLow: '#f7ecdf',
+  surfaceContainer: '#f2e5d6',
+  surfaceContainerHigh: '#eddecf',
+  surfaceContainerHighest: '#e6d4c3',
+  surfaceVariant: '#e7d8c8',
+  outlineVariant: '#c7b5a3',
+  text: '#2b1f14',
+  textSecondary: '#6f5f50',
+  textLight: '#fffdf9',
+  onBackground: '#2b1f14',
+  onSurface: '#2b1f14',
+  onSurfaceVariant: '#6f5f50',
+  accent: '#f1c552',
+  success: '#3f6600',
+  warning: '#f1c552',
+  error: '#b31e03',
+  teamBlue: '#005ab2',
+  teamRed: '#b31e03',
 };
 
-// Spacing system
 export const spacing = {
   xs: 4,
   sm: 8,
@@ -28,19 +42,23 @@ export const spacing = {
   xxxl: 64,
 };
 
-// Border radius system
 export const borderRadius = {
   xs: 4,
-  sm: 8,
+  sm: 6,
   md: 12,
   lg: 16,
-  xl: 20,
-  xxl: 24,
+  xl: 24,
+  xxl: 32,
   full: 9999,
 };
 
-// Typography scale
 export const typography = {
+  families: {
+    display: 'PlusJakartaSans_800ExtraBold',
+    heading: 'PlusJakartaSans_800ExtraBold',
+    body: 'BeVietnamPro_400Regular',
+    bodyBold: 'BeVietnamPro_700Bold',
+  },
   sizes: {
     xs: 12,
     sm: 14,
@@ -61,7 +79,6 @@ export const typography = {
   },
 };
 
-// Animation durations
 export const animation = {
   fast: 150,
   normal: 300,
@@ -69,26 +86,72 @@ export const animation = {
   slower: 700,
 };
 
-// Create a proper theme that extends MD3LightTheme
 export const theme = {
   ...MD3LightTheme,
   colors: {
     ...MD3LightTheme.colors,
     primary: colors.primary,
+    onPrimary: colors.textLight,
+    primaryContainer: colors.primaryContainer,
+    onPrimaryContainer: colors.textLight,
     secondary: colors.secondary,
+    onSecondary: colors.textLight,
+    secondaryContainer: colors.secondaryContainer,
+    onSecondaryContainer: colors.textLight,
+    tertiary: colors.tertiary,
+    onTertiary: colors.textLight,
+    tertiaryContainer: colors.tertiaryContainer,
+    onTertiaryContainer: colors.onTertiaryContainer,
     background: colors.background,
     surface: colors.surface,
+    surfaceVariant: colors.surfaceVariant,
+    surfaceDisabled: colors.surfaceContainerLow,
+    surfaceBright: colors.surfaceContainerLowest,
+    surfaceDim: colors.surfaceContainerHigh,
+    surfaceContainerLowest: colors.surfaceContainerLowest,
+    surfaceContainerLow: colors.surfaceContainerLow,
+    surfaceContainer: colors.surfaceContainer,
+    surfaceContainerHigh: colors.surfaceContainerHigh,
+    surfaceContainerHighest: colors.surfaceContainerHighest,
+    outlineVariant: colors.outlineVariant,
     error: colors.error,
     onBackground: colors.onBackground,
     onSurface: colors.onSurface,
     onSurfaceVariant: colors.onSurfaceVariant,
     text: colors.text,
+    textSecondary: colors.textSecondary,
     textLight: colors.textLight,
     accent: colors.accent,
     success: colors.success,
     warning: colors.warning,
+    primaryDim: colors.primaryDim,
+    teamBlue: colors.teamBlue,
+    teamRed: colors.teamRed,
   },
-  // Ensure elevation levels are properly defined
+  roundness: borderRadius.md,
+  fonts: {
+    ...MD3LightTheme.fonts,
+    displayLarge: {
+      ...MD3LightTheme.fonts.displayLarge,
+      fontFamily: typography.families.display,
+      fontWeight: '800',
+    },
+    headlineLarge: {
+      ...MD3LightTheme.fonts.headlineLarge,
+      fontFamily: typography.families.heading,
+      fontWeight: '800',
+    },
+    titleLarge: {
+      ...MD3LightTheme.fonts.titleLarge,
+      fontFamily: typography.families.bodyBold,
+      fontWeight: '700',
+    },
+    bodyLarge: {
+      ...MD3LightTheme.fonts.bodyLarge,
+      fontFamily: typography.families.body,
+      fontWeight: '400',
+    },
+  },
   elevation: {
     level0: 0,
     level1: 1,

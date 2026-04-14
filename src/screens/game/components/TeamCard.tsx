@@ -1,9 +1,10 @@
 import React from "react";
 import { View, StyleSheet } from "react-native";
-import { Text, Card, Divider, Chip, IconButton } from "react-native-paper";
+import { Text, Card, IconButton } from "react-native-paper";
 import { Player } from "../../../store/game-store";
-import { colors } from "../../../theme/theme";
+import { borderRadius, colors, spacing, typography } from "../../../theme/theme";
 import { TeamColor } from "../interfaces/types";
+import { SelectionChip } from "../../../shared/components/SelectionChip";
 
 interface TeamCardProps {
   team: TeamColor;
@@ -30,12 +31,11 @@ const TeamCard: React.FC<TeamCardProps> = ({
   };
 
   return (
-    <Card style={[styles.teamCard, { borderColor: backgroundColor }]}>
+    <Card style={styles.teamCard}>
       <Card.Content style={{ height: "100%" }}>
         <Text style={[styles.teamTitle, { color: backgroundColor }]}>
           {title}
         </Text>
-        <Divider style={styles.divider} />
 
         {players.length === 0 ? (
           <View style={styles.emptyTeamContainer}>
@@ -55,15 +55,11 @@ const TeamCard: React.FC<TeamCardProps> = ({
           <>
             {players.map((player) => (
               <View key={player.id} style={styles.playerItem}>
-                <Chip
-                  style={[
-                    styles.playerChip,
-                    { backgroundColor: backgroundColor + "20" },
-                  ]}
-                  textStyle={{ color: backgroundColor, fontWeight: "bold" }}
-                >
-                  {player.name}
-                </Chip>
+                <SelectionChip
+                  selected={true}
+                  label={player.name}
+                  icon="account"
+                />
                 <View style={styles.playerActions}>
                   <IconButton
                     icon="swap-horizontal"
@@ -104,63 +100,54 @@ const TeamCard: React.FC<TeamCardProps> = ({
 const styles = StyleSheet.create({
   teamCard: {
     flex: 1,
-    backgroundColor: colors.background,
-    borderRadius: 20,
+    backgroundColor: colors.surfaceContainerLow,
+    borderRadius: borderRadius.xl,
     width: "48%",
-    borderWidth: 2,
   },
   teamTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
+    fontSize: typography.sizes.xl,
+    fontWeight: "800",
+    fontFamily: typography.families.heading,
     textAlign: "center",
-    marginBottom: 15,
+    marginBottom: spacing.md,
     letterSpacing: 1,
     color: colors.text,
-  },
-  divider: {
-    backgroundColor: colors.secondary,
-    marginBottom: 20,
-    height: 2,
   },
   emptyTeamContainer: {
     alignItems: "center",
     justifyContent: "center",
     flex: 1,
-    paddingVertical: 20,
+    paddingVertical: spacing.md,
     height: "100%",
   },
   addPlayerIcon: {
-    marginBottom: 15,
-    backgroundColor: colors.secondary + "20",
+    marginBottom: spacing.md,
+    backgroundColor: colors.surfaceContainerHigh,
   },
   emptyTeamText: {
     textAlign: "center",
-    color: colors.text,
-    fontWeight: "bold",
-    fontSize: 16,
+    color: colors.textSecondary,
+    fontWeight: "700",
+    fontFamily: typography.families.bodyBold,
+    fontSize: typography.sizes.md,
     letterSpacing: 1,
   },
   playerItem: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 8,
-  },
-  playerChip: {
-    flex: 1,
-    marginRight: 8,
-    backgroundColor: colors.secondary + "20",
+    marginBottom: spacing.sm,
   },
   playerActions: {
     flexDirection: "row",
   },
   addMoreContainer: {
     alignItems: "center",
-    marginTop: 10,
+    marginTop: spacing.sm,
   },
   addMoreIcon: {
     alignSelf: "center",
-    backgroundColor: colors.secondary + "20",
+    backgroundColor: colors.surfaceContainerHigh,
   },
 });
 

@@ -4,7 +4,6 @@ import {
   Text, 
   Button, 
   Card, 
-  Divider,
   List,
   Surface,
   Chip
@@ -14,8 +13,9 @@ import { router } from 'expo-router';
 
 import { useGameStore } from '../store/game-store';
 import { database } from '../database/database';
-import { colors } from '../theme/theme';
+import { borderRadius, colors, spacing, typography } from '../theme/theme';
 import { CustomScreen } from '../shared/components/CustomScreen';
+import { BouncyButton } from '../shared/components/BouncyButton';
 
 
 
@@ -103,9 +103,9 @@ const GameEndScreen: React.FC = () => {
   };
 
   const getWinnerColor = () => {
-    if (winner === 'azul') return colors.primary + '20';
-    if (winner === 'rojo') return colors.secondary + '20';
-    return colors.text;
+    if (winner === 'azul') return colors.primary;
+    if (winner === 'rojo') return colors.secondary;
+    return colors.textSecondary;
   };
 
   const getWinnerText = () => {
@@ -125,7 +125,7 @@ const GameEndScreen: React.FC = () => {
         {/* Winner Announcement */}
         <Surface style={[styles.winnerContainer, { backgroundColor: getWinnerColor() }]} elevation={4}>
           <Text style={styles.winnerIcon}>{getWinnerIcon()}</Text>
-          <Text style={[styles.winnerText, { color: getWinnerColor() }]}>
+          <Text style={styles.winnerText}>
             {getWinnerText()}
           </Text>
           {winner !== 'empate' && (
@@ -230,24 +230,20 @@ const GameEndScreen: React.FC = () => {
                   </Chip>
                 </View>
                 
-                {index < gameHistory.length - 1 && <Divider style={styles.roundDivider} />}
+                {index < gameHistory.length - 1 && <View style={styles.roundSpacer} />}
               </View>
             ))}
           </Card.Content>
         </Card>
 
-        {/* Action Buttons */}
         <View style={styles.actionsContainer}>
-          <Button
-            mode="contained"
+          <BouncyButton
+            label="Nueva partida"
             onPress={handleNewGame}
             style={styles.primaryButton}
             contentStyle={styles.buttonContent}
-            labelStyle={styles.buttonLabel}
             icon="play"
-          >
-            Nueva Partida
-          </Button>
+          />
           
           <Button
             mode="outlined"
@@ -290,44 +286,47 @@ const GameEndScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 20,
+    paddingTop: spacing.md,
   },
   content: {
     flex: 1,
-    paddingHorizontal: 20,
-    paddingTop: 20,
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.lg,
   },
   winnerContainer: {
-    padding: 30,
-    borderRadius: 20,
+    padding: spacing.xl,
+    borderRadius: borderRadius.xl,
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: spacing.lg,
   },
   winnerIcon: {
     fontSize: 60,
     marginBottom: 10,
   },
   winnerText: {
-    fontSize: 28,
-    fontWeight: 'bold',
+    fontSize: typography.sizes.xxxl,
+    fontWeight: '800',
+    fontFamily: typography.families.heading,
+    color: colors.textLight,
     textAlign: 'center',
     marginBottom: 10,
   },
   winnerSubtext: {
-    fontSize: 16,
-    color: colors.text,
+    fontSize: typography.sizes.md,
+    color: colors.textLight,
     textAlign: 'center',
   },
   scoresCard: {
-    marginBottom: 20,
-    backgroundColor: colors.background,
+    marginBottom: spacing.lg,
+    backgroundColor: colors.surfaceContainerLowest,
     elevation: 4,
   },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
+    fontSize: typography.sizes.lg,
+    fontWeight: '800',
+    fontFamily: typography.families.heading,
     color: colors.text,
-    marginBottom: 15,
+    marginBottom: spacing.md,
     textAlign: 'center',
   },
   scoreRow: {
@@ -337,19 +336,19 @@ const styles = StyleSheet.create({
   },
   teamScore: {
     flex: 1,
-    padding: 20,
-    borderRadius: 15,
+    padding: spacing.lg,
+    borderRadius: borderRadius.lg,
     alignItems: 'center',
   },
   teamName: {
-    fontSize: 16,
-    fontWeight: 'bold',
+    fontSize: typography.sizes.md,
+    fontWeight: '700',
     marginBottom: 10,
   },
   teamScoreText: {
-    fontSize: 36,
-    fontWeight: 'bold',
-    marginBottom: 10,
+    fontSize: typography.sizes.display,
+    fontWeight: '800',
+    marginBottom: spacing.sm,
   },
   teamPlayersText: {
     fontSize: 12,
@@ -361,65 +360,60 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     color: colors.text,
-    marginHorizontal: 15,
+    marginHorizontal: spacing.md,
   },
   statsCard: {
-    marginBottom: 20,
-    backgroundColor: colors.background,
+    marginBottom: spacing.lg,
+    backgroundColor: colors.surfaceContainerLowest,
     elevation: 4,
   },
   roundsCard: {
-    marginBottom: 20,
-    backgroundColor: colors.background,
+    marginBottom: spacing.lg,
+    backgroundColor: colors.surfaceContainerLowest,
     elevation: 4,
   },
   roundResult: {
-    marginBottom: 15,
+    marginBottom: spacing.md,
   },
   roundTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
+    fontSize: typography.sizes.md,
+    fontWeight: '700',
     color: colors.text,
     marginBottom: 5,
   },
   roundDescription: {
-    fontSize: 14,
-    color: colors.text,
-    marginBottom: 10,
+    fontSize: typography.sizes.sm,
+    color: colors.textSecondary,
+    marginBottom: spacing.sm,
     fontStyle: 'italic',
   },
   roundStats: {
     flexDirection: 'row',
-    gap: 10,
+    gap: spacing.sm,
   },
   statChip: {
     alignSelf: 'flex-start',
   },
-  roundDivider: {
-    backgroundColor: '#CCCCCC',
-    marginTop: 15,
+  roundSpacer: {
+    height: spacing.sm,
   },
   actionsContainer: {
-    gap: 15,
-    marginBottom: 20,
+    gap: spacing.md,
+    marginBottom: spacing.lg,
   },
   primaryButton: {
-    backgroundColor: colors.primary,
+    borderRadius: borderRadius.xl,
   },
   secondaryButton: {
-    borderColor: colors.primary,
-    borderWidth: 2,
+    borderColor: colors.outlineVariant,
+    borderWidth: 0,
+    backgroundColor: colors.surfaceContainerLow,
   },
   textButton: {
     // No specific styles needed
   },
   buttonContent: {
-    height: 50,
-  },
-  buttonLabel: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: colors.text,
+    minHeight: 50,
   },
   saveStatus: {
     alignItems: 'center',

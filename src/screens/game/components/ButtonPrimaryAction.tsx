@@ -1,7 +1,7 @@
 import React from "react";
 import { StyleSheet, ViewStyle } from "react-native";
-import { Button } from "react-native-paper";
-import { colors } from "../../../theme/theme";
+import { BouncyButton } from "../../../shared/components/BouncyButton";
+import { borderRadius } from "../../../theme/theme";
 
 interface ButtonPrimaryActionProps {
   title: string;
@@ -24,17 +24,9 @@ const ButtonPrimaryAction: React.FC<ButtonPrimaryActionProps> = ({
 }) => {
   const getButtonStyle = (): ViewStyle[] => {
     const baseStyles: ViewStyle[] = [styles.button];
-    
-    if (variant === "success") {
-      baseStyles.push(styles.successButton);
-    } else {
-      baseStyles.push(styles.primaryButton);
-    }
-    
     if (style) {
       baseStyles.push(style);
     }
-    
     return baseStyles;
   };
 
@@ -47,25 +39,16 @@ const ButtonPrimaryAction: React.FC<ButtonPrimaryActionProps> = ({
     return styles.mediumButtonContent;
   };
 
-  const getLabelStyle = () => {
-    if (size === "large") {
-      return styles.largeButtonLabel;
-    }
-    return styles.defaultButtonLabel;
-  };
-
   return (
-    <Button
-      mode="contained"
+    <BouncyButton
+      label={title}
       onPress={onPress}
       disabled={disabled}
+      tone={variant === "success" ? "tertiary" : "primary"}
       style={getButtonStyle()}
       contentStyle={getContentStyle()}
-      labelStyle={getLabelStyle()}
       icon={icon}
-    >
-      {title}
-    </Button>
+    />
   );
 };
 
@@ -73,28 +56,16 @@ const styles = StyleSheet.create({
   button: {
     marginBottom: 15,
     width: "100%",
-  },
-  primaryButton: {
-    backgroundColor: colors.primary,
+    borderRadius: borderRadius.xl,
   },
   smallButtonContent: {
-    height: 40,
+    minHeight: 42,
   },
   mediumButtonContent: {
-    height: 50,
+    minHeight: 50,
   },
   largeButtonContent: {
-    height: 60,
-  },
-  defaultButtonLabel: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: colors.text,
-  },
-  largeButtonLabel: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: colors.text,
+    minHeight: 60,
   },
 });
 

@@ -12,7 +12,7 @@ import { router } from "expo-router";
 
 import { database, Mazo } from "../../database/database";
 import { useGameStore } from "../../store/game-store";
-import { colors } from "../../theme/theme";
+import { borderRadius, colors, spacing, typography } from "../../theme/theme";
 import { CustomScreen } from "../../shared/components/CustomScreen";
 
 const { width } = Dimensions.get("window");
@@ -68,12 +68,12 @@ const DeckSelectionScreen: React.FC = () => {
 
   const getDeckColor = (index: number) => {
     const colorOptions = [
-      "#FFD93D",
-      "#4A90E2",
-      "#FF6B6B",
-      "#4ECDC4",
-      "#95E1D3",
-      "#F38BA8",
+      colors.surfaceContainerHigh,
+      colors.surfaceContainer,
+      colors.surfaceContainerLowest,
+      colors.surfaceContainerHigh,
+      colors.surfaceContainer,
+      colors.surfaceContainerLowest,
     ];
     return colorOptions[index % colorOptions.length];
   };
@@ -172,7 +172,7 @@ const DeckSelectionScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 20,
+    paddingTop: spacing.md,
   },
   header: {
     paddingBottom: 5,
@@ -180,60 +180,51 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: 10,
+    paddingHorizontal: spacing.sm,
   },
   headerTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
+    fontSize: typography.sizes.lg,
+    fontWeight: "800",
+    fontFamily: typography.families.heading,
     color: colors.text,
   },
   content: {
     flex: 1,
-    paddingHorizontal: 20,
-    paddingTop: 20,
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.lg,
   },
   decksGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-between",
-    paddingBottom: 20,
+    paddingBottom: spacing.lg,
   },
   deckCard: {
     width: cardWidth,
     height: 120,
-    marginBottom: 20,
-    borderRadius: 15,
+    marginBottom: spacing.md,
+    borderRadius: borderRadius.xl,
     elevation: 4,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
     position: "relative",
   },
   selectedDeckCard: {
-    borderColor: colors.primary,
-    borderWidth: 3,
+    backgroundColor: colors.tertiaryContainer,
     elevation: 8,
   },
   deckCardContent: {
     flex: 1,
-    padding: 16,
+    padding: spacing.md,
     justifyContent: "center",
     alignItems: "center",
     position: "relative",
   },
   deckTitle: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#000000",
+    fontSize: typography.sizes.md,
+    fontWeight: "700",
+    fontFamily: typography.families.bodyBold,
+    color: colors.text,
     textAlign: "center",
     lineHeight: 20,
-    textShadowColor: "rgba(255, 255, 255, 0.3)",
-    textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 1,
   },
   selectionIndicator: {
     position: "absolute",
@@ -242,7 +233,7 @@ const styles = StyleSheet.create({
   },
   checkCircle: {
     backgroundColor: colors.primary,
-    borderRadius: 20,
+    borderRadius: borderRadius.full,
     width: 32,
     height: 32,
     justifyContent: "center",
@@ -252,17 +243,17 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    paddingTop: 100,
+    paddingTop: spacing.xxxl,
   },
   emptyStateText: {
-    fontSize: 18,
-    fontWeight: "bold",
+    fontSize: typography.sizes.lg,
+    fontWeight: "700",
     color: colors.text,
     marginBottom: 8,
     textAlign: "center",
   },
   emptyStateSubtext: {
-    fontSize: 14,
+    fontSize: typography.sizes.sm,
     color: colors.text + "80",
     textAlign: "center",
   },

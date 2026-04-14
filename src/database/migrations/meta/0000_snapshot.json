@@ -1,11 +1,11 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "d935dfa2-bc35-4316-920c-7f32d26f85fc",
+  "id": "554741fb-976d-467c-951c-5010522c486a",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
-    "baterias": {
-      "name": "baterias",
+    "cartas": {
+      "name": "cartas",
       "columns": {
         "id": {
           "name": "id",
@@ -14,8 +14,15 @@
           "notNull": true,
           "autoincrement": true
         },
-        "nombre": {
-          "name": "nombre",
+        "mazo_id": {
+          "name": "mazo_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "texto": {
+          "name": "texto",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -30,16 +37,22 @@
           "default": "CURRENT_TIMESTAMP"
         }
       },
-      "indexes": {
-        "baterias_nombre_unique": {
-          "name": "baterias_nombre_unique",
-          "columns": [
-            "nombre"
+      "indexes": {},
+      "foreignKeys": {
+        "cartas_mazo_id_mazos_id_fk": {
+          "name": "cartas_mazo_id_mazos_id_fk",
+          "tableFrom": "cartas",
+          "tableTo": "mazos",
+          "columnsFrom": [
+            "mazo_id"
           ],
-          "isUnique": true
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
         }
       },
-      "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "checkConstraints": {}
@@ -115,8 +128,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "palabras": {
-      "name": "palabras",
+    "mazos": {
+      "name": "mazos",
       "columns": {
         "id": {
           "name": "id",
@@ -125,15 +138,8 @@
           "notNull": true,
           "autoincrement": true
         },
-        "bateria_id": {
-          "name": "bateria_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "texto": {
-          "name": "texto",
+        "nombre": {
+          "name": "nombre",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -148,22 +154,16 @@
           "default": "CURRENT_TIMESTAMP"
         }
       },
-      "indexes": {},
-      "foreignKeys": {
-        "palabras_bateria_id_baterias_id_fk": {
-          "name": "palabras_bateria_id_baterias_id_fk",
-          "tableFrom": "palabras",
-          "tableTo": "baterias",
-          "columnsFrom": [
-            "bateria_id"
+      "indexes": {
+        "mazos_nombre_unique": {
+          "name": "mazos_nombre_unique",
+          "columns": [
+            "nombre"
           ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "isUnique": true
         }
       },
+      "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "checkConstraints": {}
@@ -178,8 +178,8 @@
           "notNull": true,
           "autoincrement": true
         },
-        "bateria_id": {
-          "name": "bateria_id",
+        "mazo_id": {
+          "name": "mazo_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
@@ -200,8 +200,8 @@
           "notNull": false,
           "autoincrement": false
         },
-        "palabras_restantes": {
-          "name": "palabras_restantes",
+        "cartas_restantes": {
+          "name": "cartas_restantes",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -240,16 +240,16 @@
           "autoincrement": false,
           "default": "'[]'"
         },
-        "palabras_acertadas": {
-          "name": "palabras_acertadas",
+        "cartas_acertadas": {
+          "name": "cartas_acertadas",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
           "default": "'[]'"
         },
-        "palabras_falladas": {
-          "name": "palabras_falladas",
+        "cartas_falladas": {
+          "name": "cartas_falladas",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -275,12 +275,12 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "partida_actual_bateria_id_baterias_id_fk": {
-          "name": "partida_actual_bateria_id_baterias_id_fk",
+        "partida_actual_mazo_id_mazos_id_fk": {
+          "name": "partida_actual_mazo_id_mazos_id_fk",
           "tableFrom": "partida_actual",
-          "tableTo": "baterias",
+          "tableTo": "mazos",
           "columnsFrom": [
-            "bateria_id"
+            "mazo_id"
           ],
           "columnsTo": [
             "id"
@@ -323,14 +323,6 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false,
-          "default": "CURRENT_TIMESTAMP"
         }
       },
       "indexes": {},
@@ -383,8 +375,8 @@
           "notNull": true,
           "autoincrement": false
         },
-        "bateria_id": {
-          "name": "bateria_id",
+        "mazo_id": {
+          "name": "mazo_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": false,
@@ -413,16 +405,16 @@
           "autoincrement": false,
           "default": 0
         },
-        "total_palabras": {
-          "name": "total_palabras",
+        "total_cartas": {
+          "name": "total_cartas",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
           "default": 0
         },
-        "palabras_correctas": {
-          "name": "palabras_correctas",
+        "cartas_correctas": {
+          "name": "cartas_correctas",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
@@ -448,12 +440,12 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "partidas_bateria_id_baterias_id_fk": {
-          "name": "partidas_bateria_id_baterias_id_fk",
+        "partidas_mazo_id_mazos_id_fk": {
+          "name": "partidas_mazo_id_mazos_id_fk",
           "tableFrom": "partidas",
-          "tableTo": "baterias",
+          "tableTo": "mazos",
           "columnsFrom": [
-            "bateria_id"
+            "mazo_id"
           ],
           "columnsTo": [
             "id"

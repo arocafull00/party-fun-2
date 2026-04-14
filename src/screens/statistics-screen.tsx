@@ -4,21 +4,21 @@ import {
   Text, 
   Card, 
   List, 
-  Divider,
   Chip,
   Surface,
   Button,
   ActivityIndicator
 } from 'react-native-paper';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 
 import { database } from '../database/database';
-import { colors } from '../theme/theme';
+import { borderRadius, colors, spacing, typography } from '../theme/theme';
+import { CustomScreen } from '../shared/components/CustomScreen';
+import { BouncyButton } from '../shared/components/BouncyButton';
 
 interface GameStatistics {
   totalGames: number;
-  totalCards: number;
+  totalWords: number;
   averageAccuracy: number;
   gamesWonByBlue: number;
   gamesWonByRed: number;
@@ -28,12 +28,12 @@ interface GameStatistics {
 interface RecentGame {
   id: number;
   fecha: string;
-  mazo_nombre: string;
+  bateria_nombre: string | null;
   equipo_ganador: string | null;
   puntuacion_azul: number;
   puntuacion_rojo: number;
-  total_cartas: number;
-  cartas_correctas: number;
+  total_palabras: number;
+  palabras_correctas: number;
   precision: number;
 }
 
@@ -125,17 +125,17 @@ const StatisticsScreen: React.FC = () => {
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.container}>
+      <CustomScreen contentStyle={styles.container}>
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={colors.primary} />
           <Text style={styles.loadingText}>Cargando estadísticas...</Text>
         </View>
-      </SafeAreaView>
+      </CustomScreen>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <CustomScreen contentStyle={styles.container}>
       <ScrollView 
         style={styles.content} 
         showsVerticalScrollIndicator={false}
@@ -220,14 +220,12 @@ const StatisticsScreen: React.FC = () => {
             {recentGames.length === 0 ? (
               <View style={styles.emptyContainer}>
                 <Text style={styles.emptyText}>No hay partidas registradas</Text>
-                <Button
-                  mode="contained"
+                <BouncyButton
+                  label="Jugar primera partida"
                   onPress={() => router.push('/new-game')}
                   style={styles.playButton}
                   icon="play"
-                >
-                  Jugar Primera Partida
-                </Button>
+                />
               </View>
             ) : (
               recentGames.map((game, index) => (
@@ -271,7 +269,7 @@ const StatisticsScreen: React.FC = () => {
                       </View>
                     )}
                   />
-                  {index < recentGames.length - 1 && <Divider style={styles.gameDivider} />}
+                  {index < recentGames.length - 1 && <View style={styles.gameDivider} />}
                 </View>
               ))
             )}
@@ -346,19 +344,18 @@ const StatisticsScreen: React.FC = () => {
           </Card>
         )}
       </ScrollView>
-    </SafeAreaView>
+    </CustomScreen>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
   },
   content: {
     flex: 1,
-    paddingHorizontal: 20,
-    paddingTop: 20,
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.lg,
   },
   loadingContainer: {
     flex: 1,
@@ -366,74 +363,76 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   loadingText: {
-    marginTop: 10,
+    marginTop: spacing.sm,
     color: colors.text,
-    fontSize: 16,
+    fontSize: typography.sizes.md,
   },
   card: {
-    marginBottom: 20,
-    backgroundColor: colors.surface,
+    marginBottom: spacing.lg,
+    backgroundColor: colors.surfaceContainerLowest,
+    borderRadius: borderRadius.xl,
     elevation: 4,
   },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
+    fontSize: typography.sizes.lg,
+    fontWeight: '800',
+    fontFamily: typography.families.heading,
     color: colors.text,
-    marginBottom: 15,
+    marginBottom: spacing.md,
   },
   statsGrid: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    gap: 10,
+    gap: spacing.sm,
   },
   statItem: {
     flex: 1,
-    padding: 20,
-    borderRadius: 12,
+    padding: spacing.lg,
+    borderRadius: borderRadius.lg,
     alignItems: 'center',
   },
   statNumber: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    fontSize: typography.sizes.xxl,
+    fontWeight: '800',
     color: colors.text,
-    marginBottom: 5,
+    marginBottom: spacing.xs,
   },
   statLabel: {
-    fontSize: 12,
+    fontSize: typography.sizes.xs,
     color: colors.textSecondary,
     textAlign: 'center',
   },
   winStatsContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 15,
+    marginBottom: spacing.md,
   },
   teamWinStat: {
     flex: 1,
-    padding: 20,
-    borderRadius: 12,
+    padding: spacing.lg,
+    borderRadius: borderRadius.lg,
     alignItems: 'center',
   },
   teamWinNumber: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    marginBottom: 5,
+    fontSize: typography.sizes.xxxl,
+    fontWeight: '800',
+    marginBottom: spacing.xs,
   },
   teamWinLabel: {
-    fontSize: 14,
+    fontSize: typography.sizes.sm,
     color: colors.text,
-    marginBottom: 5,
+    marginBottom: spacing.xs,
   },
   teamWinPercentage: {
-    fontSize: 16,
-    fontWeight: 'bold',
+    fontSize: typography.sizes.md,
+    fontWeight: '700',
   },
   vsContainer: {
     paddingHorizontal: 15,
   },
   vsText: {
-    fontSize: 16,
-    fontWeight: 'bold',
+    fontSize: typography.sizes.md,
+    fontWeight: '700',
     color: colors.text,
   },
   tiesContainer: {
@@ -444,12 +443,12 @@ const styles = StyleSheet.create({
   },
   emptyContainer: {
     alignItems: 'center',
-    paddingVertical: 20,
+    paddingVertical: spacing.lg,
   },
   emptyText: {
-    fontSize: 16,
+    fontSize: typography.sizes.md,
     color: colors.textSecondary,
-    marginBottom: 20,
+    marginBottom: spacing.lg,
     textAlign: 'center',
   },
   playButton: {
@@ -467,25 +466,25 @@ const styles = StyleSheet.create({
     color: colors.text,
   },
   gameDate: {
-    fontSize: 12,
+    fontSize: typography.sizes.xs,
     color: colors.textSecondary,
   },
   gameDetails: {
-    gap: 5,
+    gap: spacing.xs,
   },
   gameScore: {
-    fontSize: 14,
-    fontWeight: 'bold',
+    fontSize: typography.sizes.sm,
+    fontWeight: '700',
     color: colors.text,
   },
   gameBattery: {
-    fontSize: 14,
+    fontSize: typography.sizes.sm,
     color: colors.textSecondary,
   },
   gameStats: {
     flexDirection: 'row',
-    gap: 8,
-    marginTop: 5,
+    gap: spacing.sm,
+    marginTop: spacing.xs,
   },
   gameStatChip: {
     height: 24,
@@ -504,12 +503,11 @@ const styles = StyleSheet.create({
     color: colors.text,
   },
   gameDivider: {
-    backgroundColor: '#CCCCCC',
-    marginVertical: 10,
+    height: spacing.sm,
   },
   actionsContainer: {
     flexDirection: 'row',
-    gap: 15,
+    gap: spacing.md,
   },
   actionButton: {
     flex: 1,

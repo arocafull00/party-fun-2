@@ -16,8 +16,9 @@ import { router } from "expo-router";
 
 import { database } from "../database/database";
 import { useGameStore } from "../store/game-store";
-import { colors } from "../theme/theme";
+import { borderRadius, colors, spacing, typography } from "../theme/theme";
 import { CustomScreen } from "../shared/components/CustomScreen";
+import { FocusTextInput } from "../shared/components/FocusTextInput";
 
 const { width: screenWidth } = Dimensions.get("window");
 const isTablet = screenWidth > 600;
@@ -192,14 +193,13 @@ const CreateDeckScreen: React.FC = () => {
         <View style={styles.bottomSection}>
           <View style={styles.inputSection}>
             <View style={styles.inputContainer}>
-              <TextInput
+              <FocusTextInput
                 label="Añadir nueva carta"
                 value={currentCard}
                 onChangeText={(text) => {
                   setCurrentCard(text);
                   if (cardError) setCardError("");
                 }}
-                mode="outlined"
                 style={styles.cardInput}
                 error={!!cardError}
                 maxLength={30}
@@ -223,7 +223,6 @@ const CreateDeckScreen: React.FC = () => {
                 style={styles.addButton}
                 contentStyle={styles.addButtonContent}
                 disabled={cards.length === 0}
-                buttonColor="#007AFF"
                 labelStyle={styles.acceptButtonLabel}
               >
                 AÑADIR
@@ -242,7 +241,6 @@ const CreateDeckScreen: React.FC = () => {
             style={styles.acceptButton}
             contentStyle={styles.acceptButtonContent}
             disabled={cards.length === 0}
-            buttonColor="#007AFF"
             labelStyle={styles.acceptButtonLabel}
           >
             ACEPTAR
@@ -263,14 +261,13 @@ const CreateDeckScreen: React.FC = () => {
               Dale un nombre descriptivo a tu mazo de {cards.length} cartas
             </Text>
 
-            <TextInput
+            <FocusTextInput
               label="Nombre del mazo"
               value={deckName}
               onChangeText={(text) => {
                 setDeckName(text);
                 if (nameError) setNameError("");
               }}
-              mode="outlined"
               style={styles.modalInput}
               error={!!nameError}
               maxLength={50}
@@ -317,9 +314,9 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 20,
-    paddingTop: 10,
-    paddingBottom: 20,
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.sm,
+    paddingBottom: spacing.lg,
     position: "relative",
   },
   closeButton: {
@@ -329,44 +326,46 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   headerTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: colors.textLight,
+    fontSize: typography.sizes.lg,
+    fontWeight: "800",
+    fontFamily: typography.families.heading,
+    color: colors.text,
     textAlign: "center",
     flex: 1,
   },
   mainArea: {
     flex: 1,
-    paddingHorizontal: 20,
-    paddingBottom: 20,
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.lg,
   },
   cardsScrollView: {
     flex: 1,
   },
   cardsContainer: {
     flexGrow: 1,
-    paddingBottom: 20,
+    paddingBottom: spacing.lg,
   },
   emptyState: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    paddingVertical: 60,
+    paddingVertical: spacing.xxxl,
   },
   emptyIcon: {
     margin: 0,
-    marginBottom: 20,
+    marginBottom: spacing.lg,
   },
   emptyTitle: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: colors.textLight,
-    marginBottom: 12,
+    fontSize: typography.sizes.xxl,
+    fontWeight: "800",
+    fontFamily: typography.families.heading,
+    color: colors.text,
+    marginBottom: spacing.sm,
     textAlign: "center",
   },
   emptySubtitle: {
-    fontSize: 16,
-    color: colors.textLight,
+    fontSize: typography.sizes.md,
+    color: colors.textSecondary,
     opacity: 0.8,
     textAlign: "center",
     lineHeight: 22,
@@ -374,23 +373,23 @@ const styles = StyleSheet.create({
   cardsGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 8,
+    gap: spacing.sm,
     justifyContent: "flex-start",
   },
   cardChip: {
-    backgroundColor: "#E3F2FD",
-    marginBottom: 4,
+    backgroundColor: colors.surfaceContainerHigh,
+    marginBottom: spacing.xs,
   },
   cardChipText: {
     color: colors.primary,
     fontWeight: "500",
   },
   bottomSection: {
-    paddingHorizontal: 20,
-    paddingVertical: 20,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.lg,
     flexDirection: "row",
     alignItems: "flex-end",
-    gap: 16,
+    gap: spacing.md,
   },
   inputSection: {
     flex: 1,
@@ -398,15 +397,16 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: "row",
     alignItems: "flex-start",
-    gap: 12,
+    gap: spacing.sm,
   },
   cardInput: {
     flex: 1,
-    backgroundColor: "rgba(255, 255, 255, 0.1)",
+    backgroundColor: colors.surfaceContainerLowest,
   },
   addButton: {
     marginTop: 8,
-    borderRadius: 20,
+    borderRadius: borderRadius.xl,
+    backgroundColor: colors.primary,
   },
   addButtonContent: {
     height: 50,
@@ -417,7 +417,8 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   acceptButton: {
-    borderRadius: 20,
+    borderRadius: borderRadius.xl,
+    backgroundColor: colors.primary,
     minWidth: 120,
   },
   acceptButtonContent: {
@@ -425,8 +426,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
   },
   acceptButtonLabel: {
-    fontSize: 16,
-    fontWeight: "bold",
+    fontSize: typography.sizes.md,
+    fontWeight: "700",
+    fontFamily: typography.families.bodyBold,
     color: colors.textLight,
   },
   modalContainer: {
@@ -435,34 +437,35 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     backgroundColor: colors.surface,
-    borderRadius: 20,
-    padding: 24,
+    borderRadius: borderRadius.xl,
+    padding: spacing.xl,
     maxWidth: 400,
     alignSelf: "center",
     width: "100%",
   },
   modalTitle: {
-    fontSize: 24,
-    fontWeight: "bold",
+    fontSize: typography.sizes.xxl,
+    fontWeight: "800",
+    fontFamily: typography.families.heading,
     color: colors.text,
     textAlign: "center",
-    marginBottom: 8,
+    marginBottom: spacing.xs,
   },
   modalSubtitle: {
-    fontSize: 16,
-    color: colors.text,
+    fontSize: typography.sizes.md,
+    color: colors.textSecondary,
     textAlign: "center",
     opacity: 0.8,
-    marginBottom: 24,
+    marginBottom: spacing.xl,
   },
   modalInput: {
     backgroundColor: "transparent",
-    marginBottom: 8,
+    marginBottom: spacing.sm,
   },
   modalButtons: {
     flexDirection: "row",
-    gap: 12,
-    marginTop: 16,
+    gap: spacing.sm,
+    marginTop: spacing.md,
   },
   modalButton: {
     flex: 1,

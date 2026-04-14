@@ -1,11 +1,12 @@
 import React from "react";
 import { View, StyleSheet, FlatList } from "react-native";
-import { Text, Button } from "react-native-paper";
+import { Text } from "react-native-paper";
 import { router } from "expo-router";
 
 import { useGameStore } from "../store/game-store";
-import { colors } from "../theme/theme";
+import { borderRadius, colors, spacing, typography } from "../theme/theme";
 import { CustomScreen } from "../shared/components/CustomScreen";
+import { BouncyButton } from "../shared/components/BouncyButton";
 import { ReviewCard, RoundStats, PlayerInfo } from "./game/components";
 import {
   useCardReview,
@@ -143,15 +144,12 @@ const TurnReviewScreen: React.FC = () => {
             incorrectCount={incorrectCount}
           />
           
-          <Button
-            mode="contained"
+          <BouncyButton
+            label="Siguiente turno"
             onPress={handleNextTurn}
             style={styles.nextButton}
             contentStyle={styles.nextButtonContent}
-            labelStyle={styles.nextButtonLabel}
-          >
-            SIGUIENTE TURNO
-          </Button>
+          />
         </View>
       </View>
     </CustomScreen>
@@ -161,17 +159,17 @@ const TurnReviewScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 20,
+    paddingTop: spacing.md,
   },
   content: {
     flex: 1,
-    paddingHorizontal: 20,
-    paddingTop: 15,
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.md,
   },
   headerRow: {
     flexDirection: "row",
     alignItems: "flex-start",
-    marginBottom: 20,
+    marginBottom: spacing.lg,
   },
   playerInfoContainer: {
     flex: 1,
@@ -185,15 +183,16 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   headerTitle: {
-    fontSize: 24,
-    fontWeight: "bold",
+    fontSize: typography.sizes.xxl,
+    fontWeight: "800",
+    fontFamily: typography.families.heading,
     color: colors.text,
     textAlign: "center",
     marginBottom: 4,
   },
   headerSubtitle: {
-    fontSize: 16,
-    color: colors.text,
+    fontSize: typography.sizes.md,
+    color: colors.textSecondary,
     textAlign: "center",
   },
   mainContent: {
@@ -210,33 +209,27 @@ const styles = StyleSheet.create({
   },
   cardsContainer: {
     alignItems: "center",
-    paddingHorizontal: 20,
+    paddingHorizontal: spacing.lg,
     height: 220,
   },
   cardSeparator: {
-    width: 15,
+    width: spacing.sm,
   },
   bottomRow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingVertical: 20,
-    paddingLeft: 25,
+    paddingVertical: spacing.lg,
+    paddingLeft: spacing.xl,
     marginTop: 'auto',
   },
   nextButton: {
-    backgroundColor: colors.primary,
-    height: 50,
+    borderRadius: borderRadius.xl,
     minWidth: 180,
   },
   nextButtonContent: {
-    height: 50,
+    minHeight: 50,
     justifyContent: "center",
-  },
-  nextButtonLabel: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: colors.text,
   },
   flatListStyle: {
     height: 220,
@@ -246,11 +239,11 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingVertical: 40,
+    paddingVertical: spacing.xl,
   },
   noCardsText: {
-    fontSize: 16,
-    color: colors.text,
+    fontSize: typography.sizes.md,
+    color: colors.textSecondary,
     textAlign: 'center',
   },
 });

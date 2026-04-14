@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Text } from 'react-native-paper';
-import { colors } from '../../../theme/theme';
+import { colors, typography } from '../../../theme/theme';
 
 interface PlayerInfoProps {
   currentPlayer: string;
@@ -25,14 +25,13 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   currentPlayerText: {
-    fontSize: 14,
-    color: colors.textLight,
+    fontSize: typography.sizes.sm,
+    color: colors.textSecondary,
     marginBottom: 2,
-    opacity: 0.7,
   },
   nextPlayerText: {
-    fontSize: 16,
-    color: colors.textLight,
-    fontWeight: 'bold',
+    fontSize: typography.sizes.md,
+    color: colors.text,
+    fontWeight: '700',
   },
 }); 

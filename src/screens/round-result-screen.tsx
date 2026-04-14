@@ -5,14 +5,14 @@ import {
   Button, 
   Card, 
   List,
-  Divider,
   Chip
 } from 'react-native-paper';
 import { router } from 'expo-router';
 
 import { useGameStore } from '../store/game-store';
-import { colors } from '../theme/theme';
+import { borderRadius, colors, spacing, typography } from '../theme/theme';
 import { CustomScreen } from '../shared/components/CustomScreen';
+import { BouncyButton } from '../shared/components/BouncyButton';
 
 const RoundResultScreen: React.FC = () => {
   const { currentPhase, teams, gameHistory, currentTurnCards, endGame, endRound } = useGameStore();
@@ -56,7 +56,6 @@ const RoundResultScreen: React.FC = () => {
             {cards.length}
           </Chip>
         </View>
-        <Divider style={styles.divider} />
         {cards.length === 0 ? (
           <Text style={styles.emptyText}>Sin cartas</Text>
         ) : (
@@ -183,16 +182,13 @@ const RoundResultScreen: React.FC = () => {
         </Card>
 
         {/* Continue Button */}
-        <Button
-          mode="contained"
+        <BouncyButton
+          label="Continuar"
           onPress={handleNextRound}
           style={styles.continueButton}
           contentStyle={styles.continueButtonContent}
-          labelStyle={styles.continueButtonLabel}
           icon="arrow-right"
-        >
-          CONTINUAR
-        </Button>
+        />
       </ScrollView>
     </CustomScreen>
   );
@@ -201,44 +197,46 @@ const RoundResultScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 20,
+    paddingTop: spacing.md,
   },
   content: {
     flex: 1,
-    paddingHorizontal: 20,
-    paddingTop: 15,
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.md,
   },
   headerCard: {
     backgroundColor: colors.background,
-    marginBottom: 15,
+    marginBottom: spacing.md,
     elevation: 8,
   },
   headerContent: {
     alignItems: 'center',
-    paddingVertical: 15,
+    paddingVertical: spacing.md,
   },
   roundTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
+    fontSize: typography.sizes.xl,
+    fontWeight: '800',
+    fontFamily: typography.families.heading,
     color: colors.text,
     textAlign: 'center',
   },
   completedText: {
-    fontSize: 16,
+    fontSize: typography.sizes.md,
     color: colors.primary,
     textAlign: 'center',
     marginTop: 8,
   },
   scoresCard: {
     backgroundColor: colors.background,
-    marginBottom: 15,
+    marginBottom: spacing.md,
     elevation: 4,
   },
   sectionTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
+    fontSize: typography.sizes.md,
+    fontWeight: '700',
+    fontFamily: typography.families.bodyBold,
     color: colors.text,
-    marginBottom: 12,
+    marginBottom: spacing.sm,
     textAlign: 'center',
   },
   scoresContainer: {
@@ -250,13 +248,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   teamName: {
-    fontSize: 12,
-    fontWeight: 'bold',
+    fontSize: typography.sizes.xs,
+    fontWeight: '700',
     marginBottom: 4,
   },
   scoreText: {
-    fontSize: 28,
-    fontWeight: 'bold',
+    fontSize: typography.sizes.xxxl,
+    fontWeight: '800',
   },
   vsText: {
     fontSize: 16,
@@ -264,25 +262,25 @@ const styles = StyleSheet.create({
     color: colors.text,
   },
   resultsContainer: {
-    marginBottom: 15,
+    marginBottom: spacing.md,
   },
   teamsResultsRow: {
     flexDirection: 'row',
-    gap: 10,
+    gap: spacing.sm,
   },
   teamResults: {
     flex: 1,
   },
   wordsCard: {
     backgroundColor: colors.background,
-    marginBottom: 8,
+    marginBottom: spacing.sm,
     elevation: 4,
   },
   wordsHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: spacing.sm,
   },
   wordsTitle: {
     fontSize: 14,
@@ -291,19 +289,15 @@ const styles = StyleSheet.create({
   countChip: {
     elevation: 2,
   },
-  divider: {
-    backgroundColor: '#CCCCCC',
-    marginBottom: 8,
-  },
   emptyText: {
     textAlign: 'center',
     color: colors.text,
     fontStyle: 'italic',
-    paddingVertical: 8,
+    paddingVertical: spacing.sm,
   },
   totalScoresCard: {
     backgroundColor: colors.background,
-    marginBottom: 15,
+    marginBottom: spacing.md,
     elevation: 4,
   },
   totalScoresContainer: {
@@ -314,20 +308,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   totalScoreChip: {
-    paddingHorizontal: 15,
+    paddingHorizontal: spacing.md,
     paddingVertical: 4,
   },
   continueButton: {
-    backgroundColor: colors.primary,
-    marginBottom: 15,
+    marginBottom: spacing.md,
+    borderRadius: borderRadius.xl,
   },
   continueButtonContent: {
-    height: 50,
-  },
-  continueButtonLabel: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: colors.text,
+    minHeight: 50,
   },
 });
 

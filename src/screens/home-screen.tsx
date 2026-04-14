@@ -1,22 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { View, StyleSheet, ScrollView, Alert } from "react-native";
-import {
-  Text,
-  Button,
-  Card,
-  Title,
-  IconButton,
-  Divider,
-  Chip,
-  Surface,
-  Icon,
-} from "react-native-paper";
-import { router, useRouter } from "expo-router";
+import { Text, Button, Surface, Icon } from "react-native-paper";
+import { useRouter } from "expo-router";
 
 import { database, Mazo } from "../database/database";
 import { useGameStore } from "../store/game-store";
-import { colors } from "../theme/theme";
+import { borderRadius, colors, spacing, typography } from "../theme/theme";
 import { CustomScreen } from "../shared/components/CustomScreen";
+import { HeroCard } from "../shared/components/HeroCard";
+import { BouncyButton } from "../shared/components/BouncyButton";
 
 export const HomeScreen: React.FC = () => {
   const { setDecks, decks } = useGameStore();
@@ -72,21 +64,22 @@ export const HomeScreen: React.FC = () => {
     return (
       <CustomScreen>
         <View style={styles.emptyContainer}>
-          <Surface style={styles.emptyCard} elevation={2}>
+          <HeroCard
+            title="Sin mazos"
+            subtitle="Necesitas crear al menos un mazo para jugar."
+            style={styles.emptyCard}
+          >
             <Icon source="cards-outline" size={80} />
-            <Text style={styles.emptyTitle}>Sin mazos</Text>
             <Text style={styles.emptyDescription}>
               Necesitas crear al menos un mazo de cartas para jugar
             </Text>
-            <Button
-              mode="contained"
+            <BouncyButton
+              label="Crear mazos"
               onPress={() => router.push("/create-deck")}
               style={styles.createButton}
               icon="plus"
-            >
-              CREAR MAZOS
-            </Button>
-          </Surface>
+            />
+          </HeroCard>
         </View>
       </CustomScreen>
     );
@@ -101,18 +94,17 @@ export const HomeScreen: React.FC = () => {
         </View>
 
         <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-          {/* Main Game Button */}
-          <View style={styles.mainCard}>
-            <Button
-              mode="contained"
+          <HeroCard
+            title="Nuevo juego"
+            subtitle="Inicia una partida de Kinetic Play."
+            style={styles.mainCard}
+          >
+            <BouncyButton
+              label="Nuevo juego"
               onPress={handleNewGame}
               style={styles.playButton}
-              contentStyle={styles.playButtonContent}
-              labelStyle={styles.playButtonLabel}
               icon="play"
-            >
-              NUEVO JUEGO
-            </Button>
+            />
 
             {hasOngoingGame && (
               <Button
@@ -126,31 +118,22 @@ export const HomeScreen: React.FC = () => {
                 CONTINUAR PARTIDA
               </Button>
             )}
-          </View>
-
-          {/* Action Buttons */}
+          </HeroCard>
           <View style={styles.actionButtons}>
-            <Button
-              mode="contained"
+            <BouncyButton
+              label="Mis mazos"
               onPress={() => router.push("/deck-management")}
-              style={[styles.actionButton, { backgroundColor: colors.primary }]}
-              contentStyle={styles.actionButtonContent}
-              labelStyle={styles.actionButtonLabel}
+              style={styles.actionButton}
               icon="cards"
-            >
-              MIS MAZOS
-            </Button>
+            />
 
-            <Button
-              mode="contained"
+            <BouncyButton
+              label="Estadisticas"
               onPress={() => router.push("/statistics")}
-              style={[styles.actionButton, { backgroundColor: colors.secondary }]}
-              contentStyle={styles.actionButtonContent}
-              labelStyle={styles.actionButtonLabel}
+              style={styles.actionButton}
+              tone="secondary"
               icon="chart-line"
-            >
-              ESTADÍSTICAS
-            </Button>
+            />
           </View>
         </ScrollView>
       </View>
@@ -168,83 +151,64 @@ const styles = StyleSheet.create({
   },
   header: {
     alignItems: "center",
-    paddingVertical: 20,
-    paddingHorizontal: 20,
+    paddingVertical: spacing.xl,
+    paddingHorizontal: spacing.lg,
   },
   title: {
-    fontSize: 32,
-    fontWeight: "bold",
-    color: colors.textLight,
+    fontSize: typography.sizes.display,
+    fontWeight: "800",
+    color: colors.primary,
+    fontFamily: typography.families.display,
     textAlign: "center",
   },
   subtitle: {
-    fontSize: 20,
+    fontSize: typography.sizes.xxxl,
     color: colors.accent,
     fontStyle: "italic",
+    fontFamily: typography.families.body,
     textAlign: "center",
     marginTop: 5,
   },
   content: {
     flex: 1,
-    paddingHorizontal: 30,
-    paddingTop: 40,
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.lg,
     maxWidth: 600,
     alignSelf: "center",
     backgroundColor: "transparent",
   },
   mainCard: {
-    marginBottom: 30,
-    backgroundColor: "transparent",
-  },
-  mainCardContent: {
-    paddingVertical: 30,
-    paddingHorizontal: 30,
-    alignItems: "center",
+    marginBottom: spacing.lg,
   },
   playButton: {
-    backgroundColor: colors.primary,
-    marginBottom: 15,
+    marginBottom: spacing.md,
     width: "100%",
-    borderRadius: 25,
-  },
-  playButtonContent: {
-    height: 60,
-  },
-  playButtonLabel: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: colors.textLight,
+    borderRadius: borderRadius.xl,
   },
   continueButton: {
     borderColor: colors.primary,
-    borderWidth: 2,
+    borderWidth: 0,
     width: "100%",
-    borderRadius: 25,
+    borderRadius: borderRadius.xl,
+    backgroundColor: colors.surfaceContainerLow,
   },
   continueButtonContent: {
     height: 50,
   },
   continueButtonLabel: {
-    fontSize: 16,
+    fontSize: typography.sizes.md,
     fontWeight: "bold",
     color: colors.primary,
   },
   actionButtons: {
-    gap: 20,
+    gap: spacing.md,
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-between",
   },
   actionButton: {
-    borderRadius: 25,
-  },
-  actionButtonContent: {
-    height: 55,
-  },
-  actionButtonLabel: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: colors.textLight,
+    borderRadius: borderRadius.xl,
+    flex: 1,
   },
   emptyContainer: {
     flex: 1,
@@ -252,24 +216,18 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   emptyCard: {
-    padding: 20,
-    borderRadius: 10,
-    alignItems: "center",
-  },
-  emptyTitle: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: colors.textLight,
-    marginBottom: 10,
+    maxWidth: 460,
+    width: "100%",
   },
   emptyDescription: {
-    fontSize: 16,
-    color: colors.textLight,
+    marginTop: spacing.sm,
+    marginBottom: spacing.md,
+    fontSize: typography.sizes.md,
+    color: colors.textSecondary,
     textAlign: "center",
   },
   createButton: {
-    backgroundColor: colors.primary,
-    borderRadius: 25,
+    borderRadius: borderRadius.xl,
   },
 });
 

@@ -13,8 +13,9 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { router, useFocusEffect } from "expo-router";
 
 import { useGameStore } from "../store/game-store";
-import { colors } from "../theme/theme";
+import { borderRadius, colors, spacing, typography } from "../theme/theme";
 import { CustomScreen } from "../shared/components/CustomScreen";
+import { BouncyButton } from "../shared/components/BouncyButton";
 
 const GameTurnScreen: React.FC = () => {
   const {
@@ -241,15 +242,13 @@ const GameTurnScreen: React.FC = () => {
           <Text style={styles.playerNameLarge}>{currentPlayer.name}</Text>
 
           {/* Start button */}
-          <Button
-            mode="contained"
+          <BouncyButton
+            label="Empezar"
             onPress={handleStartTurn}
             style={styles.startButton}
             contentStyle={styles.startButtonContent}
-            labelStyle={styles.startButtonLabel}
-          >
-            ¡EMPEZAR!
-          </Button>
+            tone="tertiary"
+          />
         </View>
 
         {/* Exit Dialog */}
@@ -359,14 +358,14 @@ const GameTurnScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 20,
+    paddingTop: spacing.md,
   },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingHorizontal: 20,
-    paddingVertical: 10,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm,
   },
   headerLeft: {
     alignItems: "flex-start",
@@ -375,8 +374,9 @@ const styles = StyleSheet.create({
     alignItems: "flex-end",
   },
   roundText: {
-    fontSize: 24,
-    fontWeight: "bold",
+    fontSize: typography.sizes.xxl,
+    fontWeight: "800",
+    fontFamily: typography.families.heading,
     color: colors.text,
   },
   wordsRemainingText: {
@@ -384,41 +384,45 @@ const styles = StyleSheet.create({
     color: colors.text,
   },
   wordsRemainingNumber: {
-    fontSize: 24,
-    fontWeight: "bold",
+    fontSize: typography.sizes.xxl,
+    fontWeight: "800",
+    fontFamily: typography.families.heading,
     color: colors.text,
   },
   preparationContent: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    paddingHorizontal: 30,
+    paddingHorizontal: spacing.xl,
   },
   teamBanner: {
     paddingHorizontal: 40,
-    paddingVertical: 15,
-    borderRadius: 25,
-    marginBottom: 30,
+    paddingVertical: spacing.md,
+    borderRadius: borderRadius.xl,
+    marginBottom: spacing.lg,
   },
   teamBannerText: {
-    fontSize: 20,
-    fontWeight: "bold",
+    fontSize: typography.sizes.xl,
+    fontWeight: "800",
+    fontFamily: typography.families.heading,
     color: colors.text,
     textAlign: "center",
   },
   roundDescription: {
-    fontSize: 18,
-    fontWeight: "bold",
+    fontSize: typography.sizes.lg,
+    fontWeight: "700",
+    fontFamily: typography.families.bodyBold,
     color: colors.text,
     textAlign: "center",
-    marginBottom: 20,
+    marginBottom: spacing.md,
   },
   playerNameLarge: {
-    fontSize: 48,
-    fontWeight: "bold",
-    color: "#FFD700",
+    fontSize: typography.sizes.display,
+    fontWeight: "800",
+    fontFamily: typography.families.heading,
+    color: colors.primary,
     textAlign: "center",
-    marginBottom: 40,
+    marginBottom: spacing.xl,
     textTransform: "uppercase",
   },
   preparationInstructions: {
@@ -435,36 +439,19 @@ const styles = StyleSheet.create({
     marginBottom: 50,
   },
   startButton: {
-    backgroundColor: "#4CAF50",
-    borderRadius: 30,
+    borderRadius: borderRadius.xl,
     minWidth: 280,
-    marginHorizontal: 20,
-    elevation: 8,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
+    marginHorizontal: spacing.lg,
   },
   startButtonContent: {
-    height: 70,
-    paddingHorizontal: 30,
+    minHeight: 70,
+    paddingHorizontal: spacing.xl,
   },
-  startButtonLabel: {
-    fontSize: 22,
-    fontWeight: "bold",
-    color: "#FFFFFF",
-    letterSpacing: 1,
-    textTransform: "uppercase",
-  },
-  // Playing phase styles
   timerHeader: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 20,
-    paddingVertical: 10,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm,
     width: "100%",
     position: "relative",
   },
@@ -474,13 +461,14 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
   },
   teamNameSmall: {
-    fontSize: 14,
-    color: colors.text,
+    fontSize: typography.sizes.sm,
+    color: colors.textSecondary,
     fontWeight: "500",
   },
   playerNameSmall: {
-    fontSize: 20,
-    fontWeight: "bold",
+    fontSize: typography.sizes.xl,
+    fontWeight: "700",
+    fontFamily: typography.families.bodyBold,
     color: colors.text,
   },
   timerCenter: {
@@ -492,13 +480,13 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: colors.background,
+    backgroundColor: colors.surfaceContainerLowest,
     justifyContent: "center",
     alignItems: "center",
   },
   timerText: {
-    fontSize: 24,
-    fontWeight: "bold",
+    fontSize: typography.sizes.xxl,
+    fontWeight: "800",
     color: colors.primary,
   },
   timerHeaderRight: {
@@ -512,48 +500,43 @@ const styles = StyleSheet.create({
     color: colors.text,
   },
   wordsRemainingNumberSmall: {
-    fontSize: 24,
-    fontWeight: "bold",
+    fontSize: typography.sizes.xxl,
+    fontWeight: "800",
     color: colors.text,
   },
   gameContent: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    paddingHorizontal: 20,
+    paddingHorizontal: spacing.lg,
   },
   gameRow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     width: "100%",
-    marginBottom: 30,
+    marginBottom: spacing.lg,
     height: "100%",
-    paddingVertical: 40,
+    paddingVertical: spacing.xl,
   },
   wordCard: {
     flex: 1,
-    marginHorizontal: 20,
-    backgroundColor: colors.background,
+    marginHorizontal: spacing.lg,
+    backgroundColor: colors.surfaceContainerLowest,
     elevation: 8,
-    borderRadius: 15,
+    borderRadius: borderRadius.xl,
     height: "100%",
     justifyContent: "center",
     alignItems: "center",
   },
   wordCardContent: {
-    padding: 40,
+    padding: spacing.xxl,
     alignItems: "center",
   },
-  wordLabel: {
-    fontSize: 32,
-    fontWeight: "bold",
-    color: "#FFD700",
-    position: "absolute",
-  },
   wordText: {
-    fontSize: 36,
-    fontWeight: "bold",
+    fontSize: typography.sizes.display,
+    fontWeight: "800",
+    fontFamily: typography.families.heading,
     color: colors.text,
     textAlign: "center",
     marginVertical: 20,
@@ -571,7 +554,7 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
   incorrectButton: {
-    backgroundColor: colors.accent,
+    backgroundColor: colors.secondaryContainer,
     borderRadius: 60,
     width: 120,
     height: 120,
@@ -579,7 +562,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   correctButton: {
-    backgroundColor: colors.primary,
+    backgroundColor: colors.tertiaryContainer,
     borderRadius: 60,
     width: 120,
     height: 120,
@@ -593,7 +576,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   errorText: {
-    fontSize: 18,
+    fontSize: typography.sizes.lg,
     color: colors.accent,
     textAlign: "center",
     marginBottom: 20,

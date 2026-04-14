@@ -16,8 +16,9 @@ import { router } from "expo-router";
 
 import { database, Mazo, Carta } from "../database/database";
 import { useGameStore } from "../store/game-store";
-import { colors } from "../theme/theme";
+import { borderRadius, colors, spacing, typography } from "../theme/theme";
 import { CustomScreen } from "../shared/components/CustomScreen";
+import { BouncyButton } from "../shared/components/BouncyButton";
 
 export const DeckManagementScreen: React.FC = () => {
   const { setDecks, decks } = useGameStore();
@@ -135,7 +136,14 @@ export const DeckManagementScreen: React.FC = () => {
   };
 
   const getDeckColor = (index: number) => {
-    const colorOptions = ['#FFD93D', '#4A90E2', '#FF6B6B', '#4ECDC4', '#95E1D3', '#F38BA8'];
+    const colorOptions = [
+      colors.surfaceContainerLowest,
+      colors.surfaceContainerLow,
+      colors.surfaceContainer,
+      colors.surfaceContainerHigh,
+      colors.surfaceContainerLow,
+      colors.surfaceContainerHighest,
+    ];
     return colorOptions[index % colorOptions.length];
   };
 
@@ -166,14 +174,12 @@ export const DeckManagementScreen: React.FC = () => {
                 <Text style={styles.emptyDescription}>
                   No tienes ningún mazo creado. Crea tu primer mazo para empezar a jugar.
                 </Text>
-                <Button
-                  mode="contained"
+                <BouncyButton
+                  label="Crear mazo"
                   onPress={handleCreateNewDeck}
                   style={styles.createButton}
                   icon="plus"
-                >
-                  CREAR MAZO
-                </Button>
+                />
               </Surface>
             </View>
           ) : (
@@ -212,16 +218,13 @@ export const DeckManagementScreen: React.FC = () => {
               </View>
 
               <View style={styles.createNewContainer}>
-                <Button
-                  mode="contained"
+                <BouncyButton
+                  label="Crear nuevo mazo"
                   onPress={handleCreateNewDeck}
                   style={styles.createNewButton}
                   contentStyle={styles.createNewButtonContent}
-                  labelStyle={styles.createNewButtonLabel}
                   icon="plus"
-                >
-                  CREAR NUEVO MAZO
-                </Button>
+                />
               </View>
             </>
           )}
@@ -325,26 +328,27 @@ const styles = StyleSheet.create({
   },
   header: {
     alignItems: "center",
-    paddingVertical: 20,
-    paddingHorizontal: 20,
+    paddingVertical: spacing.lg,
+    paddingHorizontal: spacing.lg,
   },
   title: {
-    fontSize: 32,
-    fontWeight: "bold",
+    fontSize: typography.sizes.xxxl,
+    fontWeight: "800",
+    fontFamily: typography.families.heading,
     color: colors.text,
     textAlign: "center",
   },
   subtitle: {
-    fontSize: 16,
-    color: colors.text,
+    fontSize: typography.sizes.md,
+    color: colors.textSecondary,
     textAlign: "center",
     marginTop: 5,
     opacity: 0.8,
   },
   content: {
     flex: 1,
-    paddingHorizontal: 20,
-    paddingTop: 20,
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.lg,
   },
   loadingContainer: {
     flex: 1,
@@ -352,122 +356,117 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   loadingText: {
-    fontSize: 18,
+    fontSize: typography.sizes.lg,
     color: colors.text,
   },
   emptyContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    paddingVertical: 50,
+    paddingVertical: spacing.xxxl,
   },
   emptyCard: {
-    padding: 30,
-    borderRadius: 15,
+    padding: spacing.xl,
+    borderRadius: borderRadius.xl,
     alignItems: "center",
-    backgroundColor: colors.background,
+    backgroundColor: colors.surfaceContainerLowest,
   },
   emptyTitle: {
-    fontSize: 24,
-    fontWeight: "bold",
+    fontSize: typography.sizes.xxl,
+    fontWeight: "800",
+    fontFamily: typography.families.heading,
     color: colors.text,
     marginTop: 15,
     marginBottom: 10,
   },
   emptyDescription: {
-    fontSize: 16,
-    color: colors.text,
+    fontSize: typography.sizes.md,
+    color: colors.textSecondary,
     textAlign: "center",
     marginBottom: 20,
     opacity: 0.8,
   },
   createButton: {
-    backgroundColor: colors.primary,
-    borderRadius: 25,
+    borderRadius: borderRadius.xl,
   },
   decksGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-between",
-    gap: 15,
-    marginBottom: 30,
+    gap: spacing.md,
+    marginBottom: spacing.xl,
   },
   deckCard: {
     width: "48%",
-    borderRadius: 15,
+    borderRadius: borderRadius.xl,
     elevation: 3,
   },
   deckCardContent: {
-    padding: 15,
+    padding: spacing.md,
     alignItems: "center",
   },
   deckName: {
-    fontSize: 16,
-    fontWeight: "bold",
+    fontSize: typography.sizes.md,
+    fontWeight: "700",
+    fontFamily: typography.families.bodyBold,
     color: colors.text,
     textAlign: "center",
-    marginBottom: 10,
+    marginBottom: spacing.sm,
   },
   deckActions: {
     flexDirection: "row",
     justifyContent: "center",
-    gap: 5,
+    gap: spacing.xs,
   },
   actionButton: {
     margin: 0,
   },
   createNewContainer: {
     alignItems: "center",
-    marginBottom: 30,
+    marginBottom: spacing.xl,
   },
   createNewButton: {
-    backgroundColor: colors.primary,
-    borderRadius: 25,
+    borderRadius: borderRadius.xl,
     width: "100%",
   },
   createNewButtonContent: {
-    height: 55,
-  },
-  createNewButtonLabel: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: colors.text,
+    minHeight: 55,
   },
   modalContainer: {
-    backgroundColor: colors.background,
-    margin: 20,
-    borderRadius: 15,
+    backgroundColor: colors.surfaceContainerLowest,
+    margin: spacing.lg,
+    borderRadius: borderRadius.xl,
     maxHeight: "80%",
   },
   modalHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    padding: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.primary,
+    padding: spacing.lg,
+    backgroundColor: colors.surfaceContainerHigh,
   },
   modalTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
+    fontSize: typography.sizes.xl,
+    fontWeight: "800",
+    fontFamily: typography.families.heading,
     color: colors.text,
     flex: 1,
   },
   cardsList: {
-    padding: 20,
+    padding: spacing.lg,
     maxHeight: 400,
   },
   cardItem: {
-    marginBottom: 10,
-    backgroundColor: colors.background,
+    marginBottom: spacing.sm,
+    backgroundColor: colors.surfaceContainerLow,
   },
   cardText: {
-    fontSize: 16,
+    fontSize: typography.sizes.md,
     color: colors.text,
   },
   noCardsText: {
-    fontSize: 16,
-    color: colors.text,
+    fontSize: typography.sizes.md,
+    color: colors.textSecondary,
     textAlign: "center",
     fontStyle: "italic",
     opacity: 0.7,
@@ -475,13 +474,12 @@ const styles = StyleSheet.create({
   modalFooter: {
     flexDirection: "row",
     justifyContent: "space-between",
-    padding: 20,
-    borderTopWidth: 1,
-    borderTopColor: colors.primary,
+    padding: spacing.lg,
+    backgroundColor: colors.surfaceContainerLow,
   },
   cardCount: {
-    fontSize: 14,
-    color: colors.text,
+    fontSize: typography.sizes.sm,
+    color: colors.textSecondary,
     opacity: 0.7,
   },
   modalButton: {
@@ -489,10 +487,10 @@ const styles = StyleSheet.create({
     marginHorizontal: 5,
   },
   editForm: {
-    padding: 20,
+    padding: spacing.lg,
   },
   textInput: {
-    backgroundColor: colors.background,
+    backgroundColor: colors.surfaceContainerLowest,
   },
   errorText: {
     color: colors.accent,

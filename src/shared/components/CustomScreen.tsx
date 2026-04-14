@@ -1,6 +1,7 @@
 import React from "react";
 import { View, ViewStyle } from "react-native";
 import Background from "./background";
+import { spacing } from "../../theme/theme";
 
 interface CustomScreenProps {
   children: React.ReactNode;
@@ -11,18 +12,17 @@ interface CustomScreenProps {
 export function CustomScreen({
   children,
   contentStyle,
+  containerStyle,
 }: CustomScreenProps) {
   return (
-    <View style={{ flex: 1 }}>
-      {/* Background that covers the entire screen */}
+    <View style={[{ flex: 1 }, containerStyle]}>
       <Background />
-
       <View
         style={[
           {
             flex: 1,
             width: "100%",
-            paddingHorizontal: 16,
+            paddingHorizontal: spacing.md,
             backgroundColor: "transparent",
           },
           contentStyle,

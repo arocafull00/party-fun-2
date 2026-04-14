@@ -2,7 +2,7 @@ import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Text } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
-import { colors } from '../../../theme/theme';
+import { colors, typography } from '../../../theme/theme';
 
 interface RoundStatsProps {
   correctCount: number;
@@ -52,8 +52,8 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   count: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: colors.textLight,
+    fontSize: typography.sizes.lg,
+    fontWeight: '700',
+    color: colors.text,
   },
 }); 

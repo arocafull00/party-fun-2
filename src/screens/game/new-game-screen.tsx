@@ -7,16 +7,17 @@ import {
   IconButton,
   Portal,
   Modal,
-  TextInput,
 } from "react-native-paper";
 import { router } from "expo-router";
 
 import { database, Mazo } from "../../database/database";
 import { useGameStore, Player } from "../../store/game-store";
-import { colors } from "../../theme/theme";
+import { borderRadius, colors, spacing, typography } from "../../theme/theme";
 import { TeamCard } from "./components";
 import { TeamColor } from "./interfaces/types";
 import { CustomScreen } from "../../shared/components/CustomScreen";
+import { BouncyButton } from "../../shared/components/BouncyButton";
+import { FocusTextInput } from "../../shared/components/FocusTextInput";
 
 const NewGameScreen: React.FC = () => {
   const {
@@ -219,15 +220,12 @@ const NewGameScreen: React.FC = () => {
             {selectedDeck ? selectedDeck.nombre : "Seleccionar Mazo"}
           </Button>
 
-          <Button
-            mode="contained"
+          <BouncyButton
+            label="Empezar"
             onPress={handleStartGame}
             style={styles.startButton}
-            labelStyle={styles.startButtonLabel}
             contentStyle={styles.startButtonContent}
-          >
-            ¡EMPEZAR!
-          </Button>
+          />
         </View>
       {/* Player Modal */}
       <Portal>
@@ -245,11 +243,10 @@ const NewGameScreen: React.FC = () => {
               Equipo {selectedTeamForPlayer === "azul" ? "Azul" : "Rojo"}
             </Text>
 
-            <TextInput
+            <FocusTextInput
               label="Nombre del jugador"
               value={newPlayerName}
               onChangeText={setNewPlayerName}
-              mode="outlined"
               style={styles.textInput}
               autoFocus
             />
@@ -285,7 +282,7 @@ const NewGameScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 20,
+    paddingTop: spacing.md,
   },
   header: {
     paddingBottom: 5,
@@ -293,23 +290,24 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: 10,
+    paddingHorizontal: spacing.sm,
   },
   headerTitle: {
-    fontSize: 16,
-    fontWeight: "bold",
+    fontSize: typography.sizes.lg,
+    fontWeight: "800",
+    fontFamily: typography.families.heading,
     color: colors.text,
   },
   content: {
-    paddingHorizontal: 20,
-    paddingTop: 10,
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.sm,
   },
   teamsContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 40,
+    marginBottom: spacing.xl,
     height: 230,
-    gap: 12,
+    gap: spacing.sm,
   },
   deckInfo: {
     alignItems: "center",
@@ -326,66 +324,63 @@ const styles = StyleSheet.create({
   bottomActions: {
     flexDirection: "row",
     justifyContent: "space-between",
-    paddingHorizontal: 20,
-    paddingBottom: 20,
-    gap: 12,
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.lg,
+    gap: spacing.sm,
   },
   deckButton: {
-    borderColor: colors.primary,
-    borderWidth: 2,
-    backgroundColor: colors.background,
-    borderRadius: 12,
+    borderColor: colors.surfaceContainerHighest,
+    borderWidth: 0,
+    backgroundColor: colors.surfaceContainerLow,
+    borderRadius: borderRadius.xl,
     elevation: 0,
   },
   deckButtonLabel: {
     color: colors.primary,
-    fontSize: 14,
+    fontSize: typography.sizes.sm,
     fontWeight: "bold",
+    fontFamily: typography.families.bodyBold,
   },
   deckButtonContent: {
-    height: 48,
+    height: 56,
+    paddingHorizontal: spacing.md,
   },
   startButton: {
-    backgroundColor: colors.primary,
-    borderRadius: 12,
-    elevation: 0,
-  },
-  startButtonLabel: {
-    color: colors.background,
-    fontSize: 16,
-    fontWeight: "bold",
+    borderRadius: borderRadius.xl,
+    flex: 1,
   },
   startButtonContent: {
-    height: 48,
-    paddingHorizontal: 24,
+    minHeight: 56,
+    paddingHorizontal: spacing.md,
   },
   modalContainer: {
-    backgroundColor: "white",
-    margin: 20,
-    borderRadius: 20,
-    padding: 20,
+    backgroundColor: colors.surfaceContainerLowest,
+    margin: spacing.lg,
+    borderRadius: borderRadius.xl,
+    padding: spacing.lg,
   },
   modalContent: {
     alignItems: "center",
   },
   modalTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
+    fontSize: typography.sizes.xxl,
+    fontWeight: "800",
+    fontFamily: typography.families.heading,
     marginBottom: 8,
     color: colors.text,
   },
   modalSubtitle: {
-    fontSize: 16,
-    marginBottom: 20,
-    color: colors.text,
+    fontSize: typography.sizes.md,
+    marginBottom: spacing.lg,
+    color: colors.textSecondary,
   },
   textInput: {
     width: "100%",
-    marginBottom: 20,
+    marginBottom: spacing.lg,
   },
   modalActions: {
     flexDirection: "row",
-    gap: 12,
+    gap: spacing.sm,
   },
   modalButton: {
     minWidth: 100,
