@@ -1,27 +1,22 @@
-import React, { useState } from "react";
-import { View, StyleSheet, ScrollView, Alert, Dimensions } from "react-native";
+import React, { useMemo, useState } from "react";
+import { View, StyleSheet, ScrollView, Alert, Pressable } from "react-native";
 import {
   Text,
-  TextInput,
   Button,
-  Chip,
-  HelperText,
+  TextInput,
+  Icon,
   IconButton,
-  Surface,
   Modal,
   Portal,
+  HelperText,
 } from "react-native-paper";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 
 import { database } from "../database/database";
 import { useGameStore } from "../store/game-store";
 import { borderRadius, colors, spacing, typography } from "../theme/theme";
 import { CustomScreen } from "../shared/components/CustomScreen";
-import { FocusTextInput } from "../shared/components/FocusTextInput";
-
-const { width: screenWidth } = Dimensions.get("window");
-const isTablet = screenWidth > 600;
+import { BouncyButton } from "../shared/components/BouncyButton";
 
 const CreateDeckScreen: React.FC = () => {
   const { setDecks } = useGameStore();
@@ -33,16 +28,22 @@ const CreateDeckScreen: React.FC = () => {
   const [deckName, setDeckName] = useState("");
   const [nameError, setNameError] = useState("");
 
+  const cardIcons = useMemo(
+    () => ["paw", "water", "leaf", "weather-windy", "triangle", "castle"],
+    []
+  );
+
   const validateCard = (card: string): boolean => {
-    if (!card.trim()) {
+    const cardTrimmed = card.trim();    
+    if (!cardTrimmed) {
       setCardError("La carta no puede estar vacía");
       return false;
     }
-    if (card.trim().length < 2) {
+    if (cardTrimmed.length < 2) {
       setCardError("La carta debe tener al menos 2 caracteres");
       return false;
     }
-    if (cards.includes(card.trim().toLowerCase())) {
+    if (cards.some((item) => item.toLowerCase() === card.trim().toLowerCase())) {
       setCardError("Esta carta ya existe en la lista");
       return false;
     }
@@ -55,11 +56,12 @@ const CreateDeckScreen: React.FC = () => {
   };
 
   const validateDeckName = (name: string): boolean => {
-    if (!name.trim()) {
+    const nameTrimmed = name.trim();    
+    if (!nameTrimmed) {
       setNameError("El nombre del mazo es obligatorio");
       return false;
     }
-    if (name.trim().length < 3) {
+    if (nameTrimmed.length < 3) {
       setNameError("El nombre debe tener al menos 3 caracteres");
       return false;
     }
@@ -68,13 +70,11 @@ const CreateDeckScreen: React.FC = () => {
   };
 
   const handleAddCard = () => {
-    const trimmedCard = currentCard.trim();
-
-    if (!validateCard(trimmedCard)) {
+    if (!validateCard(currentCard)) {
       return;
     }
 
-    setCards([...cards, trimmedCard]);
+    setCards([...cards, currentCard]);
     setCurrentCard("");
     setCardError("");
   };
@@ -99,17 +99,11 @@ const CreateDeckScreen: React.FC = () => {
 
     setLoading(true);
     try {
-      // Ensure database is initialized before use
       await database.init();
-      
-      const deckId = await database.createMazo(deckName.trim());
-
-      // Add all cards to the deck
+      const deckId = await database.createMazo(deckName);
       for (const card of cards) {
         await database.addCarta(deckId, card);
       }
-
-      // Update the global state with the new list of decks
       const updatedDecks = await database.getMazos();
       setDecks(updatedDecks);
 
@@ -122,7 +116,7 @@ const CreateDeckScreen: React.FC = () => {
     } catch (error) {
       console.error("Error saving deck:", error);
       Alert.alert(
-        "Error", 
+        "Error",
         `No se pudo guardar el mazo: ${error instanceof Error ? error.message : 'Error desconocido'}`
       );
     } finally {
@@ -138,146 +132,145 @@ const CreateDeckScreen: React.FC = () => {
 
   return (
     <CustomScreen contentStyle={styles.container}>
-      <View style={styles.backgroundView}>
-        {/* Header Section */}
-        <View style={styles.header}>
-          <IconButton
-            icon="close"
-            size={24}
-            iconColor={colors.textLight}
-            style={styles.closeButton}
-            onPress={() => router.back()}
-          />
-          <Text style={styles.headerTitle}>CREACIÓN DE MAZO</Text>
+      <View style={styles.screen}>
+        <View style={styles.brandRow}>
+          <Text style={styles.brandTitle}>PARTY FUN 2</Text>
         </View>
-
-        {/* Main Cards Area */}
-        <View style={styles.mainArea}>
-          <ScrollView
-            style={styles.cardsScrollView}
-            contentContainerStyle={styles.cardsContainer}
-            showsVerticalScrollIndicator={false}
-          >
-            {cards.length === 0 ? (
-              <View style={styles.emptyState}>
-                <IconButton
-                  icon="cards-outline"
-                  size={64}
-                  iconColor={colors.textLight}
-                  style={styles.emptyIcon}
-                />
-                <Text style={styles.emptyTitle}>Agrega cartas a tu mazo</Text>
-                <Text style={styles.emptySubtitle}>
-                  Usa el campo de abajo para añadir palabras
-                </Text>
-              </View>
-            ) : (
-              <View style={styles.cardsGrid}>
-                {cards.map((card, index) => (
-                  <Chip
-                    key={index}
-                    style={styles.cardChip}
-                    textStyle={styles.cardChipText}
-                    onClose={() => handleRemoveCard(index)}
-                    closeIcon="delete"
-                  >
-                    {card}
-                  </Chip>
-                ))}
-              </View>
-            )}
-          </ScrollView>
-        </View>
-
-        {/* Bottom Fixed Section */}
-        <View style={styles.bottomSection}>
-          <View style={styles.inputSection}>
-            <View style={styles.inputContainer}>
-              <FocusTextInput
-                label="Añadir nueva carta"
-                value={currentCard}
-                onChangeText={(text) => {
-                  setCurrentCard(text);
-                  if (cardError) setCardError("");
-                }}
-                style={styles.cardInput}
-                error={!!cardError}
-                maxLength={30}
-                onSubmitEditing={handleAddCard}
-                returnKeyType="done"
-                theme={{
-                  colors: {
-                    primary: colors.textLight,
-                    onSurface: colors.textLight,
-                    outline: colors.textLight,
-                    onSurfaceVariant: colors.textLight,
-                    surface: "transparent",
-                  },
-                }}
-                textColor={colors.textLight}
-                placeholderTextColor={colors.textLight}
-              />
-              <Button
-                mode="contained"
-                onPress={handleAddCard}
-                style={styles.addButton}
-                contentStyle={styles.addButtonContent}
-                disabled={cards.length === 0}
-                labelStyle={styles.acceptButtonLabel}
-              >
-                AÑADIR
-              </Button>
-            </View>
-            {cardError && (
-              <HelperText type="error" style={styles.errorText}>
-                {cardError}
-              </HelperText>
-            )}
+        <View style={styles.headerCard}>
+          <View style={styles.headerBadgeRow}>
+            <Text style={styles.headerBadge}>BARAJA ACTIVA</Text>
+            <Text style={styles.headerCount}>{cards.length} Palabras</Text>
           </View>
+          <Pressable onPress={() => setShowNameModal(true)}>
+            <Text style={styles.headerTitle}>
+              {deckName || "Editor de Baraja"}
+            </Text>
+          </Pressable>
+          <Text style={styles.headerSubtitle}>
+            Añade todas las palabras que quieras!
+          </Text>
+        </View>
 
+        <View style={styles.addWordSection}>
+          <View style={styles.addInputWrapper}>
+            <TextInput
+              mode="outlined"
+              value={currentCard}
+              onChangeText={(text) => {
+                setCurrentCard(text);
+                if (cardError) {
+                  setCardError("");
+                }
+              }}
+              placeholder="Añadir palabra"
+              style={styles.addWordInput}
+              maxLength={30}
+              onSubmitEditing={handleAddCard}
+              returnKeyType="done"
+              error={!!cardError}
+            />
+          </View>
+          {cardError ? (
+            <HelperText type="error" style={styles.errorText}>
+              {cardError}
+            </HelperText>
+          ) : null}
+          <BouncyButton
+            label="Añadir Palabra"
+            onPress={handleAddCard}
+            variant="primary"
+            icon="plus-circle"
+            disabled={!currentCard.trim() || cards.length >= 30}
+          />
+        </View>
+
+        <ScrollView
+          style={styles.cardsScrollView}
+          contentContainerStyle={styles.cardsContainer}
+          showsVerticalScrollIndicator={false}
+        >
+          {cards.length === 0 ? (
+            <View style={styles.emptyState}>
+              <Text style={styles.emptyTitle}>Tu baraja está vacía</Text>
+              <Text style={styles.emptySubtitle}>Añade palabras para empezar a jugar.</Text>
+            </View>
+          ) : (
+            <View style={styles.cardRows}>
+              {cards.map((card, index) => (
+                <View key={`${card}-${index}`} style={styles.cardRow}>
+                  <View style={styles.cardRowIcon}>
+                    <Icon source={cardIcons[index % cardIcons.length]} size={26} color={colors.primary} />
+                  </View>
+                  <Text style={styles.cardRowText}>{card}</Text>
+                  <Pressable onPress={() => handleRemoveCard(index)} style={styles.deleteButton}>
+                    <Icon source="trash-can" size={26} color={colors.secondary} />
+                  </Pressable>
+                </View>
+              ))}
+              <View style={styles.listEnd}>
+                <View style={styles.listEndDot} />
+                <View style={styles.listEndDot} />
+                <View style={styles.listEndDot} />
+                <Text style={styles.listEndText}>FIN DE LA LISTA</Text>
+              </View>
+            </View>
+          )}
+        </ScrollView>
+
+        <View style={styles.bottomActions}>
+          <Button
+            mode="outlined"
+            onPress={() => setShowNameModal(true)}
+            style={styles.nameButton}
+            icon="pencil"
+          >
+            Nombrar
+          </Button>
           <Button
             mode="contained"
             onPress={handleSaveRequest}
-            style={styles.acceptButton}
-            contentStyle={styles.acceptButtonContent}
+            style={styles.saveButton}
             disabled={cards.length === 0}
-            labelStyle={styles.acceptButtonLabel}
+            icon="content-save"
+            loading={loading}
           >
-            ACEPTAR
+            Guardar Baraja
           </Button>
         </View>
+        <IconButton
+          icon="arrow-left"
+          size={24}
+          iconColor={colors.primary}
+          style={styles.backButton}
+          onPress={() => router.back()}
+        />
       </View>
 
-      {/* Name Modal */}
       <Portal>
         <Modal
           visible={showNameModal}
           onDismiss={handleCloseModal}
           contentContainerStyle={styles.modalContainer}
         >
-          <Surface style={styles.modalContent} elevation={5}>
+          <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Nombra tu mazo</Text>
-            <Text style={styles.modalSubtitle}>
-              Dale un nombre descriptivo a tu mazo de {cards.length} cartas
-            </Text>
-
-            <FocusTextInput
+            <Text style={styles.modalSubtitle}>Dale un nombre descriptivo a tu mazo de {cards.length} cartas</Text>
+            <TextInput
+              mode="outlined"
               label="Nombre del mazo"
               value={deckName}
               onChangeText={(text) => {
-                setDeckName(text);
-                if (nameError) setNameError("");
+                setDeckName(text.trim());
+                if (nameError) {
+                  setNameError("");
+                }
               }}
               style={styles.modalInput}
               error={!!nameError}
               maxLength={50}
               placeholder="Ej: Animales, Deportes, Comida..."
-              left={<TextInput.Icon icon="cards" />}
             />
-            <HelperText type="error" visible={!!nameError}>
-              {nameError}
-            </HelperText>
-
+            {nameError ? <HelperText type="error">{nameError}</HelperText> : null}
             <View style={styles.modalButtons}>
               <Button
                 mode="outlined"
@@ -292,12 +285,12 @@ const CreateDeckScreen: React.FC = () => {
                 onPress={handleSaveDeck}
                 style={[styles.modalButton, styles.modalSaveButton]}
                 loading={loading}
-                disabled={loading || !deckName.trim()}
+                disabled={loading || !deckName}
               >
                 Guardar
               </Button>
             </View>
-          </Surface>
+          </View>
         </Modal>
       </Portal>
     </CustomScreen>
@@ -307,160 +300,212 @@ const CreateDeckScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    paddingHorizontal: 0,
   },
-  backgroundView: {
+  screen: {
     flex: 1,
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.sm,
-    paddingBottom: spacing.lg,
-    position: "relative",
   },
-  closeButton: {
-    position: "absolute",
-    left: 10,
-    top: 5,
-    zIndex: 1,
+  brandRow: {
+    alignItems: "center",
+    marginBottom: spacing.md,
+  },
+  brandTitle: {
+    fontFamily: typography.families.heading,
+    color: colors.primary,
+    fontSize: typography.sizes.xl,
+    letterSpacing: 0.8,
+  },
+  headerCard: {
+    borderRadius: borderRadius.xl,
+    backgroundColor: colors.background,
+    borderBottomWidth: 4,
+    borderBottomColor: colors.primary,
+    padding: spacing.lg,
+    gap: spacing.sm,
+    marginBottom: spacing.md,
+  },
+  headerBadgeRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  headerBadge: {
+    backgroundColor: "#c8ff7f",
+    color: "#2a2a2a",
+    alignSelf: "flex-start",
+    borderRadius: borderRadius.full,
+    paddingVertical: 4,
+    paddingHorizontal: 12,
+    fontFamily: typography.families.bodyBold,
+    fontSize: typography.sizes.sm,
+    letterSpacing: 1.2,
+  },
+  headerCount: {
+    fontFamily: typography.families.bodyBold,
+    color: "#5a4328",
+    fontSize: typography.sizes.xxl,
   },
   headerTitle: {
-    fontSize: typography.sizes.lg,
-    fontWeight: "800",
     fontFamily: typography.families.heading,
-    color: colors.text,
-    textAlign: "center",
-    flex: 1,
+    color: "#2a1e12",
+    fontSize: 58,
+    lineHeight: 58,
   },
-  mainArea: {
+  headerSubtitle: {
+    fontFamily: typography.families.body,
+    color: "#544435",
+    fontSize: typography.sizes.xl,
+    lineHeight: 30,
+  },
+  addWordSection: {
+    gap: spacing.sm,
+    marginBottom: spacing.md,
+  },
+  addInputWrapper: {
+    flexDirection: "row",
+    gap: spacing.sm,
+    alignItems: "flex-start",
+  },
+  addWordInput: {
     flex: 1,
-    paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.lg,
+    backgroundColor: colors.background,
+  },
+  errorText: {
+    marginTop: -6,
+  },
+  addWordButton: {
+    borderRadius: borderRadius.xl,
+  },
+  addWordButtonContent: {
+    minHeight: 58,
   },
   cardsScrollView: {
     flex: 1,
   },
   cardsContainer: {
-    flexGrow: 1,
-    paddingBottom: spacing.lg,
+    gap: spacing.md,
+    paddingBottom: 120,
   },
   emptyState: {
-    flex: 1,
-    justifyContent: "center",
+    borderRadius: borderRadius.xl,
+    borderWidth: 1,
+    borderColor: "#e8d9c3",
+    borderStyle: "dashed",
     alignItems: "center",
-    paddingVertical: spacing.xxxl,
-  },
-  emptyIcon: {
-    margin: 0,
-    marginBottom: spacing.lg,
+    paddingVertical: spacing.xl,
+    gap: spacing.xs,
   },
   emptyTitle: {
-    fontSize: typography.sizes.xxl,
-    fontWeight: "800",
     fontFamily: typography.families.heading,
-    color: colors.text,
-    marginBottom: spacing.sm,
-    textAlign: "center",
+    color: "#2a1e12",
+    fontSize: typography.sizes.xl,
   },
   emptySubtitle: {
+    fontFamily: typography.families.body,
+    color: "#6f5f50",
     fontSize: typography.sizes.md,
-    color: colors.textSecondary,
-    opacity: 0.8,
-    textAlign: "center",
-    lineHeight: 22,
   },
-  cardsGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: spacing.sm,
-    justifyContent: "flex-start",
-  },
-  cardChip: {
-    backgroundColor: colors.surfaceContainerHigh,
-    marginBottom: spacing.xs,
-  },
-  cardChipText: {
-    color: colors.primary,
-    fontWeight: "500",
-  },
-  bottomSection: {
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.lg,
-    flexDirection: "row",
-    alignItems: "flex-end",
+  cardRows: {
     gap: spacing.md,
   },
-  inputSection: {
-    flex: 1,
-  },
-  inputContainer: {
+  cardRow: {
+    minHeight: 84,
+    borderRadius: borderRadius.xl,
+    backgroundColor: "#fff2df",
+    borderBottomWidth: 3,
+    borderBottomColor: "#f0d7b7",
+    paddingHorizontal: spacing.md,
     flexDirection: "row",
-    alignItems: "flex-start",
+    alignItems: "center",
+    gap: spacing.md,
+  },
+  cardRowIcon: {
+    width: 58,
+    height: 58,
+    borderRadius: borderRadius.md,
+    backgroundColor: "#dbe7f8",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  cardRowText: {
+    flex: 1,
+    fontFamily: typography.families.bodyBold,
+    color: "#1d160f",
+    fontSize: 44,
+    lineHeight: 44,
+  },
+  deleteButton: {
+    width: 42,
+    height: 42,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  listEnd: {
+    alignItems: "center",
+    justifyContent: "center",
+    gap: spacing.xs,
+    paddingVertical: spacing.xl,
+  },
+  listEndDot: {
+    width: 8,
+    height: 8,
+    borderRadius: borderRadius.full,
+    backgroundColor: "#f0d8b0",
+  },
+  listEndText: {
+    marginTop: spacing.sm,
+    fontFamily: typography.families.bodyBold,
+    color: "#5a4328",
+    letterSpacing: 1,
+    fontSize: typography.sizes.md,
+  },
+  bottomActions: {
+    position: "absolute",
+    left: spacing.lg,
+    right: spacing.lg,
+    bottom: spacing.md,
+    flexDirection: "row",
     gap: spacing.sm,
   },
-  cardInput: {
+  nameButton: {
     flex: 1,
-    backgroundColor: colors.surfaceContainerLowest,
+    borderRadius: borderRadius.xl,
+    borderColor: colors.primary,
   },
-  addButton: {
-    marginTop: 8,
+  saveButton: {
+    flex: 1.4,
     borderRadius: borderRadius.xl,
     backgroundColor: colors.primary,
   },
-  addButtonContent: {
-    height: 50,
-    paddingHorizontal: 24,
-  },
-  errorText: {
-    color: colors.error,
-    marginTop: 4,
-  },
-  acceptButton: {
-    borderRadius: borderRadius.xl,
-    backgroundColor: colors.primary,
-    minWidth: 120,
-  },
-  acceptButtonContent: {
-    height: 50,
-    paddingHorizontal: 24,
-  },
-  acceptButtonLabel: {
-    fontSize: typography.sizes.md,
-    fontWeight: "700",
-    fontFamily: typography.families.bodyBold,
-    color: colors.textLight,
+  backButton: {
+    position: "absolute",
+    top: 2,
+    left: 2,
+    margin: 0,
   },
   modalContainer: {
-    justifyContent: "center",
-    paddingHorizontal: 20,
+    paddingHorizontal: spacing.lg,
   },
-  modalContent: {
-    backgroundColor: colors.surface,
+  modalContent: { 
+    backgroundColor: colors.background,
     borderRadius: borderRadius.xl,
-    padding: spacing.xl,
-    maxWidth: 400,
-    alignSelf: "center",
-    width: "100%",
+    padding: spacing.lg,
   },
   modalTitle: {
     fontSize: typography.sizes.xxl,
-    fontWeight: "800",
     fontFamily: typography.families.heading,
     color: colors.text,
-    textAlign: "center",
-    marginBottom: spacing.xs,
   },
   modalSubtitle: {
     fontSize: typography.sizes.md,
-    color: colors.textSecondary,
-    textAlign: "center",
-    opacity: 0.8,
-    marginBottom: spacing.xl,
+    color: colors.text,
+    marginTop: spacing.xs,
+    marginBottom: spacing.md,
   },
   modalInput: {
-    backgroundColor: "transparent",
-    marginBottom: spacing.sm,
+    backgroundColor: colors.background,
   },
   modalButtons: {
     flexDirection: "row",
@@ -471,7 +516,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   modalSaveButton: {
-    backgroundColor: colors.success,
+    backgroundColor: colors.primary,
   },
 });
 

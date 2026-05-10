@@ -1,13 +1,12 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { View, StyleSheet, Alert, BackHandler } from "react-native";
 import {
   Text,
   Button,
-  Card,
   IconButton,
   Dialog,
   Portal,
-  Surface,
+  Icon,
 } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router, useFocusEffect } from "expo-router";
@@ -42,13 +41,11 @@ const GameTurnScreen: React.FC = () => {
     "preparation"
   );
 
-  // Current player and team info
   const currentTeamData = teams[currentTeam];
   const currentPlayer = currentTeamData.players[currentPlayerIndex];
   const currentCard = phaseCards[currentCardIndex];
   const cardsRemaining = phaseCards.length - currentCardIndex;
 
-  // Phase descriptions
   const getPhaseDescription = (phase: number): string => {
     switch (phase) {
       case 1:
@@ -62,7 +59,6 @@ const GameTurnScreen: React.FC = () => {
     }
   };
 
-  // Prevent back button
   useFocusEffect(
     useCallback(() => {
       const onBackPress = () => {
@@ -79,14 +75,12 @@ const GameTurnScreen: React.FC = () => {
     }, [])
   );
 
-  // Timer effect
   useEffect(() => {
     let interval: ReturnType<typeof setInterval>;
 
     if (isTimerRunning && timer > 0) {
       interval = setInterval(() => {
         const timerStillRunning = decrementTimer();
-
         if (!timerStillRunning) {
           handleTimeUp();
         }
@@ -100,17 +94,25 @@ const GameTurnScreen: React.FC = () => {
     };
   }, [isTimerRunning, timer, decrementTimer]);
 
-  // Check if game should redirect
   useEffect(() => {
     if (!gameStarted) {
       return;
     }
   }, [gameStarted]);
 
-  // Reset game phase when turn changes
   useEffect(() => {
     setGamePhase("preparation");
   }, [currentTeam, currentPlayerIndex]);
+
+  const prepDots = useMemo(() => {
+    const rows = [8, 14, 20, 26, 32, 38, 44, 50, 56, 62, 68, 74, 80, 86, 92];
+    const cols = [6, 16, 26, 36, 46, 56, 66, 76, 86, 96];
+    return rows.flatMap((top) => cols.map((left) => ({ top, left })));
+  }, []);
+
+  const currentTeamScore = teams[currentTeam].score;
+  const oppositeTeam = currentTeam === "azul" ? "rojo" : "azul";
+  const oppositeTeamScore = teams[oppositeTeam].score;
 
   const handleTimeUp = () => {
     stopTimer();
@@ -130,36 +132,37 @@ const GameTurnScreen: React.FC = () => {
   };
 
   const handleCorrect = () => {
-    if (!currentCard) return;
+    if (!currentCard) {
+      return;
+    }
 
     markCardCorrect(currentCard);
 
-    // Check if all cards are done
     if (currentCardIndex >= phaseCards.length - 1) {
       handleAllCardsCompleted();
-    } else {
-      // Continue with next card
-      useGameStore.setState({ currentCardIndex: currentCardIndex + 1 });
+      return;
     }
+
+    useGameStore.setState({ currentCardIndex: currentCardIndex + 1 });
   };
 
   const handleIncorrect = () => {
-    if (!currentCard) return;
+    if (!currentCard) {
+      return;
+    }
 
     markCardIncorrect(currentCard);
 
-    // In phase 1, reduce timer by 5 seconds when skipping a word
     if (currentPhase === 1) {
       reduceTimerForSkip();
     }
 
-    // Check if all cards are done
     if (currentCardIndex >= phaseCards.length - 1) {
       handleAllCardsCompleted();
-    } else {
-      // Continue with next card
-      useGameStore.setState({ currentCardIndex: currentCardIndex + 1 });
+      return;
     }
+
+    useGameStore.setState({ currentCardIndex: currentCardIndex + 1 });
   };
 
   const handleAllCardsCompleted = () => {
@@ -171,8 +174,6 @@ const GameTurnScreen: React.FC = () => {
   const handleEndTurn = () => {
     stopTimer();
     resetTimer();
-
-    // Always go to turn review screen after a turn ends
     router.push("/turn-review");
   };
 
@@ -202,56 +203,67 @@ const GameTurnScreen: React.FC = () => {
     );
   }
 
-  // Preparation Phase - Show player info and start button
   if (gamePhase === "preparation") {
     return (
-      <CustomScreen contentStyle={styles.container}>
-        {/* Header with exit button */}
-        <View style={styles.header}>
-          <View style={styles.headerLeft}>
-            <Text style={styles.roundText}>Fase {currentPhase}</Text>
+      <CustomScreen contentStyle={styles.screenContent}>
+        <View style={styles.screen}>
+          <View style={styles.prepBlueBackground} />
+          {prepDots.map((dot, index) => (
+            <View
+              key={`prep-dot-${index}`}
+              style={[styles.prepDot, { top: `${dot.top}%`, left: `${dot.left}%` }]}
+            />
+          ))}
+          <View style={styles.topBar}>
+            <View style={styles.topBarLeft}>
+              <View style={styles.avatarPill}>
+                <Icon source="account" size={18} color={colors.text} />
+              </View>
+              <Text style={styles.topBrand}>Party Fun 2</Text>
+            </View>
+            <IconButton
+              icon="cog"
+              size={24}
+              iconColor={colors.text}
+              style={styles.settingsButton}
+              onPress={() => setShowExitDialog(true)}
+            />
           </View>
-          <View style={styles.headerRight}>
-            <Text style={styles.wordsRemainingNumber}>x{cardsRemaining}</Text>
-          </View>
-        </View>
-
-        {/* Main content */}
-        <View style={styles.preparationContent}>
-          {/* Team name */}
-          <Surface
-            style={[
-              styles.teamBanner,
-              {
-                backgroundColor:
-                  currentTeam === "azul" ? colors.primary : colors.secondary,
-              },
-            ]}
-          >
-            <Text style={styles.teamBannerText}>
-              EQUIPO {currentTeam.toUpperCase()}
+          <View style={styles.prepContent}>
+            <View
+              style={[
+                styles.prepTeamBadge,
+                { backgroundColor: currentTeam === "azul" ? "#2f89e9" : "#d4513a" },
+              ]}
+            >
+              <Text style={styles.prepTeamBadgeText}>EQUIPO {currentTeam.toUpperCase()}</Text>
+            </View>
+            <Text style={styles.prepTurnLine}>
+              TURNO {currentPlayerIndex + 1} - {getPhaseDescription(currentPhase)}
             </Text>
-          </Surface>
-
-          {/* Phase description */}
-          <Text style={styles.roundDescription}>
-            TURNO {currentPlayerIndex + 1} - {getPhaseDescription(currentPhase)}
-          </Text>
-
-          {/* Player name */}
-          <Text style={styles.playerNameLarge}>{currentPlayer.name}</Text>
-
-          {/* Start button */}
-          <BouncyButton
-            label="Empezar"
-            onPress={handleStartTurn}
-            style={styles.startButton}
-            contentStyle={styles.startButtonContent}
-            tone="tertiary"
-          />
+            <View style={styles.prepPlayerCard}>
+              <Text style={styles.prepPlayerName}>{currentPlayer.name}</Text>
+            </View>
+            <View style={styles.prepStatsRow}>
+              <View style={styles.prepStatCard}>
+                <Text style={styles.prepStatLabel}>RONDA</Text>
+                <Text style={styles.prepStatValue}>{currentPhase}</Text>
+              </View>
+              <View style={styles.prepStatCard}>
+                <Text style={styles.prepStatLabel}>RESTANTES</Text>
+                <Text style={styles.prepStatValue}>x{cardsRemaining}</Text>
+              </View>
+            </View>
+            <View style={styles.prepStartButton}>
+              <BouncyButton
+                label="¡Empezar!"
+                onPress={handleStartTurn}
+                variant="tertiary"
+                icon="play"
+              />
+            </View>
+          </View>
         </View>
-
-        {/* Exit Dialog */}
         <Portal>
           <Dialog
             visible={showExitDialog}
@@ -276,61 +288,101 @@ const GameTurnScreen: React.FC = () => {
     );
   }
 
-  // Playing Phase - Show word and action buttons
   return (
-    <CustomScreen contentStyle={styles.container}>
-      {/* Timer at top */}
-      <View style={styles.timerHeader}>
-        <View style={styles.timerHeaderLeft}>
-          <Text style={styles.teamNameSmall}>
-            Equipo {currentTeam === "azul" ? "Azul" : "Rojo"}
-          </Text>
-          <Text style={styles.playerNameSmall}>{currentPlayer.name}</Text>
+    <CustomScreen contentStyle={styles.screenContent}>
+      <View style={styles.screen}>
+        <View style={styles.topBar}>
+          <View style={styles.topBarLeft}>
+            <View style={styles.avatarPill}>
+              <Text style={styles.avatarInitial}>
+                {currentPlayer.name.charAt(0).toUpperCase()}
+              </Text>
+            </View>
+            <Text style={styles.topBrand}>Party Fun 2</Text>
+          </View>
+          <IconButton
+            icon="cog"
+            size={24}
+            iconColor={colors.text}
+            style={styles.settingsButton}
+            onPress={() => setShowExitDialog(true)}
+          />
         </View>
-        <View style={styles.timerCenter}>
-          <Surface style={styles.timerCircle} elevation={4}>
-            <Text style={styles.timerText}>{formatTime(timer)}</Text>
-          </Surface>
+        <View style={styles.playingScoreRow}>
+          <View style={styles.scoreSideCard}>
+            <Text style={styles.scoreSideLabel}>
+              TEAM {currentTeam === "azul" ? "BLUE" : "RED"}
+            </Text>
+            <View
+              style={[
+                styles.scoreValueBox,
+                { backgroundColor: currentTeam === "azul" ? "#5ca7ff" : "#ffb4a9" },
+              ]}
+            >
+              <Text style={styles.scoreValueText}>{currentTeamScore}</Text>
+            </View>
+          </View>
+          <View style={styles.mainTimerWrap}>
+            <View style={styles.mainTimerCircle}>
+              <Text style={styles.mainTimerText}>{formatTime(timer)}</Text>
+            </View>
+          </View>
+          <View style={styles.scoreSideCard}>
+            <Text style={styles.scoreSideLabel}>
+              TEAM {oppositeTeam === "azul" ? "BLUE" : "RED"}
+            </Text>
+            <View
+              style={[
+                styles.scoreValueBox,
+                { backgroundColor: oppositeTeam === "azul" ? "#5ca7ff" : "#ffb4a9" },
+              ]}
+            >
+              <Text style={styles.scoreValueText}>{oppositeTeamScore}</Text>
+            </View>
+          </View>
         </View>
-        <View style={styles.timerHeaderRight}>
-          <Text style={styles.teamNameSmall}>Restantes</Text>
-          <Text style={styles.wordsRemainingNumberSmall}>{cardsRemaining}</Text>
+        <View style={styles.wordCard}>
+          <View style={styles.wordMarkerTop}>
+            <Text style={styles.wordMarkerText}>
+              {currentPhase === 1 ? "P" : currentPhase === 2 ? "1" : "M"}
+            </Text>
+          </View>
+          <Text style={styles.wordText}>{currentCard}</Text>
+          <View style={styles.wordUnderline} />
+          <View style={styles.wordMarkerBottom}>
+            <Text style={styles.wordMarkerText}>F</Text>
+          </View>
+        </View>
+        <View style={styles.actionRow}>
+          <IconButton
+            icon="close"
+            size={56}
+            iconColor={colors.textLight}
+            style={styles.wrongButton}
+            onPress={handleIncorrect}
+          />
+          <View style={styles.phaseHintPill}>
+            <Text style={styles.phaseHintText}>
+              {currentPhase === 1
+                ? "PISTA LIBRE"
+                : currentPhase === 2
+                  ? "¡UNA PALABRA!"
+                  : "MÍMICA"}
+            </Text>
+          </View>
+          <IconButton
+            icon="check"
+            size={56}
+            iconColor={colors.textLight}
+            style={styles.correctButton}
+            onPress={handleCorrect}
+          />
+        </View>
+        <View style={styles.currentTurnBox}>
+          <Text style={styles.currentTurnLabel}>CURRENT TURN</Text>
+          <Text style={styles.currentTurnPlayer}>{currentPlayer.name}</Text>
         </View>
       </View>
-
-      {/* Main game area with buttons on sides */}
-      <View style={styles.gameContent}>
-        <View style={styles.gameRow}>
-          {/* Left button */}
-          <Surface style={styles.incorrectButton} elevation={4}>
-            <IconButton
-              icon="close"
-              iconColor={colors.text}
-              size={60}
-              onPress={handleIncorrect}
-            />
-          </Surface>
-
-          {/* Word card */}
-          <Card style={styles.wordCard}>
-            <Card.Content style={styles.wordCardContent}>
-              <Text style={styles.wordText}>{currentCard}</Text>
-            </Card.Content>
-          </Card>
-
-          {/* Right button */}
-          <Surface style={styles.correctButton} elevation={4}>
-            <IconButton
-              icon="check"
-              iconColor={colors.text}
-              size={60}
-              onPress={handleCorrect}
-            />
-          </Surface>
-        </View>
-      </View>
-
-      {/* Exit Dialog */}
       <Portal>
         <Dialog
           visible={showExitDialog}
@@ -358,216 +410,317 @@ const GameTurnScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: spacing.md,
   },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.sm,
+  screenContent: {
+    paddingHorizontal: 0,
   },
-  headerLeft: {
-    alignItems: "flex-start",
-  },
-  headerRight: {
-    alignItems: "flex-end",
-  },
-  roundText: {
-    fontSize: typography.sizes.xxl,
-    fontWeight: "800",
-    fontFamily: typography.families.heading,
-    color: colors.text,
-  },
-  wordsRemainingText: {
-    fontSize: 14,
-    color: colors.text,
-  },
-  wordsRemainingNumber: {
-    fontSize: typography.sizes.xxl,
-    fontWeight: "800",
-    fontFamily: typography.families.heading,
-    color: colors.text,
-  },
-  preparationContent: {
+  screen: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    paddingHorizontal: spacing.xl,
-  },
-  teamBanner: {
-    paddingHorizontal: 40,
-    paddingVertical: spacing.md,
-    borderRadius: borderRadius.xl,
-    marginBottom: spacing.lg,
-  },
-  teamBannerText: {
-    fontSize: typography.sizes.xl,
-    fontWeight: "800",
-    fontFamily: typography.families.heading,
-    color: colors.text,
-    textAlign: "center",
-  },
-  roundDescription: {
-    fontSize: typography.sizes.lg,
-    fontWeight: "700",
-    fontFamily: typography.families.bodyBold,
-    color: colors.text,
-    textAlign: "center",
-    marginBottom: spacing.md,
-  },
-  playerNameLarge: {
-    fontSize: typography.sizes.display,
-    fontWeight: "800",
-    fontFamily: typography.families.heading,
-    color: colors.primary,
-    textAlign: "center",
-    marginBottom: spacing.xl,
-    textTransform: "uppercase",
-  },
-  preparationInstructions: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: colors.text,
-    textAlign: "center",
-    marginBottom: 10,
-  },
-  preparationSubtext: {
-    fontSize: 16,
-    color: colors.text + "80",
-    textAlign: "center",
-    marginBottom: 50,
-  },
-  startButton: {
-    borderRadius: borderRadius.xl,
-    minWidth: 280,
-    marginHorizontal: spacing.lg,
-  },
-  startButtonContent: {
-    minHeight: 70,
-    paddingHorizontal: spacing.xl,
-  },
-  timerHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.sm,
-    width: "100%",
+    paddingTop: spacing.sm,
     position: "relative",
   },
-  timerHeaderLeft: {
+  prepBlueBackground: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: colors.primary,
+  },
+  prepDot: {
     position: "absolute",
-    left: 20,
-    alignItems: "flex-start",
+    width: 6,
+    height: 6,
+    borderRadius: borderRadius.full,
+    backgroundColor: "#2d6cb4",
+    opacity: 0.7,
   },
-  teamNameSmall: {
-    fontSize: typography.sizes.sm,
-    color: colors.textSecondary,
-    fontWeight: "500",
+  topBar: {
+    backgroundColor: colors.surfaceContainerLowest,
+    minHeight: 78,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: spacing.lg,
+    borderBottomWidth: 1,
+    borderBottomColor: "#e7dac8",
   },
-  playerNameSmall: {
-    fontSize: typography.sizes.xl,
-    fontWeight: "700",
-    fontFamily: typography.families.bodyBold,
-    color: colors.text,
+  topBarLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.sm,
   },
-  timerCenter: {
-    flex: 1,
+  avatarPill: {
+    width: 44,
+    height: 44,
+    borderRadius: borderRadius.full,
+    backgroundColor: "#6babff",
     alignItems: "center",
     justifyContent: "center",
   },
-  timerCircle: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+  avatarInitial: {
+    fontFamily: typography.families.heading,
+    color: "#173a5b",
+    fontSize: typography.sizes.lg,
+  },
+  topBrand: {
+    fontFamily: typography.families.heading,
+    color: colors.primary,
+    fontSize: typography.sizes.xxxl,
+  },
+  settingsButton: {
+    margin: 0,
+  },
+  prepContent: {
+    flex: 1,
+    alignItems: "center",
+    paddingHorizontal: spacing.lg,
+    justifyContent: "center",
+  },
+  prepTeamBadge: {
+    borderRadius: borderRadius.full,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm,
+    marginBottom: spacing.md,
+  },
+  prepTeamBadgeText: {
+    fontSize: typography.sizes.xl,
+    fontFamily: typography.families.heading,
+    color: colors.textLight,
+    letterSpacing: 1,
+  },
+  prepTurnLine: {
+    fontSize: typography.sizes.xxxl,
+    fontFamily: typography.families.bodyBold,
+    color: "#83b4e6",
+    textAlign: "center",
+    marginBottom: spacing.lg,
+  },
+  prepPlayerCard: {
+    width: "100%",
+    minHeight: 170,
+    borderRadius: borderRadius.xxl,
+    borderWidth: 3,
+    borderColor: "#6ea3df",
+    backgroundColor: "rgba(11, 100, 187, 0.5)",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: spacing.lg,
+    paddingHorizontal: spacing.md,
+  },
+  prepPlayerName: {
+    fontSize: 92,
+    lineHeight: 92,
+    fontFamily: typography.families.heading,
+    color: "#f4d79e",
+    textAlign: "center",
+    textTransform: "uppercase",
+    textShadowColor: "#704f26",
+    textShadowOffset: { width: 0, height: 3 },
+    textShadowRadius: 0,
+  },
+  prepStatsRow: {
+    width: "100%",
+    flexDirection: "row",
+    gap: spacing.md,
+    marginBottom: spacing.xxl,
+  },
+  prepStatCard: {
+    flex: 1,
+    minHeight: 112,
+    borderRadius: borderRadius.xl,
+    backgroundColor: "#0f73cf",
+    borderWidth: 1,
+    borderColor: "#308ee6",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: spacing.xs,
+  },
+  prepStatLabel: {
+    fontSize: typography.sizes.lg,
+    color: "#8db9e7",
+    fontFamily: typography.families.bodyBold,
+    letterSpacing: 2,
+  },
+  prepStatValue: {
+    fontSize: 58,
+    lineHeight: 58,
+    color: colors.textLight,
+    fontFamily: typography.families.heading,
+  },
+  prepStartButton: {
+    width: "100%",
+    borderRadius: borderRadius.xl,
+  },
+  prepStartButtonContent: {
+    minHeight: 86,
+    paddingHorizontal: spacing.lg,
+  },
+  playingScoreRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: spacing.lg,
+    marginTop: spacing.md,
+    marginBottom: spacing.md,
+  },
+  scoreSideCard: {
+    width: 94,
+    alignItems: "center",
+    gap: spacing.xs,
+  },
+  scoreSideLabel: {
+    fontFamily: typography.families.bodyBold,
+    fontSize: 12,
+    color: "#9a7f65",
+    letterSpacing: 1,
+  },
+  scoreValueBox: {
+    minWidth: 88,
+    minHeight: 72,
+    borderRadius: borderRadius.lg,
+    borderBottomWidth: 5,
+    borderBottomColor: "#9a2a18",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: spacing.sm,
+  },
+  scoreValueText: {
+    fontSize: typography.sizes.display,
+    lineHeight: typography.sizes.display,
+    fontFamily: typography.families.bodyBold,
+    color: "#2d1d12",
+  },
+  mainTimerWrap: {
+    width: 140,
+    height: 140,
+    borderRadius: borderRadius.full,
+    borderWidth: 9,
+    borderColor: "#b32b12",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  mainTimerCircle: {
+    width: 118,
+    height: 118,
+    borderRadius: borderRadius.full,
     backgroundColor: colors.surfaceContainerLowest,
     justifyContent: "center",
     alignItems: "center",
   },
-  timerText: {
-    fontSize: typography.sizes.xxl,
-    fontWeight: "800",
-    color: colors.primary,
+  mainTimerText: {
+    fontSize: 68,
+    lineHeight: 68,
+    fontFamily: typography.families.heading,
+    color: "#2d1d12",
   },
-  timerHeaderRight: {
-    position: "absolute",
-    right: 20,
-    alignItems: "flex-end",
-    justifyContent: "center",
-  },
-  wordsRemainingSmall: {
-    fontSize: 14,
-    color: colors.text,
-  },
-  wordsRemainingNumberSmall: {
-    fontSize: typography.sizes.xxl,
-    fontWeight: "800",
-    color: colors.text,
-  },
-  gameContent: {
-    flex: 1,
+  wordCard: {
+    marginHorizontal: spacing.lg,
+    backgroundColor: colors.surfaceContainerLowest,
+    borderRadius: borderRadius.xxl,
+    minHeight: 290,
     justifyContent: "center",
     alignItems: "center",
     paddingHorizontal: spacing.lg,
-  },
-  gameRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    width: "100%",
-    marginBottom: spacing.lg,
-    height: "100%",
     paddingVertical: spacing.xl,
+    marginBottom: spacing.xl,
+    borderBottomWidth: 7,
+    borderBottomColor: "#ebdfcf",
   },
-  wordCard: {
-    flex: 1,
-    marginHorizontal: spacing.lg,
-    backgroundColor: colors.surfaceContainerLowest,
-    elevation: 8,
-    borderRadius: borderRadius.xl,
-    height: "100%",
+  wordMarkerTop: {
+    position: "absolute",
+    top: 20,
+    left: 24,
+    width: 56,
+    height: 56,
+    borderRadius: borderRadius.full,
+    backgroundColor: "#fff0d8",
+    alignItems: "center",
     justifyContent: "center",
-    alignItems: "center",
-  },
-  wordCardContent: {
-    padding: spacing.xxl,
-    alignItems: "center",
   },
   wordText: {
-    fontSize: typography.sizes.display,
-    fontWeight: "800",
+    fontSize: 84,
+    lineHeight: 84,
     fontFamily: typography.families.heading,
-    color: colors.text,
+    color: "#0d0d15",
     textAlign: "center",
-    marginVertical: 20,
+    textTransform: "uppercase",
   },
-  gameInstruction: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: colors.text,
-    textAlign: "center",
+  wordUnderline: {
+    width: 126,
+    height: 12,
+    borderRadius: borderRadius.full,
+    backgroundColor: "#d8e8f8",
+    marginTop: spacing.lg,
   },
-  actionButtons: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    paddingHorizontal: 40,
-    paddingBottom: 40,
-  },
-  incorrectButton: {
-    backgroundColor: colors.secondaryContainer,
-    borderRadius: 60,
-    width: 120,
-    height: 120,
-    justifyContent: "center",
+  wordMarkerBottom: {
+    position: "absolute",
+    right: 24,
+    bottom: 20,
+    width: 56,
+    height: 56,
+    borderRadius: borderRadius.full,
+    backgroundColor: "#fff0d8",
     alignItems: "center",
+    justifyContent: "center",
+  },
+  wordMarkerText: {
+    color: "#7a592f",
+    fontFamily: typography.families.bodyBold,
+    fontSize: typography.sizes.xxxl,
+  },
+  actionRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: spacing.lg,
+    marginBottom: spacing.xl,
+  },
+  wrongButton: {
+    width: 118,
+    height: 118,
+    borderRadius: borderRadius.full,
+    backgroundColor: "#b31e03",
+    margin: 0,
   },
   correctButton: {
-    backgroundColor: colors.tertiaryContainer,
-    borderRadius: 60,
-    width: 120,
-    height: 120,
-    justifyContent: "center",
+    width: 118,
+    height: 118,
+    borderRadius: borderRadius.full,
+    backgroundColor: "#3f6600",
+    margin: 0,
+  },
+  phaseHintPill: {
+    flex: 1,
+    marginHorizontal: spacing.md,
+    minHeight: 72,
+    borderRadius: borderRadius.full,
+    backgroundColor: "#c8ff7f",
+    borderBottomWidth: 4,
+    borderBottomColor: "#8fcc3d",
     alignItems: "center",
+    justifyContent: "center",
+  },
+  phaseHintText: {
+    fontFamily: typography.families.bodyBold,
+    color: "#23340d",
+    fontSize: typography.sizes.xl,
+    letterSpacing: 1.1,
+  },
+  currentTurnBox: {
+    alignItems: "center",
+    justifyContent: "center",
+    gap: spacing.xs,
+    paddingHorizontal: spacing.lg,
+  },
+  currentTurnLabel: {
+    fontFamily: typography.families.bodyBold,
+    color: "#7f663f",
+    fontSize: typography.sizes.md,
+    letterSpacing: 2,
+  },
+  currentTurnPlayer: {
+    fontFamily: typography.families.heading,
+    color: colors.primary,
+    fontSize: 56,
+    lineHeight: 56,
+    textAlign: "center",
   },
   errorContainer: {
     flex: 1,
@@ -577,7 +730,7 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: typography.sizes.lg,
-    color: colors.accent,
+    color: colors.error,
     textAlign: "center",
     marginBottom: 20,
   },

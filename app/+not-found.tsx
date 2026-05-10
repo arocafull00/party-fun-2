@@ -18,7 +18,7 @@ export default function NotFoundScreen() {
           <Text style={styles.subtitle}>
             La pantalla que buscas no existe o ha sido movida.
           </Text>
-          <BouncyButton label="Ir al inicio" onPress={() => router.push('/')} style={styles.button} />
+          <BouncyButton label="Ir al inicio" onPress={() => router.push('/')} variant="primary" />
         </View>
       </CustomScreen>
     </>

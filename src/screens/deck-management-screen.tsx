@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, StyleSheet, ScrollView, Alert, TouchableOpacity } from "react-native";
+import { View, StyleSheet, ScrollView, Alert, Pressable } from "react-native";
 import {
   Text,
   Button,
@@ -8,9 +8,8 @@ import {
   Portal,
   Modal,
   TextInput,
-  Chip,
-  Surface,
   Icon,
+  ActivityIndicator,
 } from "react-native-paper";
 import { router } from "expo-router";
 
@@ -23,6 +22,7 @@ import { BouncyButton } from "../shared/components/BouncyButton";
 export const DeckManagementScreen: React.FC = () => {
   const { setDecks, decks } = useGameStore();
   const [loading, setLoading] = useState(true);
+  const [wordCounts, setWordCounts] = useState<Record<number, number>>({});
   const [selectedDeck, setSelectedDeck] = useState<Mazo | null>(null);
   const [deckCards, setDeckCards] = useState<Carta[]>([]);
   const [showCardsModal, setShowCardsModal] = useState(false);
@@ -39,6 +39,17 @@ export const DeckManagementScreen: React.FC = () => {
       setLoading(true);
       const decksData = await database.getMazos();
       setDecks(decksData);
+      const deckCounts = await Promise.all(
+        decksData.map(async (deck) => {
+          const cards = await database.getCartasByMazo(deck.id);
+          return [deck.id, cards.length] as const;
+        })
+      );
+      const counts = deckCounts.reduce<Record<number, number>>((acc, [id, count]) => {
+        acc[id] = count;
+        return acc;
+      }, {});
+      setWordCounts(counts);
     } catch (error) {
       console.error("Error loading decks:", error);
       Alert.alert("Error", "No se pudieron cargar los mazos");
@@ -75,7 +86,6 @@ export const DeckManagementScreen: React.FC = () => {
       setDeckNameError("El nombre debe tener al menos 3 caracteres");
       return false;
     }
-    // Check if name already exists (excluding current deck)
     const existingDeck = decks.find(
       (d) => d.nombre.toLowerCase() === name.trim().toLowerCase() && d.id !== selectedDeck?.id
     );
@@ -93,12 +103,8 @@ export const DeckManagementScreen: React.FC = () => {
     }
 
     try {
-      // Update deck name in database
       await database.updateMazo(selectedDeck.id, editingDeckName.trim());
-      
-      // Reload decks to update the list
       await loadDecks();
-      
       setShowEditModal(false);
       Alert.alert("Éxito", "Nombre del mazo actualizado correctamente");
     } catch (error) {
@@ -135,103 +141,120 @@ export const DeckManagementScreen: React.FC = () => {
     router.push("/create-deck");
   };
 
-  const getDeckColor = (index: number) => {
-    const colorOptions = [
-      colors.surfaceContainerLowest,
-      colors.surfaceContainerLow,
-      colors.surfaceContainer,
-      colors.surfaceContainerHigh,
-      colors.surfaceContainerLow,
-      colors.surfaceContainerHighest,
-    ];
-    return colorOptions[index % colorOptions.length];
+  const handleDeckOptions = (deck: Mazo) => {
+    Alert.alert(deck.nombre, "Elige una acción", [
+      {
+        text: "Ver cartas",
+        onPress: () => handleViewCards(deck),
+      },
+      {
+        text: "Renombrar",
+        onPress: () => handleEditDeck(deck),
+      },
+      {
+        text: "Eliminar",
+        style: "destructive",
+        onPress: () => handleDeleteDeck(deck),
+      },
+      {
+        text: "Cancelar",
+        style: "cancel",
+      },
+    ]);
+  };
+
+  const getDeckIcon = (index: number) => {
+    const icons = ["silverware-fork-knife", "compass-outline", "leaf", "castle"];
+    return icons[index % icons.length];
   };
 
   if (loading) {
     return (
-      <CustomScreen>
-        <View style={styles.loadingContainer}>
-          <Text style={styles.loadingText}>Cargando mazos...</Text>
+      <CustomScreen contentStyle={styles.screenContent}>
+        <View style={styles.screen}>
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color={colors.primary} />
+            <Text style={styles.loadingText}>Cargando mazos...</Text>
+          </View>
         </View>
       </CustomScreen>
     );
   }
 
   return (
-    <CustomScreen>
-      <View style={styles.container}>
-        <View style={styles.header}>
-          <Text style={styles.title}>MIS MAZOS</Text>
-          <Text style={styles.subtitle}>Gestiona tus mazos de cartas</Text>
+    <CustomScreen contentStyle={styles.screenContent}>
+      <View style={styles.screen}>
+        <View style={styles.brandRow}>
+          <Text style={styles.brandTitle}>PARTY FUN 2</Text>
         </View>
-
-        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        <View style={styles.header}>
+          <Text style={styles.title}>Mis Barajas</Text>
+          <Text style={styles.subtitle}>Elige una baraja para empezar a jugar o crea una nueva.</Text>
+        </View>
+        <View style={styles.primaryAction}>
+          <BouncyButton
+            label="Crear Nueva Baraja"
+            onPress={handleCreateNewDeck}
+            icon="plus-circle"
+            variant="tertiary"
+          />
+        </View>
+        <ScrollView
+          style={styles.content}
+          contentContainerStyle={styles.contentContainer}
+          showsVerticalScrollIndicator={false}
+        >
           {decks.length === 0 ? (
             <View style={styles.emptyContainer}>
-              <Surface style={styles.emptyCard} elevation={2}>
-                <Icon source="cards-outline" size={80} />
-                <Text style={styles.emptyTitle}>Sin mazos</Text>
-                <Text style={styles.emptyDescription}>
-                  No tienes ningún mazo creado. Crea tu primer mazo para empezar a jugar.
-                </Text>
-                <BouncyButton
-                  label="Crear mazo"
-                  onPress={handleCreateNewDeck}
-                  style={styles.createButton}
-                  icon="plus"
-                />
-              </Surface>
+              <Text style={styles.emptyTitle}>Todavía no tienes barajas.</Text>
+              <Text style={styles.emptyDescription}>Pulsa crear nueva baraja para comenzar.</Text>
             </View>
-          ) : (
-            <>
-              <View style={styles.decksGrid}>
-                {decks.map((deck, index) => (
-                  <Card key={deck.id} style={[styles.deckCard, { backgroundColor: getDeckColor(index) }]}>
-                    <Card.Content style={styles.deckCardContent}>
-                      <Text style={styles.deckName}>{deck.nombre}</Text>
-                      <View style={styles.deckActions}>
-                        <IconButton
-                          icon="eye"
-                          size={20}
-                          iconColor={colors.text}
-                          onPress={() => handleViewCards(deck)}
-                          style={styles.actionButton}
-                        />
-                        <IconButton
-                          icon="pencil"
-                          size={20}
-                          iconColor={colors.text}
-                          onPress={() => handleEditDeck(deck)}
-                          style={styles.actionButton}
-                        />
-                        <IconButton
-                          icon="delete"
-                          size={20}
-                          iconColor={colors.text}
-                          onPress={() => handleDeleteDeck(deck)}
-                          style={styles.actionButton}
-                        />
-                      </View>
-                    </Card.Content>
-                  </Card>
-                ))}
-              </View>
+          ) : null}
 
-              <View style={styles.createNewContainer}>
-                <BouncyButton
-                  label="Crear nuevo mazo"
-                  onPress={handleCreateNewDeck}
-                  style={styles.createNewButton}
-                  contentStyle={styles.createNewButtonContent}
-                  icon="plus"
-                />
+          {decks.map((deck, index) => (
+            <Pressable
+              key={deck.id}
+              style={styles.deckCard}
+              onPress={() => handleViewCards(deck)}
+              onLongPress={() => handleDeckOptions(deck)}
+            >
+              <View style={styles.deckIconContainer}>
+                <Icon source={getDeckIcon(index)} size={18} color={colors.textLight} />
               </View>
-            </>
-          )}
+              <View style={styles.deckTextArea}>
+                <Text style={styles.deckName}>{deck.nombre}</Text>
+                <Text style={styles.deckDescription}>Vocabulario experto sobre este mundo culinario.</Text>
+                <View style={styles.deckMeta}>
+                  <Icon source="book-open-page-variant-outline" size={14} color={colors.textSecondary} />
+                  <Text style={styles.deckMetaText}>{wordCounts[deck.id] ?? 0} PALABRAS</Text>
+                </View>
+              </View>
+            </Pressable>
+          ))}
+
+          <Pressable style={styles.customDeckCard} onPress={handleCreateNewDeck}>
+            <View style={styles.customDeckPlus}>
+              <Icon source="plus" size={26} color={colors.accent} />
+            </View>
+            <Text style={styles.customDeckText}>Nueva Baraja Personalizada</Text>
+          </Pressable>
         </ScrollView>
+        <View style={styles.bottomTabs}>
+          <Pressable style={styles.tabItem} onPress={() => router.push("/new-game")}>
+            <Icon source="play-circle" size={18} color={"#69a4d8"} />
+            <Text style={styles.tabLabel}>JUGAR</Text>
+          </Pressable>
+          <Pressable style={styles.tabItem} onPress={() => router.push("/statistics")}>
+            <Icon source="chart-bar" size={18} color={"#69a4d8"} />
+            <Text style={styles.tabLabel}>ESTADÍSTICAS</Text>
+          </Pressable>
+          <View style={styles.tabItemActive}>
+            <Icon source="cards" size={18} color={colors.textLight} />
+            <Text style={styles.tabLabelActive}>BARAJAS</Text>
+          </View>
+        </View>
       </View>
 
-      {/* Cards Modal */}
       <Portal>
         <Modal
           visible={showCardsModal}
@@ -239,9 +262,7 @@ export const DeckManagementScreen: React.FC = () => {
           contentContainerStyle={styles.modalContainer}
         >
           <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>
-              Cartas de "{selectedDeck?.nombre}"
-            </Text>
+            <Text style={styles.modalTitle}>Cartas de "{selectedDeck?.nombre}"</Text>
             <IconButton
               icon="close"
               size={24}
@@ -252,7 +273,7 @@ export const DeckManagementScreen: React.FC = () => {
             {deckCards.length === 0 ? (
               <Text style={styles.noCardsText}>Este mazo no tiene cartas</Text>
             ) : (
-              deckCards.map((card, index) => (
+              deckCards.map((card) => (
                 <Card key={card.id} style={styles.cardItem}>
                   <Card.Content>
                     <Text style={styles.cardText}>{card.texto}</Text>
@@ -263,13 +284,12 @@ export const DeckManagementScreen: React.FC = () => {
           </ScrollView>
           <View style={styles.modalFooter}>
             <Text style={styles.cardCount}>
-              {deckCards.length} carta{deckCards.length !== 1 ? 's' : ''}
+              {deckCards.length} carta{deckCards.length !== 1 ? "s" : ""}
             </Text>
           </View>
         </Modal>
       </Portal>
 
-      {/* Edit Deck Modal */}
       <Portal>
         <Modal
           visible={showEditModal}
@@ -319,118 +339,194 @@ export const DeckManagementScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {
+  screenContent: {
+    paddingHorizontal: 0,
+  },
+  screen: {
     flex: 1,
-    width: "100%",
-    height: "100%",
-    position: "relative",
-    backgroundColor: "transparent",
+    paddingTop: spacing.md,
+  },
+  brandRow: {
+    alignItems: "center",
+    marginBottom: spacing.md,
+  },
+  brandTitle: {
+    fontFamily: typography.families.heading,
+    color: colors.primary,
+    fontSize: typography.sizes.xl,
+    letterSpacing: 0.8,
   },
   header: {
-    alignItems: "center",
-    paddingVertical: spacing.lg,
     paddingHorizontal: spacing.lg,
+    marginBottom: spacing.md,
+    gap: spacing.xs,
   },
   title: {
-    fontSize: typography.sizes.xxxl,
-    fontWeight: "800",
+    fontSize: 52,
+    lineHeight: 52,
     fontFamily: typography.families.heading,
-    color: colors.text,
-    textAlign: "center",
+    color: "#2a1e12",
   },
   subtitle: {
-    fontSize: typography.sizes.md,
-    color: colors.textSecondary,
-    textAlign: "center",
-    marginTop: 5,
-    opacity: 0.8,
+    fontFamily: typography.families.body,
+    color: "#5a4a3a",
+    fontSize: typography.sizes.lg,
+  },
+  primaryAction: {
+    paddingHorizontal: spacing.lg,
+    marginBottom: spacing.lg,
+  },
+  createDeckButton: {
+    borderRadius: borderRadius.xl,
+  },
+  createDeckButtonContent: {
+    minHeight: 62,
   },
   content: {
     flex: 1,
     paddingHorizontal: spacing.lg,
-    paddingTop: spacing.lg,
+  },
+  contentContainer: {
+    gap: spacing.md,
+    paddingBottom: 120,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    gap: spacing.md,
   },
   loadingText: {
-    fontSize: typography.sizes.lg,
-    color: colors.text,
-  },
-  emptyContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    paddingVertical: spacing.xxxl,
-  },
-  emptyCard: {
-    padding: spacing.xl,
-    borderRadius: borderRadius.xl,
-    alignItems: "center",
-    backgroundColor: colors.surfaceContainerLowest,
-  },
-  emptyTitle: {
-    fontSize: typography.sizes.xxl,
-    fontWeight: "800",
-    fontFamily: typography.families.heading,
-    color: colors.text,
-    marginTop: 15,
-    marginBottom: 10,
-  },
-  emptyDescription: {
+    fontFamily: typography.families.bodyBold,
     fontSize: typography.sizes.md,
     color: colors.textSecondary,
-    textAlign: "center",
-    marginBottom: 20,
-    opacity: 0.8,
   },
-  createButton: {
+  emptyContainer: {
     borderRadius: borderRadius.xl,
-  },
-  decksGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
-    gap: spacing.md,
-    marginBottom: spacing.xl,
-  },
-  deckCard: {
-    width: "48%",
-    borderRadius: borderRadius.xl,
-    elevation: 3,
-  },
-  deckCardContent: {
-    padding: spacing.md,
+    borderWidth: 1,
+    borderColor: "#e9d5b5",
+    borderStyle: "dashed",
+    paddingVertical: spacing.xl,
     alignItems: "center",
-  },
-  deckName: {
-    fontSize: typography.sizes.md,
-    fontWeight: "700",
-    fontFamily: typography.families.bodyBold,
-    color: colors.text,
-    textAlign: "center",
-    marginBottom: spacing.sm,
-  },
-  deckActions: {
-    flexDirection: "row",
-    justifyContent: "center",
     gap: spacing.xs,
   },
-  actionButton: {
-    margin: 0,
+  emptyTitle: {
+    fontFamily: typography.families.heading,
+    color: "#2a1e12",
+    fontSize: typography.sizes.xl,
   },
-  createNewContainer: {
-    alignItems: "center",
-    marginBottom: spacing.xl,
+  emptyDescription: {
+    color: "#6f5f50",
+    textAlign: "center",
+    fontFamily: typography.families.body,
   },
-  createNewButton: {
+  deckCard: {
+    backgroundColor: "#ffe8c6",
     borderRadius: borderRadius.xl,
-    width: "100%",
+    minHeight: 176,
+    padding: spacing.md,
+    borderBottomWidth: 4,
+    borderBottomColor: "#f2c89b",
+    flexDirection: "row",
+    gap: spacing.md,
   },
-  createNewButtonContent: {
-    minHeight: 55,
+  deckIconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: borderRadius.sm,
+    backgroundColor: "#2d1c16",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  deckTextArea: {
+    flex: 1,
+    gap: spacing.sm,
+  },
+  deckName: {
+    fontFamily: typography.families.heading,
+    color: "#2a1e12",
+    fontSize: typography.sizes.xxxl,
+    lineHeight: typography.sizes.xxxl + 2,
+  },
+  deckDescription: {
+    fontFamily: typography.families.body,
+    color: "#665648",
+    fontSize: typography.sizes.md,
+    lineHeight: 22,
+  },
+  deckMeta: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.xs,
+  },
+  deckMetaText: {
+    fontFamily: typography.families.bodyBold,
+    color: "#5e4e40",
+    fontSize: typography.sizes.sm,
+    letterSpacing: 0.5,
+  },
+  customDeckCard: {
+    marginTop: spacing.sm,
+    borderRadius: borderRadius.xl,
+    borderWidth: 2,
+    borderStyle: "dashed",
+    borderColor: "#e9d5b5",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: spacing.xl,
+    gap: spacing.sm,
+  },
+  customDeckPlus: {
+    width: 52,
+    height: 52,
+    borderRadius: borderRadius.full,
+    backgroundColor: "#ffe8b8",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  customDeckText: {
+    fontFamily: typography.families.bodyBold,
+    color: "#684d2f",
+    fontSize: typography.sizes.lg,
+  },
+  bottomTabs: {
+    position: "absolute",
+    bottom: 14,
+    left: 16,
+    right: 16,
+    borderRadius: borderRadius.xl,
+    backgroundColor: "#fff6ea",
+    borderWidth: 1,
+    borderColor: "#f2e0c9",
+    flexDirection: "row",
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.sm,
+    gap: spacing.sm,
+  },
+  tabItem: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 3,
+  },
+  tabLabel: {
+    color: "#69a4d8",
+    fontFamily: typography.families.bodyBold,
+    fontSize: 12,
+  },
+  tabItemActive: {
+    flex: 1,
+    borderRadius: borderRadius.full,
+    backgroundColor: colors.primary,
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 3,
+    paddingVertical: 6,
+  },
+  tabLabelActive: {
+    color: colors.textLight,
+    fontFamily: typography.families.bodyBold,
+    fontSize: 12,
   },
   modalContainer: {
     backgroundColor: colors.surfaceContainerLowest,
@@ -497,4 +593,5 @@ const styles = StyleSheet.create({
     fontSize: 12,
     marginTop: 5,
   },
-}); 
+});
+export default DeckManagementScreen;

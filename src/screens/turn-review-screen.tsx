@@ -147,8 +147,7 @@ const TurnReviewScreen: React.FC = () => {
           <BouncyButton
             label="Siguiente turno"
             onPress={handleNextTurn}
-            style={styles.nextButton}
-            contentStyle={styles.nextButtonContent}
+            variant="primary"
           />
         </View>
       </View>

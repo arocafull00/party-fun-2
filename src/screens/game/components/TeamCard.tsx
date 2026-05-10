@@ -1,15 +1,13 @@
 import React from "react";
 import { View, StyleSheet } from "react-native";
-import { Text, Card, IconButton } from "react-native-paper";
+import { Text, Card, IconButton, Icon } from "react-native-paper";
 import { Player } from "../../../store/game-store";
 import { borderRadius, colors, spacing, typography } from "../../../theme/theme";
 import { TeamColor } from "../interfaces/types";
-import { SelectionChip } from "../../../shared/components/SelectionChip";
 
 interface TeamCardProps {
   team: TeamColor;
   title: string;
-  backgroundColor: string;
   players: Player[];
   onMovePlayer: (playerId: string, fromTeam: TeamColor, toTeam: TeamColor) => void;
   onRemovePlayer: (team: TeamColor, playerId: string) => void;
@@ -19,7 +17,6 @@ interface TeamCardProps {
 const TeamCard: React.FC<TeamCardProps> = ({
   team,
   title,
-  backgroundColor,
   players,
   onMovePlayer,
   onRemovePlayer,
@@ -30,68 +27,57 @@ const TeamCard: React.FC<TeamCardProps> = ({
     onMovePlayer(playerId, team, toTeam);
   };
 
+  const teamColor = team === "azul" ? colors.primary : colors.secondary;
+
   return (
     <Card style={styles.teamCard}>
-      <Card.Content style={{ height: "100%" }}>
-        <Text style={[styles.teamTitle, { color: backgroundColor }]}>
-          {title}
-        </Text>
-
-        {players.length === 0 ? (
-          <View style={styles.emptyTeamContainer}>
-            <IconButton
-              icon="account-plus"
-              size={48}
-              iconColor={backgroundColor}
-              style={[
-                styles.addPlayerIcon,
-                { backgroundColor: backgroundColor + "20" },
-              ]}
-              onPress={onAddPlayer}
-            />
-            <Text style={styles.emptyTeamText}>AÑADIR JUGADOR</Text>
-          </View>
-        ) : (
-          <>
-            {players.map((player) => (
-              <View key={player.id} style={styles.playerItem}>
-                <SelectionChip
-                  selected={true}
-                  label={player.name}
-                  icon="account"
-                />
+      <Card.Content style={styles.teamContent}>
+        <View style={styles.teamHeader}>
+          <View style={[styles.teamAccent, { backgroundColor: teamColor }]} />
+          <Text style={[styles.teamTitle, { color: teamColor }]}>{title}</Text>
+        </View>
+        {players.length > 0 ? (
+          <View style={styles.playersList}>
+            {players.map((player, index) => (
+              <View key={player.id} style={styles.playerRow}>
+                <View style={styles.avatarCircle}>
+                  <Icon
+                    source={index % 2 === 0 ? "account" : "account-star"}
+                    size={24}
+                    color={teamColor}
+                  />
+                </View>
+                <Text style={styles.playerName}>{player.name}</Text>
                 <View style={styles.playerActions}>
                   <IconButton
                     icon="swap-horizontal"
                     size={20}
-                    iconColor={colors.primary}
+                    iconColor={teamColor}
                     onPress={() => handleMovePlayer(player.id)}
+                    style={styles.actionIcon}
                   />
                   <IconButton
-                    icon="close"
+                    icon="trash-can"
                     size={20}
-                    iconColor={colors.accent}
+                    iconColor={colors.error}
                     onPress={() => onRemovePlayer(team, player.id)}
+                    style={styles.actionIcon}
                   />
                 </View>
               </View>
             ))}
-            
-            {/* Add player button when there are existing players */}
-            <View style={styles.addMoreContainer}>
-              <IconButton
-                icon="plus"
-                size={24}
-                iconColor={backgroundColor}
-                style={[
-                  styles.addMoreIcon,
-                  { backgroundColor: backgroundColor + "20" },
-                ]}
-                onPress={onAddPlayer}
-              />
-            </View>
-          </>
-        )}
+          </View>
+        ) : null}
+        <View style={[styles.addPlayerContainer, { borderColor: `${teamColor}66` }]}>
+          <IconButton
+            icon="account-plus"
+            size={22}
+            iconColor={teamColor}
+            onPress={onAddPlayer}
+            style={styles.addPlayerIcon}
+          />
+          <Text style={[styles.addPlayerText, { color: teamColor }]}>Añadir Jugador</Text>
+        </View>
       </Card.Content>
     </Card>
   );
@@ -99,55 +85,82 @@ const TeamCard: React.FC<TeamCardProps> = ({
 
 const styles = StyleSheet.create({
   teamCard: {
-    flex: 1,
-    backgroundColor: colors.surfaceContainerLow,
+    width: "100%",
+    backgroundColor: "#ffeedb",
     borderRadius: borderRadius.xl,
-    width: "48%",
+    borderBottomWidth: 5,
+    borderBottomColor: "#e8d8c1",
+  },
+  teamContent: {
+    padding: spacing.md,
+    gap: spacing.md,
+  },
+  teamHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.sm,
+  },
+  teamAccent: {
+    width: 14,
+    height: 58,
+    borderRadius: borderRadius.md,
   },
   teamTitle: {
-    fontSize: typography.sizes.xl,
-    fontWeight: "800",
+    fontSize: 46,
+    lineHeight: 46,
     fontFamily: typography.families.heading,
-    textAlign: "center",
-    marginBottom: spacing.md,
-    letterSpacing: 1,
-    color: colors.text,
+    letterSpacing: 0.3,
   },
-  emptyTeamContainer: {
+  playersList: {
+    gap: spacing.sm,
+  },
+  playerRow: {
+    minHeight: 72,
+    borderRadius: borderRadius.xl,
+    backgroundColor: colors.surfaceContainerLowest,
+    paddingHorizontal: spacing.md,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.sm,
+  },
+  avatarCircle: {
+    width: 44,
+    height: 44,
+    borderRadius: borderRadius.full,
+    backgroundColor: "#f2f5fb",
     alignItems: "center",
     justifyContent: "center",
+  },
+  playerName: {
     flex: 1,
-    paddingVertical: spacing.md,
-    height: "100%",
-  },
-  addPlayerIcon: {
-    marginBottom: spacing.md,
-    backgroundColor: colors.surfaceContainerHigh,
-  },
-  emptyTeamText: {
-    textAlign: "center",
-    color: colors.textSecondary,
-    fontWeight: "700",
     fontFamily: typography.families.bodyBold,
-    fontSize: typography.sizes.md,
-    letterSpacing: 1,
-  },
-  playerItem: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: spacing.sm,
+    color: "#251c14",
+    fontSize: typography.sizes.xl,
   },
   playerActions: {
     flexDirection: "row",
-  },
-  addMoreContainer: {
     alignItems: "center",
-    marginTop: spacing.sm,
+    marginRight: -10,
   },
-  addMoreIcon: {
-    alignSelf: "center",
-    backgroundColor: colors.surfaceContainerHigh,
+  actionIcon: {
+    margin: 0,
+  },
+  addPlayerContainer: {
+    minHeight: 76,
+    borderRadius: borderRadius.xl,
+    borderWidth: 2,
+    borderStyle: "dashed",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: spacing.xs,
+  },
+  addPlayerIcon: {
+    margin: 0,
+  },
+  addPlayerText: {
+    fontFamily: typography.families.bodyBold,
+    fontSize: typography.sizes.xl,
   },
 });
 

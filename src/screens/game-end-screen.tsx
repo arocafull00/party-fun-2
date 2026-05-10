@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, ScrollView, Alert } from 'react-native';
-import { 
-  Text, 
-  Button, 
-  Card, 
+import {
+  Text,
+  Button,
+  Card,
   List,
   Surface,
   Chip
@@ -48,7 +48,7 @@ const GameEndScreen: React.FC = () => {
 
   const saveGameToDatabase = async () => {
     if (gameSaved || saving) return;
-    
+
     setSaving(true);
     try {
       // Create game record
@@ -73,7 +73,7 @@ const GameEndScreen: React.FC = () => {
           nombre: player.name,
           equipo: equipo
         };
-        
+
         const playerId = await database.createJugador(playerData);
         await database.addPlayerToGame(gameId, playerId, equipo as 'azul' | 'rojo');
       }
@@ -139,7 +139,7 @@ const GameEndScreen: React.FC = () => {
         <Card style={styles.scoresCard}>
           <Card.Content>
             <Text style={styles.sectionTitle}>Puntuación Final</Text>
-            
+
             <View style={styles.scoreRow}>
               <View style={[styles.teamScore, { backgroundColor: colors.primary + '20' }]}>
                 <Text style={[styles.teamName, { color: colors.primary }]}>AZUL</Text>
@@ -148,9 +148,9 @@ const GameEndScreen: React.FC = () => {
                   {teams.azul.players.map(p => p.name).join(', ')}
                 </Text>
               </View>
-              
+
               <Text style={styles.vs}>VS</Text>
-              
+
               <View style={[styles.teamScore, { backgroundColor: colors.secondary + '20' }]}>
                 <Text style={[styles.teamName, { color: colors.secondary }]}>ROJO</Text>
                 <Text style={[styles.teamScoreText, { color: colors.secondary }]}>{redScore}</Text>
@@ -166,31 +166,31 @@ const GameEndScreen: React.FC = () => {
         <Card style={styles.statsCard}>
           <Card.Content>
             <Text style={styles.sectionTitle}>Estadísticas del Juego</Text>
-            
+
             <List.Item
               title="Mazo utilizado"
               description={selectedDeck?.nombre || 'Sin mazo'}
               left={props => <List.Icon {...props} icon="cards" color={colors.primary} />}
             />
-            
+
             <List.Item
               title="Total de cartas"
               description={`${totalCards} cartas jugadas`}
               left={props => <List.Icon {...props} icon="format-list-numbered" color={colors.primary} />}
             />
-            
+
             <List.Item
               title="Cartas correctas"
               description={`${totalCorrect} aciertos`}
               left={props => <List.Icon {...props} icon="check-circle" color={colors.primary} />}
             />
-            
+
             <List.Item
               title="Precisión"
               description={`${accuracy}% de acierto`}
               left={props => <List.Icon {...props} icon="target" color={colors.primary} />}
             />
-            
+
             <List.Item
               title="Rondas completadas"
               description="3 rondas (Libre, Una palabra, Mímica)"
@@ -203,7 +203,7 @@ const GameEndScreen: React.FC = () => {
         <Card style={styles.roundsCard}>
           <Card.Content>
             <Text style={styles.sectionTitle}>Resultados por Ronda</Text>
-            
+
             {gameHistory.map((round, index) => (
               <View key={index} style={styles.roundResult}>
                 <Text style={styles.roundTitle}>Ronda {index + 1}</Text>
@@ -212,24 +212,24 @@ const GameEndScreen: React.FC = () => {
                   {index === 1 && 'Solo una palabra como pista'}
                   {index === 2 && 'Solo mímica'}
                 </Text>
-                
+
                 <View style={styles.roundStats}>
-                  <Chip 
-                    icon="check" 
+                  <Chip
+                    icon="check"
                     style={[styles.statChip, { backgroundColor: colors.primary + '20' }]}
                     textStyle={{ color: colors.primary }}
                   >
                     {round.correctCards.length} correctas
                   </Chip>
-                  <Chip 
-                    icon="close" 
+                  <Chip
+                    icon="close"
                     style={[styles.statChip, { backgroundColor: colors.accent + '20' }]}
                     textStyle={{ color: colors.accent }}
                   >
                     {round.incorrectCards.length} incorrectas
                   </Chip>
                 </View>
-                
+
                 {index < gameHistory.length - 1 && <View style={styles.roundSpacer} />}
               </View>
             ))}
@@ -240,37 +240,30 @@ const GameEndScreen: React.FC = () => {
           <BouncyButton
             label="Nueva partida"
             onPress={handleNewGame}
-            style={styles.primaryButton}
-            contentStyle={styles.buttonContent}
             icon="play"
+            variant="primary"
           />
-          
-          <Button
-            mode="outlined"
+
+          <BouncyButton
             onPress={handleViewStatistics}
-            style={styles.secondaryButton}
-            contentStyle={styles.buttonContent}
+            variant="secondary"
             icon="chart-line"
-          >
-            Ver Estadísticas
-          </Button>
-          
-          <Button
-            mode="text"
+            label="Ver Estadísticas"
+          />
+
+          <BouncyButton
+            label="Volver al Inicio"
             onPress={handleBackToHome}
-            style={styles.textButton}
-            contentStyle={styles.buttonContent}
             icon="home"
-          >
-            Volver al Inicio
-          </Button>
+            variant="secondary"
+          />
         </View>
 
         {/* Save Status */}
         {gameSaved && (
           <View style={styles.saveStatus}>
-            <Chip 
-              icon="check-circle" 
+            <Chip
+              icon="check-circle"
               style={styles.savedChip}
               textStyle={{ color: colors.primary }}
             >

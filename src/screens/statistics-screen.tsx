@@ -223,7 +223,7 @@ const StatisticsScreen: React.FC = () => {
                 <BouncyButton
                   label="Jugar primera partida"
                   onPress={() => router.push('/new-game')}
-                  style={styles.playButton}
+                  variant="secondary"
                   icon="play"
                 />
               </View>

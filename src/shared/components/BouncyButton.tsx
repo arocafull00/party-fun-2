@@ -2,11 +2,9 @@ import React, { useMemo, useRef } from 'react';
 import {
   Animated,
   Pressable,
-  StyleProp,
   StyleSheet,
   Text,
   View,
-  ViewStyle,
 } from 'react-native';
 import { Icon } from 'react-native-paper';
 import { borderRadius, colors, typography } from '../../theme/theme';
@@ -15,20 +13,20 @@ interface BouncyButtonProps {
   label: string;
   onPress: () => void;
   icon?: string;
+  iconSize?: number;
+  iconColor?: string;
   disabled?: boolean;
-  tone?: 'primary' | 'secondary' | 'tertiary';
-  style?: StyleProp<ViewStyle>;
-  contentStyle?: StyleProp<ViewStyle>;
+  variant: 'primary' | 'secondary' | 'tertiary' | 'surface' | 'tonal';
 }
 
 export const BouncyButton: React.FC<BouncyButtonProps> = ({
   label,
   onPress,
   icon,
+  iconSize = 22,
+  iconColor,
   disabled = false,
-  tone = 'primary',
-  style,
-  contentStyle,
+  variant = 'primary',
 }) => {
   const pressAnim = useRef(new Animated.Value(0)).current;
 
@@ -62,62 +60,47 @@ export const BouncyButton: React.FC<BouncyButtonProps> = ({
     }).start();
   };
 
+  const isPrimary = variant === 'primary';
+  const isSecondary = variant === 'secondary';
+  const isLightTone = isPrimary || variant === 'surface' || variant === 'tonal';
+  const resolvedIconColor = iconColor ?? (isPrimary ? colors.buttonPrimaryText : isSecondary ? colors.textLight : isLightTone ? colors.primary : colors.textLight);
+
   return (
-    <View style={[styles.shell, style, disabled && styles.disabledShell]}>
-      <View
+    <Pressable
+      disabled={disabled}
+      onPress={onPress}
+      onPressIn={handlePressIn}
+      onPressOut={handlePressOut}
+      style={styles.pressable}
+    >
+      <Animated.View
         style={[
-          styles.bottomEdge,
-          tone === 'secondary' && styles.bottomEdgeSecondary,
-          tone === 'tertiary' && styles.bottomEdgeTertiary,
+          styles.topLayer,
+          variant === 'primary' && styles.topLayerPrimary,
+          variant === 'secondary' && styles.topLayerSecondary,
+          variant === 'tertiary' && styles.topLayerTertiary,
+          variant === 'surface' && styles.topLayerSurface,
+          variant === 'tonal' && styles.topLayerTonal,
+          animatedStyle,
         ]}
-      />
-      <Pressable
-        disabled={disabled}
-        onPress={onPress}
-        onPressIn={handlePressIn}
-        onPressOut={handlePressOut}
-        style={styles.pressable}
       >
-        <Animated.View
-          style={[
-            styles.topLayer,
-            tone === 'secondary' && styles.topLayerSecondary,
-            tone === 'tertiary' && styles.topLayerTertiary,
-            animatedStyle,
-            contentStyle,
-          ]}
-        >
-          {icon ? <Icon source={icon} size={22} color={colors.textLight} /> : null}
-          <Text style={styles.label}>{label}</Text>
-        </Animated.View>
-      </Pressable>
-    </View>
+        {icon ? <Icon source={icon} size={iconSize} color={resolvedIconColor} /> : null}
+        <Text style={[styles.label, isPrimary && styles.labelPrimary, !isPrimary && !isSecondary && isLightTone && styles.labelDark]}>
+          {label}
+        </Text>
+      </Animated.View>
+    </Pressable>
   );
 };
 
 const styles = StyleSheet.create({
   shell: {
+    width: '100%',
     borderRadius: borderRadius.xl,
     overflow: 'hidden',
   },
   disabledShell: {
     opacity: 0.5,
-  },
-  bottomEdge: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 10,
-    backgroundColor: colors.primaryDim,
-    borderBottomLeftRadius: borderRadius.xl,
-    borderBottomRightRadius: borderRadius.xl,
-  },
-  bottomEdgeSecondary: {
-    backgroundColor: '#7f1402',
-  },
-  bottomEdgeTertiary: {
-    backgroundColor: '#2c4700',
   },
   pressable: {
     width: '100%',
@@ -125,7 +108,6 @@ const styles = StyleSheet.create({
   topLayer: {
     minHeight: 56,
     borderRadius: borderRadius.xl,
-    backgroundColor: colors.primary,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -133,11 +115,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingBottom: 10,
   },
-  topLayerSecondary: {
-    backgroundColor: colors.secondary,
+  topLayerPrimary: {
+    backgroundColor: colors.backgroundLight,
+    borderWidth: 2,
+    borderColor: colors.primaryLight,
   },
-  topLayerTertiary: {
-    backgroundColor: colors.tertiary,
+  topLayerSecondary: {
+    backgroundColor: colors.primaryLight,
   },
   label: {
     color: colors.textLight,
@@ -145,5 +129,11 @@ const styles = StyleSheet.create({
     fontSize: typography.sizes.lg,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
+  },
+  labelDark: {
+    color: colors.primary,
+  },
+  labelPrimary: {
+    color: colors.text,
   },
 });

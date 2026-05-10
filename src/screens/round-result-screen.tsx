@@ -182,13 +182,13 @@ const RoundResultScreen: React.FC = () => {
         </Card>
 
         {/* Continue Button */}
-        <BouncyButton
-          label="Continuar"
-          onPress={handleNextRound}
-          style={styles.continueButton}
-          contentStyle={styles.continueButtonContent}
-          icon="arrow-right"
-        />
+        <View style={styles.continueButton}>
+          <BouncyButton
+            label="Continuar"
+            onPress={handleNextRound}
+            icon="arrow-right"
+          />
+        </View>
       </ScrollView>
     </CustomScreen>
   );

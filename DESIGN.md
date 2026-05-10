@@ -1,4 +1,4 @@
-# Design System Document: Kinetic Play
+# Design System Document: Party Fun 2
 
 ## 1. Overview & Creative North Star
 
