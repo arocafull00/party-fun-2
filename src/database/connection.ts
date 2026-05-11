@@ -1,12 +1,13 @@
 import { drizzle } from 'drizzle-orm/expo-sqlite';
-import { openDatabaseSync } from 'expo-sqlite';
+import { openDatabaseSync, type SQLiteDatabase } from 'expo-sqlite';
 import { migrate } from 'drizzle-orm/expo-sqlite/migrator';
 import migrations from './migrations/migrations';
 import * as schema from './schema';
+import type { ExpoSQLiteDatabase } from 'drizzle-orm/expo-sqlite';
 
 // Initialize database connection
-let expo: any = null;
-let db: any = null;
+let expo: SQLiteDatabase | null = null;
+let db: ExpoSQLiteDatabase<typeof schema> | null = null;
 
 const initializeDatabase = () => {
   try {
@@ -15,13 +16,13 @@ const initializeDatabase = () => {
       expo = openDatabaseSync('partyfun.db', { enableChangeListener: true });
       console.log('Database connection opened successfully');
     }
-    
+
     if (!db) {
       console.log('Creating drizzle instance...');
       db = drizzle(expo, { schema });
       console.log('Drizzle instance created successfully');
     }
-    
+
     return db;
   } catch (error) {
     console.error('Failed to initialize database:', error);
@@ -51,4 +52,4 @@ export const runMigrations = async () => {
     console.error('Migration failed:', error);
     throw error;
   }
-}; 
+};

@@ -1,62 +1,37 @@
-import React, { useEffect, useState } from "react";
-import { View, StyleSheet, ScrollView, Alert, Pressable } from "react-native";
-import { Text, Button, IconButton, Portal, Modal, Icon } from "react-native-paper";
+import React, { useState } from "react";
+import { View, ScrollView, Alert } from "react-native";
+import { Text, Button, Portal, Modal } from "react-native-paper";
 import { router } from "expo-router";
 
-import { database } from "../../database/database";
+import { useDecks } from "../../hooks/useDecks";
 import { useGameStore, Player } from "../../store/game-store";
-import { borderRadius, colors, spacing, typography } from "../../theme/theme";
-import { TeamCard } from "./components";
-import { TeamColor } from "./interfaces/types";
 import { CustomScreen } from "../../shared/components/CustomScreen";
-import { BouncyButton } from "../../shared/components/BouncyButton";
+import { BottomNavigation } from "../../shared/components/BottomNavigation";
 import { FocusTextInput } from "../../shared/components/FocusTextInput";
+import { AppHeader } from "../../shared/components/app-header";
+import { AppHeaderIconButton } from "../../shared/components/app-header-icon-button";
+import { SparkleBurst } from "../home/components/SparkleBurst";
+import NewGameDeckCard from "./components/new-game-deck-card";
+import NewGameContinueButton from "./components/new-game-continue-button";
+import TeamCard from "./components/TeamCard";
+import { TeamColor } from "./interfaces/types";
+import { newGameScreenStyles as styles } from "./new-game-screen.styles";
 
 const NewGameScreen: React.FC = () => {
   const {
-    setDecks,
     selectedDeck,
     teams,
     addPlayerToTeam,
     removePlayerFromTeam,
     movePlayerToTeam,
     clearTeams,
-    loadLastGamePlayers,
     startGame,
   } = useGameStore();
 
+  useDecks();
   const [showPlayerModal, setShowPlayerModal] = useState(false);
   const [newPlayerName, setNewPlayerName] = useState("");
   const [selectedTeamForPlayer, setSelectedTeamForPlayer] = useState<TeamColor>("azul");
-
-  useEffect(() => {
-    const initializeScreen = async () => {
-      await loadDecks();
-      const hasPlayers = teams.azul.players.length > 0 || teams.rojo.players.length > 0;
-      if (!hasPlayers) {
-        await loadLastGamePlayersAutomatically();
-      }
-    };
-
-    initializeScreen();
-  }, []);
-
-  const loadDecks = async () => {
-    try {
-      const decksData = await database.getMazos();
-      setDecks(decksData);
-    } catch (error) {
-      console.error("Error loading decks:", error);
-    }
-  };
-
-  const loadLastGamePlayersAutomatically = async () => {
-    try {
-      await loadLastGamePlayers();
-    } catch (error) {
-      console.error("Error auto-loading last game players:", error);
-    }
-  };
 
   const handleShufflePlayers = () => {
     const allPlayers = [...teams.azul.players, ...teams.rojo.players];
@@ -71,6 +46,11 @@ const NewGameScreen: React.FC = () => {
       addPlayerToTeam(team, player);
     });
     Alert.alert("¡Jugadores mezclados!", "Los equipos han sido reorganizados aleatoriamente");
+  };
+
+  const handleClearTeam = (team: TeamColor) => {
+    const list = team === "azul" ? teams.azul.players : teams.rojo.players;
+    [...list].forEach((p) => removePlayerFromTeam(team, p.id));
   };
 
   const handleAddPlayerPress = (team: TeamColor) => {
@@ -125,25 +105,32 @@ const NewGameScreen: React.FC = () => {
   };
 
   return (
-    <CustomScreen contentStyle={styles.screenContent}>
-      <View style={styles.screen}>
-        <IconButton
-          icon="arrow-left"
-          size={24}
-          iconColor={colors.primary}
-          style={styles.backButton}
-          onPress={() => router.push("/")}
+    <CustomScreen
+      contentStyle={styles.screenContent}
+      header={
+        <AppHeader
+          left={
+            <AppHeaderIconButton
+              icon="chevron-left"
+              onPress={() => router.push("/")}
+            />
+          }
         />
-        <View style={styles.brandRow}>
-          <Text style={styles.brandTitle}>Party Fun 2</Text>
-        </View>
-        <View style={styles.headerBlock}>
-          <Text style={styles.mainTitle}>Configura tu Partida</Text>
-          <Text style={styles.mainSubtitle}>Añade a los jugadores y elige su bando.</Text>
+      }
+    >
+      <View style={styles.screenBody}>
+        <View style={styles.headerTitleBlock}>
+          <View style={styles.titleRow}>
+            <Text style={styles.mainTitle}>Configura tu Partida</Text>
+            <SparkleBurst />
+          </View>
+          <Text style={styles.mainSubtitle}>
+            Añade a los jugadores y elige su bando para comenzar.
+          </Text>
         </View>
         <ScrollView
-          style={styles.content}
-          contentContainerStyle={styles.contentContainer}
+          style={styles.scroll}
+          contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
           <TeamCard
@@ -153,6 +140,8 @@ const NewGameScreen: React.FC = () => {
             onMovePlayer={movePlayerToTeam}
             onRemovePlayer={removePlayerFromTeam}
             onAddPlayer={() => handleAddPlayerPress("azul")}
+            onClearTeam={() => handleClearTeam("azul")}
+            onShuffleTeams={handleShufflePlayers}
           />
           <TeamCard
             team="rojo"
@@ -161,43 +150,18 @@ const NewGameScreen: React.FC = () => {
             onMovePlayer={movePlayerToTeam}
             onRemovePlayer={removePlayerFromTeam}
             onAddPlayer={() => handleAddPlayerPress("rojo")}
+            onClearTeam={() => handleClearTeam("rojo")}
+            onShuffleTeams={handleShufflePlayers}
           />
-          <View style={styles.deckRow}>
-            <Pressable style={styles.deckButton} onPress={handleOpenDeckSelection}>
-              <Text style={styles.deckButtonLabel}>
-                {selectedDeck ? selectedDeck.nombre : "Seleccionar mazo"}
-              </Text>
-            </Pressable>
-            <IconButton
-              icon="shuffle-variant"
-              size={20}
-              iconColor={colors.primary}
-              style={styles.shuffleButton}
-              onPress={handleShufflePlayers}
-            />
-          </View>
+          <NewGameDeckCard
+            deckName={selectedDeck?.nombre ?? null}
+            onPress={handleOpenDeckSelection}
+          />
           <View style={styles.startButton}>
-            <BouncyButton
-              label="Continuar"
-              onPress={handleStartGame}
-              icon="arrow-right"
-            />
+            <NewGameContinueButton onPress={handleStartGame} />
           </View>
         </ScrollView>
-        <View style={styles.bottomTabs}>
-          <View style={styles.tabItemActive}>
-            <Icon source="gamepad-variant" size={18} color={colors.textLight} />
-            <Text style={styles.tabLabelActive}>Jugar</Text>
-          </View>
-          <Pressable style={styles.tabItem} onPress={() => router.push("/statistics")}>
-            <Icon source="chart-bar" size={18} color={"#6b819e"} />
-            <Text style={styles.tabLabel}>Estadísticas</Text>
-          </Pressable>
-          <Pressable style={styles.tabItem} onPress={() => router.push("/deck-management")}>
-            <Icon source="cards" size={18} color={"#6b819e"} />
-            <Text style={styles.tabLabel}>Barajas</Text>
-          </Pressable>
-        </View>
+        <BottomNavigation activeTab="play" />
       </View>
       <Portal>
         <Modal
@@ -246,159 +210,5 @@ const NewGameScreen: React.FC = () => {
     </CustomScreen>
   );
 };
-
-const styles = StyleSheet.create({
-  screenContent: {
-    paddingHorizontal: 0,
-  },
-  screen: {
-    flex: 1,
-    paddingTop: spacing.sm,
-    position: "relative",
-  },
-  backButton: {
-    position: "absolute",
-    top: spacing.xs,
-    left: spacing.sm,
-    margin: 0,
-    zIndex: 2,
-  },
-  brandRow: {
-    alignItems: "center",
-    marginBottom: spacing.sm,
-  },
-  brandTitle: {
-    fontFamily: typography.families.heading,
-    color: colors.primary,
-    fontSize: typography.sizes.xxl,
-    letterSpacing: 0.6,
-  },
-  headerBlock: {
-    paddingHorizontal: spacing.lg,
-    marginBottom: spacing.md,
-    gap: spacing.xs,
-  },
-  mainTitle: {
-    fontFamily: typography.families.heading,
-    color: "#2a1e12",
-    fontSize: 56,
-    lineHeight: 56,
-  },
-  mainSubtitle: {
-    fontFamily: typography.families.body,
-    color: "#5f503f",
-    fontSize: typography.sizes.xl,
-  },
-  content: {
-    flex: 1,
-    paddingHorizontal: spacing.lg,
-  },
-  contentContainer: {
-    gap: spacing.lg,
-    paddingBottom: 140,
-  },
-  deckRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.sm,
-  },
-  deckButton: {
-    flex: 1,
-    minHeight: 56,
-    borderRadius: borderRadius.xl,
-    backgroundColor: "#fff4e6",
-    borderWidth: 1,
-    borderColor: "#e6d4be",
-    justifyContent: "center",
-    paddingHorizontal: spacing.md,
-  },
-  deckButtonLabel: {
-    color: colors.primary,
-    fontSize: typography.sizes.md,
-    fontFamily: typography.families.bodyBold,
-  },
-  shuffleButton: {
-    backgroundColor: "#e7f1ff",
-    margin: 0,
-  },
-  startButton: {
-    borderRadius: borderRadius.xl,
-    marginTop: spacing.xs,
-  },
-  startButtonContent: {
-    minHeight: 72,
-    paddingHorizontal: spacing.md,
-  },
-  bottomTabs: {
-    position: "absolute",
-    bottom: 14,
-    left: 16,
-    right: 16,
-    borderRadius: borderRadius.xl,
-    backgroundColor: "#fff6ea",
-    borderWidth: 1,
-    borderColor: "#f2e0c9",
-    flexDirection: "row",
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.sm,
-    gap: spacing.sm,
-  },
-  tabItem: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 3,
-  },
-  tabLabel: {
-    color: "#6b819e",
-    fontFamily: typography.families.bodyBold,
-    fontSize: 12,
-  },
-  tabItemActive: {
-    flex: 1,
-    borderRadius: borderRadius.full,
-    backgroundColor: colors.primary,
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 3,
-    paddingVertical: 6,
-  },
-  tabLabelActive: {
-    color: colors.textLight,
-    fontFamily: typography.families.bodyBold,
-    fontSize: 12,
-  },
-  modalContainer: {
-    backgroundColor: colors.surfaceContainerLowest,
-    margin: spacing.lg,
-    borderRadius: borderRadius.xl,
-    padding: spacing.lg,
-  },
-  modalContent: {
-    alignItems: "center",
-  },
-  modalTitle: {
-    fontSize: typography.sizes.xxl,
-    fontFamily: typography.families.heading,
-    marginBottom: 8,
-    color: colors.text,
-  },
-  modalSubtitle: {
-    fontSize: typography.sizes.md,
-    marginBottom: spacing.lg,
-    color: colors.textSecondary,
-  },
-  textInput: {
-    width: "100%",
-    marginBottom: spacing.lg,
-  },
-  modalActions: {
-    flexDirection: "row",
-    gap: spacing.sm,
-  },
-  modalButton: {
-    minWidth: 100,
-  },
-});
 
 export default NewGameScreen;

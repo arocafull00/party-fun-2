@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { View, StyleSheet, ScrollView, Alert, Pressable } from "react-native";
 import {
   Text,
@@ -14,14 +14,17 @@ import {
 import { router } from "expo-router";
 
 import { database, Mazo, Carta } from "../database/database";
+import { useDecks } from "../hooks/useDecks";
 import { useGameStore } from "../store/game-store";
 import { borderRadius, colors, spacing, typography } from "../theme/theme";
 import { CustomScreen } from "../shared/components/CustomScreen";
+import { BottomNavigation } from "../shared/components/BottomNavigation";
 import { BouncyButton } from "../shared/components/BouncyButton";
+import { AppHeader } from "../shared/components/app-header";
+import { AppHeaderIconButton } from "../shared/components/app-header-icon-button";
 
 export const DeckManagementScreen: React.FC = () => {
-  const { setDecks, decks } = useGameStore();
-  const [loading, setLoading] = useState(true);
+  const { decks, loading, refetch } = useDecks();
   const [wordCounts, setWordCounts] = useState<Record<number, number>>({});
   const [selectedDeck, setSelectedDeck] = useState<Mazo | null>(null);
   const [deckCards, setDeckCards] = useState<Carta[]>([]);
@@ -29,34 +32,6 @@ export const DeckManagementScreen: React.FC = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingDeckName, setEditingDeckName] = useState("");
   const [deckNameError, setDeckNameError] = useState("");
-
-  useEffect(() => {
-    loadDecks();
-  }, []);
-
-  const loadDecks = async () => {
-    try {
-      setLoading(true);
-      const decksData = await database.getMazos();
-      setDecks(decksData);
-      const deckCounts = await Promise.all(
-        decksData.map(async (deck) => {
-          const cards = await database.getCartasByMazo(deck.id);
-          return [deck.id, cards.length] as const;
-        })
-      );
-      const counts = deckCounts.reduce<Record<number, number>>((acc, [id, count]) => {
-        acc[id] = count;
-        return acc;
-      }, {});
-      setWordCounts(counts);
-    } catch (error) {
-      console.error("Error loading decks:", error);
-      Alert.alert("Error", "No se pudieron cargar los mazos");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleViewCards = async (deck: Mazo) => {
     try {
@@ -104,7 +79,7 @@ export const DeckManagementScreen: React.FC = () => {
 
     try {
       await database.updateMazo(selectedDeck.id, editingDeckName.trim());
-      await loadDecks();
+      await refetch();
       setShowEditModal(false);
       Alert.alert("Éxito", "Nombre del mazo actualizado correctamente");
     } catch (error) {
@@ -125,7 +100,7 @@ export const DeckManagementScreen: React.FC = () => {
           onPress: async () => {
             try {
               await database.deleteMazo(deck.id);
-              await loadDecks();
+              await refetch();
               Alert.alert("Éxito", "Mazo eliminado correctamente");
             } catch (error) {
               console.error("Error deleting deck:", error);
@@ -168,9 +143,29 @@ export const DeckManagementScreen: React.FC = () => {
     return icons[index % icons.length];
   };
 
+  const handleDeckBack = () => {
+    if (router.canGoBack()) {
+      router.back();
+      return;
+    }
+    router.replace("/");
+  };
+
+  const deckManagementHeader = (
+    <AppHeader
+      left={
+        <AppHeaderIconButton
+          icon="chevron-left"
+          onPress={handleDeckBack}
+        />
+      }
+      right={<AppHeaderIconButton icon="cog-outline" />}
+    />
+  );
+
   if (loading) {
     return (
-      <CustomScreen contentStyle={styles.screenContent}>
+      <CustomScreen contentStyle={styles.screenContent} header={deckManagementHeader}>
         <View style={styles.screen}>
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color={colors.primary} />
@@ -182,11 +177,8 @@ export const DeckManagementScreen: React.FC = () => {
   }
 
   return (
-    <CustomScreen contentStyle={styles.screenContent}>
+    <CustomScreen contentStyle={styles.screenContent} header={deckManagementHeader}>
       <View style={styles.screen}>
-        <View style={styles.brandRow}>
-          <Text style={styles.brandTitle}>PARTY FUN 2</Text>
-        </View>
         <View style={styles.header}>
           <Text style={styles.title}>Mis Barajas</Text>
           <Text style={styles.subtitle}>Elige una baraja para empezar a jugar o crea una nueva.</Text>
@@ -239,20 +231,7 @@ export const DeckManagementScreen: React.FC = () => {
             <Text style={styles.customDeckText}>Nueva Baraja Personalizada</Text>
           </Pressable>
         </ScrollView>
-        <View style={styles.bottomTabs}>
-          <Pressable style={styles.tabItem} onPress={() => router.push("/new-game")}>
-            <Icon source="play-circle" size={18} color={"#69a4d8"} />
-            <Text style={styles.tabLabel}>JUGAR</Text>
-          </Pressable>
-          <Pressable style={styles.tabItem} onPress={() => router.push("/statistics")}>
-            <Icon source="chart-bar" size={18} color={"#69a4d8"} />
-            <Text style={styles.tabLabel}>ESTADÍSTICAS</Text>
-          </Pressable>
-          <View style={styles.tabItemActive}>
-            <Icon source="cards" size={18} color={colors.textLight} />
-            <Text style={styles.tabLabelActive}>BARAJAS</Text>
-          </View>
-        </View>
+        <BottomNavigation activeTab="decks" />
       </View>
 
       <Portal>
@@ -345,16 +324,6 @@ const styles = StyleSheet.create({
   screen: {
     flex: 1,
     paddingTop: spacing.md,
-  },
-  brandRow: {
-    alignItems: "center",
-    marginBottom: spacing.md,
-  },
-  brandTitle: {
-    fontFamily: typography.families.heading,
-    color: colors.primary,
-    fontSize: typography.sizes.xl,
-    letterSpacing: 0.8,
   },
   header: {
     paddingHorizontal: spacing.lg,
@@ -488,45 +457,6 @@ const styles = StyleSheet.create({
     fontFamily: typography.families.bodyBold,
     color: "#684d2f",
     fontSize: typography.sizes.lg,
-  },
-  bottomTabs: {
-    position: "absolute",
-    bottom: 14,
-    left: 16,
-    right: 16,
-    borderRadius: borderRadius.xl,
-    backgroundColor: "#fff6ea",
-    borderWidth: 1,
-    borderColor: "#f2e0c9",
-    flexDirection: "row",
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.sm,
-    gap: spacing.sm,
-  },
-  tabItem: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 3,
-  },
-  tabLabel: {
-    color: "#69a4d8",
-    fontFamily: typography.families.bodyBold,
-    fontSize: 12,
-  },
-  tabItemActive: {
-    flex: 1,
-    borderRadius: borderRadius.full,
-    backgroundColor: colors.primary,
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 3,
-    paddingVertical: 6,
-  },
-  tabLabelActive: {
-    color: colors.textLight,
-    fontFamily: typography.families.bodyBold,
-    fontSize: 12,
   },
   modalContainer: {
     backgroundColor: colors.surfaceContainerLowest,

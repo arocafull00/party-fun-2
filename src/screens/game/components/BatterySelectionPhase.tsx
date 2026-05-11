@@ -1,12 +1,12 @@
 import React from "react";
 import { View, StyleSheet } from "react-native";
 import { Text, Card, Chip } from "react-native-paper";
-import { Bateria } from "../../../database/database";
+import { Mazo } from "../../../database/database";
 import { colors } from "../../../theme/theme";
 
 interface BatterySelectionPhaseProps {
-  batteries: Bateria[];
-  onSelectBattery: (battery: Bateria) => void;
+  batteries: Mazo[];
+  onSelectBattery: (battery: Mazo) => void;
 }
 
 const BatterySelectionPhase: React.FC<BatterySelectionPhaseProps> = ({

@@ -30,7 +30,7 @@ const PlayerInput: React.FC<PlayerInputProps> = ({
           <Button
             mode="contained"
             onPress={() => onAddPlayer("azul")}
-            style={[styles.teamAddButton, { backgroundColor: colors.teamBlue }]}
+            style={[styles.teamAddButton, { backgroundColor: colors.primary }]}
             contentStyle={styles.teamAddButtonContent}
             compact
           >
@@ -39,7 +39,7 @@ const PlayerInput: React.FC<PlayerInputProps> = ({
           <Button
             mode="contained"
             onPress={() => onAddPlayer("rojo")}
-            style={[styles.teamAddButton, { backgroundColor: colors.teamRed }]}
+            style={[styles.teamAddButton, { backgroundColor: colors.secondary }]}
             contentStyle={styles.teamAddButtonContent}
             compact
           >

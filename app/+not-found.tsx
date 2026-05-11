@@ -6,12 +6,23 @@ import { Text } from 'react-native-paper';
 import { borderRadius, colors, spacing, typography } from '../src/theme/theme';
 import { CustomScreen } from '../src/shared/components/CustomScreen';
 import { BouncyButton } from '../src/shared/components/BouncyButton';
+import { AppHeader } from "../src/shared/components/app-header";
+import { AppHeaderIconButton } from "../src/shared/components/app-header-icon-button";
 
 export default function NotFoundScreen() {
   return (
     <>
       <Stack.Screen options={{ title: "¡Oops! Esta pantalla no existe." }} />
-      <CustomScreen contentStyle={styles.container}>
+      <CustomScreen
+        contentStyle={styles.container}
+        header={
+          <AppHeader
+            left={
+              <AppHeaderIconButton icon="chevron-left" onPress={() => router.push('/')} />
+            }
+          />
+        }
+      >
         <View style={styles.content}>
           <Text style={styles.title}>404</Text>
           <Text style={styles.message}>¡Página no encontrada!</Text>
@@ -46,13 +57,13 @@ const styles = StyleSheet.create({
     fontSize: typography.sizes.xxl,
     fontWeight: '800',
     fontFamily: typography.families.heading,
-    color: colors.onBackground,
+    color: colors.onSurface,
     textAlign: 'center',
     marginBottom: spacing.sm,
   },
   subtitle: {
     fontSize: typography.sizes.md,
-    color: colors.onSurfaceVariant,
+    color: colors.textSecondary,
     textAlign: 'center',
     marginBottom: spacing.xl,
   },

@@ -39,7 +39,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surfaceContainerHigh,
   },
   selectedChip: {
-    backgroundColor: colors.tertiaryContainer,
+    backgroundColor: colors.tertiary,
   },
   label: {
     fontFamily: typography.families.bodyBold,
@@ -50,6 +50,6 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
   },
   selectedLabel: {
-    color: colors.onTertiaryContainer,
+    color: colors.textLight,
   },
 });

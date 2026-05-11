@@ -19,7 +19,7 @@ export const RoundStats: React.FC<RoundStatsProps> = ({
         <Ionicons 
           name="checkmark-circle" 
           size={20} 
-          color={colors.success} 
+          color={colors.tertiary} 
         />
         <Text style={styles.count}>
           {correctCount}

@@ -1,31 +1,18 @@
 import React from 'react';
 import { View, StyleSheet, ScrollView } from 'react-native';
-import { 
-  Text, 
-  Button, 
-  Card, 
-  List,
-  Chip
-} from 'react-native-paper';
+import { Text, Card, List, Chip } from 'react-native-paper';
 import { router } from 'expo-router';
 
 import { useGameStore } from '../store/game-store';
 import { borderRadius, colors, spacing, typography } from '../theme/theme';
 import { CustomScreen } from '../shared/components/CustomScreen';
 import { BouncyButton } from '../shared/components/BouncyButton';
+import { AppHeader } from '../shared/components/app-header';
 
 const RoundResultScreen: React.FC = () => {
-  const { currentPhase, teams, gameHistory, currentTurnCards, endGame, endRound } = useGameStore();
-
-  // Get current round results
-  const azulCorrect = currentTurnCards.correct.slice(0, Math.floor(currentTurnCards.correct.length / 2));
-  const azulIncorrect = currentTurnCards.incorrect.slice(0, Math.floor(currentTurnCards.incorrect.length / 2));
-  const rojoCorrect = currentTurnCards.correct.slice(Math.floor(currentTurnCards.correct.length / 2));
-  const rojoIncorrect = currentTurnCards.incorrect.slice(Math.floor(currentTurnCards.incorrect.length / 2));
+  const { currentPhase, teams, gameHistory, currentTurnCards } = useGameStore();
 
   const handleNextRound = () => {
-    // The phase transition is already handled by endTurn() in turn-review-screen
-    // We just need to continue to the next turn
     router.push('/game-turn');
   };
 
@@ -78,20 +65,21 @@ const RoundResultScreen: React.FC = () => {
     </Card>
   );
 
-  return (
-    <CustomScreen contentStyle={styles.container}>
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        {/* Round Header */}
-        <Card style={styles.headerCard}>
-          <Card.Content style={styles.headerContent}>
-            <Text style={styles.roundTitle}>
-              {getRoundTitle(currentPhase)}
-            </Text>
-            <Text style={styles.completedText}>¡Ronda Completada!</Text>
-          </Card.Content>
-        </Card>
+  const phaseHistory = gameHistory.filter((h) => h.roundNumber === currentPhase);
+  const totalCorrect = phaseHistory.reduce((sum, h) => sum + h.correctCards.length, 0);
+  const totalIncorrect = phaseHistory.reduce((sum, h) => sum + h.incorrectCards.length, 0);
 
-        {/* Scores */}
+  return (
+    <CustomScreen
+      contentStyle={styles.container}
+      header={
+        <AppHeader
+          title={getRoundTitle(currentPhase)}
+          subtitle="¡Ronda completada!"
+        />
+      }
+    >
+      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         <Card style={styles.scoresCard}>
           <Card.Content>
             <Text style={styles.sectionTitle}>Puntuación de la Ronda</Text>
@@ -101,7 +89,7 @@ const RoundResultScreen: React.FC = () => {
                   EQUIPO AZUL
                 </Text>
                 <Text style={[styles.scoreText, { color: colors.primary }]}>
-                  {azulCorrect.length}
+                  {teams.azul.score}
                 </Text>
               </View>
               <Text style={styles.vsText}>VS</Text>
@@ -110,45 +98,29 @@ const RoundResultScreen: React.FC = () => {
                   EQUIPO ROJO
                 </Text>
                 <Text style={[styles.scoreText, { color: colors.secondary }]}>
-                  {rojoCorrect.length}
+                  {teams.rojo.score}
                 </Text>
               </View>
             </View>
           </Card.Content>
         </Card>
 
-        {/* Team Results */}
         <View style={styles.resultsContainer}>
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>Resultados por Equipo</Text>
-          
-          <View style={styles.teamsResultsRow}>
-            {/* Blue Team */}
-            <View style={styles.teamResults}>
-              <CardsList 
-                cards={azulCorrect}
-                title="Equipo Azul - Acertadas"
-                color={colors.primary}
-                correct={true}
-              />
-              <CardsList 
-                cards={azulIncorrect}
-                title="Equipo Azul - Falladas"
-                color={colors.accent}
-                correct={false}
-              />
-            </View>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>
+            Resultados del Último Turno
+          </Text>
 
-            {/* Red Team */}
+          <View style={styles.teamsResultsRow}>
             <View style={styles.teamResults}>
-              <CardsList 
-                cards={rojoCorrect}
-                title="Equipo Rojo - Acertadas"
+              <CardsList
+                cards={currentTurnCards.correct}
+                title="Acertadas"
                 color={colors.primary}
                 correct={true}
               />
-              <CardsList 
-                cards={rojoIncorrect}
-                title="Equipo Rojo - Falladas"
+              <CardsList
+                cards={currentTurnCards.incorrect}
+                title="Falladas"
                 color={colors.accent}
                 correct={false}
               />
@@ -156,32 +128,44 @@ const RoundResultScreen: React.FC = () => {
           </View>
         </View>
 
-        {/* Total Scores */}
         <Card style={styles.totalScoresCard}>
           <Card.Content>
-            <Text style={styles.sectionTitle}>Puntuación Total</Text>
+            <Text style={styles.sectionTitle}>Resumen de la Fase</Text>
             <View style={styles.totalScoresContainer}>
               <View style={styles.totalScoreItem}>
-                <Chip 
-                  style={[styles.totalScoreChip, { backgroundColor: colors.primary }]}
-                  textStyle={{ color: colors.text, fontSize: 18, fontWeight: 'bold' }}
+                <Chip
+                  style={[
+                    styles.totalScoreChip,
+                    { backgroundColor: colors.primary + "20" },
+                  ]}
+                  textStyle={{
+                    color: colors.primary,
+                    fontSize: 14,
+                    fontWeight: "bold",
+                  }}
                 >
-                  Azul: {teams.azul.score}
+                  {totalCorrect} correctas
                 </Chip>
               </View>
               <View style={styles.totalScoreItem}>
-                <Chip 
-                  style={[styles.totalScoreChip, { backgroundColor: colors.secondary }]}
-                  textStyle={{ color: colors.text, fontSize: 18, fontWeight: 'bold' }}
+                <Chip
+                  style={[
+                    styles.totalScoreChip,
+                    { backgroundColor: colors.accent + "20" },
+                  ]}
+                  textStyle={{
+                    color: colors.accent,
+                    fontSize: 14,
+                    fontWeight: "bold",
+                  }}
                 >
-                  Rojo: {teams.rojo.score}
+                  {totalIncorrect} incorrectas
                 </Chip>
               </View>
             </View>
           </Card.Content>
         </Card>
 
-        {/* Continue Button */}
         <View style={styles.continueButton}>
           <BouncyButton
             label="Continuar"
@@ -197,34 +181,13 @@ const RoundResultScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: spacing.md,
+    paddingHorizontal: 0,
+    paddingTop: 0,
   },
   content: {
     flex: 1,
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.md,
-  },
-  headerCard: {
-    backgroundColor: colors.background,
-    marginBottom: spacing.md,
-    elevation: 8,
-  },
-  headerContent: {
-    alignItems: 'center',
-    paddingVertical: spacing.md,
-  },
-  roundTitle: {
-    fontSize: typography.sizes.xl,
-    fontWeight: '800',
-    fontFamily: typography.families.heading,
-    color: colors.text,
-    textAlign: 'center',
-  },
-  completedText: {
-    fontSize: typography.sizes.md,
-    color: colors.primary,
-    textAlign: 'center',
-    marginTop: 8,
   },
   scoresCard: {
     backgroundColor: colors.background,

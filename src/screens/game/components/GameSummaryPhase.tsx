@@ -20,7 +20,7 @@ const GameSummaryPhase: React.FC<GameSummaryPhaseProps> = ({
   return (
     <View style={styles.phaseContainer}>
       <ButtonPrimaryAction
-        title="¡EMPEZAR PARTIDA!"
+        title="EMPEZAR PARTIDA!"
         onPress={onStartGame}
         variant="success"
         size="large"
@@ -49,7 +49,7 @@ const GameSummaryPhase: React.FC<GameSummaryPhaseProps> = ({
             <View style={styles.teamsSummaryRow}>
               <View style={styles.teamSummary}>
                 <Text
-                  style={[styles.teamSummaryTitle, { color: colors.teamBlue }]}
+                  style={[styles.teamSummaryTitle, { color: colors.primary }]}
                 >
                   EQUIPO AZUL ({teams.azul.players.length})
                 </Text>
@@ -61,7 +61,7 @@ const GameSummaryPhase: React.FC<GameSummaryPhaseProps> = ({
               </View>
               <View style={styles.teamSummary}>
                 <Text
-                  style={[styles.teamSummaryTitle, { color: colors.teamRed }]}
+                  style={[styles.teamSummaryTitle, { color: colors.secondary }]}
                 >
                   EQUIPO ROJO ({teams.rojo.players.length})
                 </Text>
@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   selectedDeckChip: {
-    backgroundColor: colors.success,
+    backgroundColor: colors.tertiary,
     alignSelf: "flex-start",
   },
   teamsSummaryRow: {

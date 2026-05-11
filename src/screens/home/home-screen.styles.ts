@@ -12,15 +12,6 @@ export const styles = StyleSheet.create({
   },
   blueBackground: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: colors.primary,
-  },
-  patternDot: {
-    position: "absolute",
-    width: 12,
-    height: 12,
-    borderRadius: borderRadius.full,
-    backgroundColor: "#2b6fbe",
-    opacity: 0.65,
   },
   loadingWrapper: {
     flex: 1,
@@ -34,33 +25,37 @@ export const styles = StyleSheet.create({
     color: colors.textLight,
     textTransform: "uppercase",
   },
-  content: {
+  homeCenteredBody: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    width: "100%",
     paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.xxxl,
-    paddingTop: spacing.xl,
+  },
+  mainScrollCentered: {
+    flexGrow: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    width: "100%",
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.xl,
+    gap: spacing.lg,
+  },
+  mainActionsColumn: {
+    width: "100%",
+    maxWidth: 440,
     gap: spacing.lg,
   },
   logoSection: {
     alignItems: "center",
-    marginTop: spacing.xxl,
-    marginBottom: spacing.xl,
+    justifyContent: "center",
+    marginBottom: spacing.lg,
+    width: "100%",
   },
-  title: {
-    fontSize: 72,
-    lineHeight: 66,
-    color: colors.textLight,
-    fontFamily: typography.families.display,
-    textAlign: "center",
-    letterSpacing: 1,
-    transform: [{ skewX: "-8deg" }],
-  },
-  subtitle: {
-    marginTop: spacing.sm,
-    fontSize: 66,
-    lineHeight: 58,
-    color: colors.textLight,
-    fontFamily: typography.families.body,
-    textAlign: "center",
+  titleImage: {
+    width: "96%",
+    maxWidth: 440,
+    height: 300,
   },
   actionButtons: {
     flexDirection: "row",
@@ -70,7 +65,9 @@ export const styles = StyleSheet.create({
     flex: 1,
   },
   emptyCard: {
-    marginHorizontal: spacing.lg,
+    width: "100%",
+    maxWidth: 440,
+    alignSelf: "center",
     padding: spacing.lg,
     borderRadius: borderRadius.xl,
     backgroundColor: colors.background,
@@ -97,3 +94,10 @@ export const styles = StyleSheet.create({
     borderRadius: borderRadius.xl,
   },
 });
+
+export const homeScreenColors = {
+  ctaBlue: "#0066E1",
+  navActiveBg: "#C8E3FF",
+  navInactiveIcon: "#8A95A8",
+  navInactiveLabel: "#8A95A8",
+} as const;

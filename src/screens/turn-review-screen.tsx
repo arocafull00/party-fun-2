@@ -7,6 +7,8 @@ import { useGameStore } from "../store/game-store";
 import { borderRadius, colors, spacing, typography } from "../theme/theme";
 import { CustomScreen } from "../shared/components/CustomScreen";
 import { BouncyButton } from "../shared/components/BouncyButton";
+import { AppHeader } from "../shared/components/app-header";
+import { AppHeaderIconButton } from "../shared/components/app-header-icon-button";
 import { ReviewCard, RoundStats, PlayerInfo } from "./game/components";
 import {
   useCardReview,
@@ -22,7 +24,6 @@ const TurnReviewScreen: React.FC = () => {
     getNextPlayer,
     nextTurn,
     endTurn,
-    endRound,
     endGame,
   } = useGameStore();
 
@@ -97,24 +98,28 @@ const TurnReviewScreen: React.FC = () => {
   );
 
   return (
-    <CustomScreen contentStyle={styles.container}>
-      <View style={styles.content}>
-        {/* Header Row with PlayerInfo on the left */}
-        <View style={styles.headerRow}>
-          <View style={styles.playerInfoContainer}>
-            <PlayerInfo
-              currentPlayer={currentPlayer?.name || "Jugador Actual"}
-              nextPlayer={nextPlayer?.name || "Siguiente Jugador"}
+    <CustomScreen
+      contentStyle={styles.container}
+      header={
+        <AppHeader
+          title={getPhaseTitle(currentPhase)}
+          subtitle="REVISIÓN DE TURNO"
+          left={
+            <AppHeaderIconButton
+              icon="chevron-left"
+              onPress={() => router.back()}
             />
-          </View>
-          <View style={styles.headerCenter}>
-            <Text style={styles.headerTitle}>{getPhaseTitle(currentPhase)}</Text>
-            <Text style={styles.headerSubtitle}>REVISIÓN DE TURNO</Text>
-          </View>
-          <View style={styles.headerSpacer} />
-        </View>
+          }
+          right={null}
+        />
+      }
+    >
+      <View style={styles.content}>
+        <PlayerInfo
+          currentPlayer={currentPlayer?.name || "Jugador Actual"}
+          nextPlayer={nextPlayer?.name || "Siguiente Jugador"}
+        />
 
-        {/* Main Content - Horizontal Cards List */}
         <View style={styles.mainContent}>
           {reviewCards.length > 0 ? (
             <FlatList
@@ -137,7 +142,6 @@ const TurnReviewScreen: React.FC = () => {
           )}
         </View>
 
-        {/* Bottom Row */}
         <View style={styles.bottomRow}>
           <RoundStats
             correctCount={correctCount}
@@ -158,41 +162,14 @@ const TurnReviewScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: spacing.md,
+    paddingHorizontal: 0,
+    paddingTop: 0,
   },
   content: {
     flex: 1,
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.md,
-  },
-  headerRow: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    marginBottom: spacing.lg,
-  },
-  playerInfoContainer: {
-    flex: 1,
-    paddingTop: 5,
-  },
-  headerCenter: {
-    flex: 2,
-    alignItems: "center",
-  },
-  headerSpacer: {
-    flex: 1,
-  },
-  headerTitle: {
-    fontSize: typography.sizes.xxl,
-    fontWeight: "800",
-    fontFamily: typography.families.heading,
-    color: colors.text,
-    textAlign: "center",
-    marginBottom: 4,
-  },
-  headerSubtitle: {
-    fontSize: typography.sizes.md,
-    color: colors.textSecondary,
-    textAlign: "center",
+    gap: spacing.md,
   },
   mainContent: {
     flex: 1,

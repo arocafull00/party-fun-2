@@ -69,18 +69,18 @@ const TeamConfigurationPhase: React.FC<TeamConfigurationPhaseProps> = ({
         <TeamCard
           team="azul"
           title="EQUIPO AZUL"
-          backgroundColor={colors.teamBlue}
           players={teams.azul.players}
           onMovePlayer={onMovePlayer}
           onRemovePlayer={onRemovePlayer}
+          onAddPlayer={() => onAddPlayer("azul")}
         />
         <TeamCard
           team="rojo"
           title="EQUIPO ROJO"
-          backgroundColor={colors.teamRed}
           players={teams.rojo.players}
           onMovePlayer={onMovePlayer}
           onRemovePlayer={onRemovePlayer}
+          onAddPlayer={() => onAddPlayer("rojo")}
         />
       </View>
 

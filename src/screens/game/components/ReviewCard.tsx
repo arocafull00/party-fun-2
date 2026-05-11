@@ -32,7 +32,7 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({
         </View>
         <View style={[
           styles.iconContainer,
-          { backgroundColor: isCorrect ? colors.success : colors.error }
+          { backgroundColor: isCorrect ? colors.tertiary : colors.error }
         ]}>
           <Ionicons
             name={isCorrect ? "checkmark" : "close"}

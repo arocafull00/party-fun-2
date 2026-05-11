@@ -3,26 +3,23 @@ import {
   View,
   StyleSheet,
   ScrollView,
-  Dimensions,
-  TouchableOpacity,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { Text, IconButton } from "react-native-paper";
+import { Text } from "react-native-paper";
 import { router } from "expo-router";
 
 import { database, Mazo } from "../../database/database";
 import { useGameStore } from "../../store/game-store";
-import { borderRadius, colors, spacing, typography } from "../../theme/theme";
+import { colors, spacing, typography } from "../../theme/theme";
 import { CustomScreen } from "../../shared/components/CustomScreen";
-
-const { width } = Dimensions.get("window");
-const cardWidth = (width - 60) / 2; // 2 cards per row with margins
+import { AppHeader } from "../../shared/components/app-header";
+import { AppHeaderIconButton } from "../../shared/components/app-header-icon-button";
+import { DeckSelectionPhase } from "./components";
 
 const DeckSelectionScreen: React.FC = () => {
-  const { decks, setDecks, selectedDeck, setSelectedDeck, setCards } =
-    useGameStore();
+  const { decks, setDecks, setSelectedDeck, setCards } = useGameStore();
 
   const [isLoading, setIsLoading] = useState(false);
+  const [cardCounts, setCardCounts] = useState<Record<number, number>>({});
 
   useEffect(() => {
     loadDecks();
@@ -34,6 +31,16 @@ const DeckSelectionScreen: React.FC = () => {
       const decksData = await database.getMazos();
       console.log("Loaded decks:", decksData);
       setDecks(decksData);
+
+      // Load card counts for all decks
+      const counts: Record<number, number> = {};
+      await Promise.all(
+        decksData.map(async (deck) => {
+          const cards = await database.getCartasByMazo(deck.id);
+          counts[deck.id] = cards.length;
+        })
+      );
+      setCardCounts(counts);
     } catch (error) {
       console.error("Error loading decks:", error);
     } finally {
@@ -66,86 +73,38 @@ const DeckSelectionScreen: React.FC = () => {
     }
   };
 
-  const getDeckColor = (index: number) => {
-    const colorOptions = [
-      colors.surfaceContainerHigh,
-      colors.surfaceContainer,
-      colors.surfaceContainerLowest,
-      colors.surfaceContainerHigh,
-      colors.surfaceContainer,
-      colors.surfaceContainerLowest,
-    ];
-    return colorOptions[index % colorOptions.length];
-  };
-
-  const getCardCount = async (deckId: number) => {
-    try {
-      const cards = await database.getCartasByMazo(deckId);
-      return cards.length;
-    } catch {
-      return 0;
-    }
+  const handleCreateDeck = () => {
+    router.push("/create-deck");
   };
 
   return (
-    <CustomScreen contentStyle={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <IconButton
-          icon="close"
-          size={24}
-          iconColor={colors.text}
-          onPress={() => router.back()}
+    <CustomScreen
+      contentStyle={styles.container}
+      header={
+        <AppHeader
+          title="MAZOS"
+          left={
+            <AppHeaderIconButton
+              icon="close"
+              onPress={() => router.back()}
+            />
+          }
+          right={
+            <AppHeaderIconButton icon="refresh" onPress={loadDecks} />
+          }
         />
-        <Text style={styles.headerTitle}>MAZOS</Text>
-        <IconButton
-          icon="refresh"
-          size={24}
-          iconColor={colors.text}
-          onPress={loadDecks}
-        />
-      </View>
-      <SafeAreaView style={{ flex: 1 }}>
+      }
+    >
+      <View style={styles.flexFill}>
         <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-          <View style={styles.decksGrid}>
-            {decks.map((deck, index) => {
-              const deckColor = getDeckColor(index);
-              const isSelected = selectedDeck?.id === deck.id;
-
-              return (
-                <TouchableOpacity
-                  key={deck.id}
-                  style={[
-                    styles.deckCard,
-                    { backgroundColor: deckColor },
-                    isSelected && styles.selectedDeckCard,
-                  ]}
-                  onPress={() => handleSelectDeck(deck)}
-                  activeOpacity={0.8}
-                >
-                  <View style={styles.deckCardContent}>
-                    {/* Deck title */}
-                    <Text style={styles.deckTitle} numberOfLines={2}>
-                      {deck.nombre.toUpperCase()}
-                    </Text>
-
-                    {/* Selection indicator */}
-                    {isSelected && (
-                      <View style={styles.selectionIndicator}>
-                        <View style={styles.checkCircle}>
-                          <IconButton
-                            icon="check"
-                            size={20}
-                            iconColor={colors.text}
-                          />
-                        </View>
-                      </View>
-                    )}
-                  </View>
-                </TouchableOpacity>
-              );
-            })}
-          </View>
+          {decks.length > 0 && !isLoading && (
+            <DeckSelectionPhase
+              decks={decks}
+              onSelectDeck={handleSelectDeck}
+              onCreateDeck={handleCreateDeck}
+              cardCounts={cardCounts}
+            />
+          )}
 
           {decks.length === 0 && !isLoading && (
             <View style={styles.emptyState}>
@@ -164,7 +123,7 @@ const DeckSelectionScreen: React.FC = () => {
             </View>
           )}
         </ScrollView>
-      </SafeAreaView>
+      </View>
     </CustomScreen>
   );
 };
@@ -172,72 +131,16 @@ const DeckSelectionScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: spacing.md,
+    paddingHorizontal: 0,
+    paddingTop: 0,
   },
-  header: {
-    paddingBottom: 5,
-    height: 50,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: spacing.sm,
-  },
-  headerTitle: {
-    fontSize: typography.sizes.lg,
-    fontWeight: "800",
-    fontFamily: typography.families.heading,
-    color: colors.text,
+  flexFill: {
+    flex: 1,
   },
   content: {
     flex: 1,
-    paddingHorizontal: spacing.lg,
+    paddingHorizontal: spacing.md,
     paddingTop: spacing.lg,
-  },
-  decksGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
-    paddingBottom: spacing.lg,
-  },
-  deckCard: {
-    width: cardWidth,
-    height: 120,
-    marginBottom: spacing.md,
-    borderRadius: borderRadius.xl,
-    elevation: 4,
-    position: "relative",
-  },
-  selectedDeckCard: {
-    backgroundColor: colors.tertiaryContainer,
-    elevation: 8,
-  },
-  deckCardContent: {
-    flex: 1,
-    padding: spacing.md,
-    justifyContent: "center",
-    alignItems: "center",
-    position: "relative",
-  },
-  deckTitle: {
-    fontSize: typography.sizes.md,
-    fontWeight: "700",
-    fontFamily: typography.families.bodyBold,
-    color: colors.text,
-    textAlign: "center",
-    lineHeight: 20,
-  },
-  selectionIndicator: {
-    position: "absolute",
-    bottom: 8,
-    right: 8,
-  },
-  checkCircle: {
-    backgroundColor: colors.primary,
-    borderRadius: borderRadius.full,
-    width: 32,
-    height: 32,
-    justifyContent: "center",
-    alignItems: "center",
   },
   emptyState: {
     flex: 1,

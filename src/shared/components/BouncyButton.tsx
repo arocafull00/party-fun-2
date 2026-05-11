@@ -16,7 +16,7 @@ interface BouncyButtonProps {
   iconSize?: number;
   iconColor?: string;
   disabled?: boolean;
-  variant: 'primary' | 'secondary' | 'tertiary' | 'surface' | 'tonal';
+  variant?: 'primary' | 'secondary' | 'tertiary' | 'surface' | 'tonal';
 }
 
 export const BouncyButton: React.FC<BouncyButtonProps> = ({
@@ -63,7 +63,7 @@ export const BouncyButton: React.FC<BouncyButtonProps> = ({
   const isPrimary = variant === 'primary';
   const isSecondary = variant === 'secondary';
   const isLightTone = isPrimary || variant === 'surface' || variant === 'tonal';
-  const resolvedIconColor = iconColor ?? (isPrimary ? colors.buttonPrimaryText : isSecondary ? colors.textLight : isLightTone ? colors.primary : colors.textLight);
+  const resolvedIconColor = iconColor ?? (isPrimary ? colors.text : isSecondary ? colors.textLight : isLightTone ? colors.primary : colors.textLight);
 
   return (
     <Pressable
@@ -122,6 +122,17 @@ const styles = StyleSheet.create({
   },
   topLayerSecondary: {
     backgroundColor: colors.primaryLight,
+  },
+  topLayerTertiary: {
+    backgroundColor: colors.tertiary,
+  },
+  topLayerSurface: {
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.outline,
+  },
+  topLayerTonal: {
+    backgroundColor: colors.surfaceVariant,
   },
   label: {
     color: colors.textLight,

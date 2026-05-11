@@ -34,7 +34,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   header: {
-    backgroundColor: colors.surfaceContainerHighest,
+    backgroundColor: colors.surfaceContainerHigh,
     paddingHorizontal: 20,
     paddingVertical: 14,
     gap: 4,

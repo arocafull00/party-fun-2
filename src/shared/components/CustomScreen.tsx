@@ -1,22 +1,24 @@
 import React from "react";
 import { View, ViewStyle } from "react-native";
-import Background from "./background";
 import { spacing } from "../../theme/theme";
 
 interface CustomScreenProps {
   children: React.ReactNode;
   contentStyle?: ViewStyle;
   containerStyle?: ViewStyle;
+  hideBackground?: boolean;
+  header?: React.ReactNode | null;
 }
 
 export function CustomScreen({
   children,
   contentStyle,
   containerStyle,
+  header,
 }: CustomScreenProps) {
   return (
     <View style={[{ flex: 1 }, containerStyle]}>
-      <Background />
+      {header === null ? null : header ?? null}
       <View
         style={[
           {

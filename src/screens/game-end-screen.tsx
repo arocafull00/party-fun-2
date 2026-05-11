@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, ScrollView, Alert } from 'react-native';
+import { View, StyleSheet, ScrollView } from 'react-native';
 import {
   Text,
   Button,
@@ -8,7 +8,6 @@ import {
   Surface,
   Chip
 } from 'react-native-paper';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 
 import { useGameStore } from '../store/game-store';
@@ -16,6 +15,7 @@ import { database } from '../database/database';
 import { borderRadius, colors, spacing, typography } from '../theme/theme';
 import { CustomScreen } from '../shared/components/CustomScreen';
 import { BouncyButton } from '../shared/components/BouncyButton';
+import { AppHeader } from '../shared/components/app-header';
 
 
 
@@ -68,10 +68,10 @@ const GameEndScreen: React.FC = () => {
       // Save players
       const allPlayers = [...teams.azul.players, ...teams.rojo.players];
       for (const player of allPlayers) {
-        const equipo = teams.azul.players.includes(player) ? 'azul' : 'rojo';
+        const equipo: 'azul' | 'rojo' = teams.azul.players.includes(player) ? 'azul' : 'rojo';
         const playerData = {
           nombre: player.name,
-          equipo: equipo
+          equipo
         };
 
         const playerId = await database.createJugador(playerData);
@@ -120,7 +120,7 @@ const GameEndScreen: React.FC = () => {
   };
 
   return (
-    <CustomScreen contentStyle={styles.container}>
+    <CustomScreen contentStyle={styles.container} header={<AppHeader />}>
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Winner Announcement */}
         <Surface style={[styles.winnerContainer, { backgroundColor: getWinnerColor() }]} elevation={4}>
@@ -279,7 +279,8 @@ const GameEndScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: spacing.md,
+    paddingHorizontal: 0,
+    paddingTop: 0,
   },
   content: {
     flex: 1,

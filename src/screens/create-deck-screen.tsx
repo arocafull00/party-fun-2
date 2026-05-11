@@ -1,25 +1,40 @@
-import React, { useMemo, useState } from "react";
-import { View, StyleSheet, ScrollView, Alert, Pressable } from "react-native";
+import React, { useState } from "react";
+import {
+  View,
+  StyleSheet,
+  ScrollView,
+  Alert,
+  Pressable,
+  TextInput as RNTextInput,
+} from "react-native";
 import {
   Text,
   Button,
-  TextInput,
   Icon,
-  IconButton,
   Modal,
   Portal,
   HelperText,
 } from "react-native-paper";
 import { router } from "expo-router";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { database } from "../database/database";
-import { useGameStore } from "../store/game-store";
+import { AppHeader } from "../shared/components/app-header";
+import { AppHeaderIconButton } from "../shared/components/app-header-icon-button";
+import { useCreateDeck } from "../hooks/useCreateDeck";
 import { borderRadius, colors, spacing, typography } from "../theme/theme";
-import { CustomScreen } from "../shared/components/CustomScreen";
-import { BouncyButton } from "../shared/components/BouncyButton";
+import { CreateDeckScreenBackdrop } from "./create-deck/CreateDeckScreenBackdrop";
+import { CreateDeckWordRow } from "./create-deck/CreateDeckWordRow";
+
+const NAVY = "#0F2847";
+const GREY_MUTED = "#5C6570";
+const ACTIVE_BADGE_BG = "#D4F4DD";
+const ACTIVE_BADGE_FG = "#1B5E20";
+const LIGHT_INPUT_BORDER = "#D1D5DB";
+const EMPTY_CARD_BG = "#E3F0FF";
 
 const CreateDeckScreen: React.FC = () => {
-  const { setDecks } = useGameStore();
+  const insets = useSafeAreaInsets();
+  const { createDeck, loading: saving } = useCreateDeck();
   const [currentCard, setCurrentCard] = useState("");
   const [cards, setCards] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
@@ -28,13 +43,8 @@ const CreateDeckScreen: React.FC = () => {
   const [deckName, setDeckName] = useState("");
   const [nameError, setNameError] = useState("");
 
-  const cardIcons = useMemo(
-    () => ["paw", "water", "leaf", "weather-windy", "triangle", "castle"],
-    []
-  );
-
   const validateCard = (card: string): boolean => {
-    const cardTrimmed = card.trim();    
+    const cardTrimmed = card.trim();
     if (!cardTrimmed) {
       setCardError("La carta no puede estar vacía");
       return false;
@@ -56,7 +66,7 @@ const CreateDeckScreen: React.FC = () => {
   };
 
   const validateDeckName = (name: string): boolean => {
-    const nameTrimmed = name.trim();    
+    const nameTrimmed = name.trim();
     if (!nameTrimmed) {
       setNameError("El nombre del mazo es obligatorio");
       return false;
@@ -99,25 +109,19 @@ const CreateDeckScreen: React.FC = () => {
 
     setLoading(true);
     try {
-      await database.init();
-      const deckId = await database.createMazo(deckName);
-      for (const card of cards) {
-        await database.addCarta(deckId, card);
-      }
-      const updatedDecks = await database.getMazos();
-      setDecks(updatedDecks);
+      await createDeck(deckName.trim(), cards);
 
       setShowNameModal(false);
       Alert.alert(
         "Mazo creado",
-        `Se ha creado el mazo "${deckName}" con ${cards.length} cartas`,
+        `Se ha creado el mazo "${deckName.trim()}" con ${cards.length} cartas`,
         [{ text: "OK", onPress: () => router.back() }]
       );
     } catch (error) {
       console.error("Error saving deck:", error);
       Alert.alert(
         "Error",
-        `No se pudo guardar el mazo: ${error instanceof Error ? error.message : 'Error desconocido'}`
+        `No se pudo guardar el mazo: ${error instanceof Error ? error.message : "Error desconocido"}`
       );
     } finally {
       setLoading(false);
@@ -130,82 +134,112 @@ const CreateDeckScreen: React.FC = () => {
     setNameError("");
   };
 
+  const addDisabled = !currentCard.trim() || cards.length >= 30;
+
   return (
-    <CustomScreen contentStyle={styles.container}>
-      <View style={styles.screen}>
-        <View style={styles.brandRow}>
-          <Text style={styles.brandTitle}>PARTY FUN 2</Text>
-        </View>
-        <View style={styles.headerCard}>
-          <View style={styles.headerBadgeRow}>
-            <Text style={styles.headerBadge}>BARAJA ACTIVA</Text>
-            <Text style={styles.headerCount}>{cards.length} Palabras</Text>
-          </View>
-          <Pressable onPress={() => setShowNameModal(true)}>
-            <Text style={styles.headerTitle}>
-              {deckName || "Editor de Baraja"}
-            </Text>
-          </Pressable>
-          <Text style={styles.headerSubtitle}>
-            Añade todas las palabras que quieras!
-          </Text>
-        </View>
-
-        <View style={styles.addWordSection}>
-          <View style={styles.addInputWrapper}>
-            <TextInput
-              mode="outlined"
-              value={currentCard}
-              onChangeText={(text) => {
-                setCurrentCard(text);
-                if (cardError) {
-                  setCardError("");
-                }
-              }}
-              placeholder="Añadir palabra"
-              style={styles.addWordInput}
-              maxLength={30}
-              onSubmitEditing={handleAddCard}
-              returnKeyType="done"
-              error={!!cardError}
+    <View style={styles.root}>
+      <CreateDeckScreenBackdrop />
+      <View style={styles.shell}>
+        <AppHeader
+          left={
+            <AppHeaderIconButton
+              icon="chevron-left"
+              onPress={() => router.back()}
             />
-          </View>
-          {cardError ? (
-            <HelperText type="error" style={styles.errorText}>
-              {cardError}
-            </HelperText>
-          ) : null}
-          <BouncyButton
-            label="Añadir Palabra"
-            onPress={handleAddCard}
-            variant="primary"
-            icon="plus-circle"
-            disabled={!currentCard.trim() || cards.length >= 30}
-          />
-        </View>
+          }
+        />
 
-        <ScrollView
-          style={styles.cardsScrollView}
-          contentContainerStyle={styles.cardsContainer}
-          showsVerticalScrollIndicator={false}
-        >
+        <View style={styles.body}>
+          <ScrollView
+            style={styles.scroll}
+            contentContainerStyle={styles.scrollContent}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+          >
+          <View style={styles.editorCard}>
+            <View style={styles.headerBadgeRow}>
+              <View style={styles.badgeWords}>
+                <Icon source="file-document-outline" size={18} color={colors.primary} />
+                <Text style={styles.badgeWordsLabel}>{cards.length} Palabras</Text>
+              </View>
+            </View>
+
+            <View style={styles.titleRow}>
+              <View style={styles.titleTexts}>
+                <Text style={styles.editorTitle}>Editor de Baraja</Text>
+                <Text style={styles.editorSubtitle}>Añade todas las palabras que quieras!</Text>
+              </View>
+              <View style={styles.illustration}>
+                <Icon source="cards-playing-outline" size={42} color={colors.primary} />
+              </View>
+            </View>
+
+
+            <View style={styles.inputShell}>
+              <View style={styles.inputGlyph}>
+                <Text style={styles.inputGlyphText}>T</Text>
+              </View>
+              <RNTextInput
+                value={currentCard}
+                onChangeText={(text) => {
+                  setCurrentCard(text);
+                  if (cardError) {
+                    setCardError("");
+                  }
+                }}
+                placeholder="Añadir palabra"
+                placeholderTextColor="#9CA3AF"
+                style={styles.nativeInput}
+                maxLength={30}
+                onSubmitEditing={handleAddCard}
+                returnKeyType="done"
+              />
+            </View>
+
+            {cardError ? (
+              <HelperText type="error" style={styles.errorText} visible={!!cardError}>
+                {cardError}
+              </HelperText>
+            ) : null}
+
+            <Pressable
+              disabled={addDisabled}
+              onPress={handleAddCard}
+              style={({ pressed }) => [
+                styles.addOutlineBtn,
+                addDisabled && styles.addOutlineBtnDisabled,
+                pressed && !addDisabled && styles.addOutlineBtnPressed,
+              ]}
+            >
+              <View style={styles.addIconCircle}>
+                <Icon source="plus" size={20} color="#fff" />
+              </View>
+              <Text style={styles.addOutlineLabel}>AÑADIR PALABRA</Text>
+            </Pressable>
+          </View>
+
           {cards.length === 0 ? (
-            <View style={styles.emptyState}>
+            <View style={styles.emptyCard}>
+              <View style={styles.emptyIconCluster}>
+                <View style={styles.raysRow}>
+                  <View style={[styles.ray, { transform: [{ rotate: "-28deg" }] }]} />
+                  <View style={[styles.ray, styles.rayTall]} />
+                  <View style={[styles.ray, { transform: [{ rotate: "28deg" }] }]} />
+                </View>
+                <Icon source="package-variant" size={40} color={colors.primary} />
+              </View>
               <Text style={styles.emptyTitle}>Tu baraja está vacía</Text>
               <Text style={styles.emptySubtitle}>Añade palabras para empezar a jugar.</Text>
             </View>
           ) : (
             <View style={styles.cardRows}>
               {cards.map((card, index) => (
-                <View key={`${card}-${index}`} style={styles.cardRow}>
-                  <View style={styles.cardRowIcon}>
-                    <Icon source={cardIcons[index % cardIcons.length]} size={26} color={colors.primary} />
-                  </View>
-                  <Text style={styles.cardRowText}>{card}</Text>
-                  <Pressable onPress={() => handleRemoveCard(index)} style={styles.deleteButton}>
-                    <Icon source="trash-can" size={26} color={colors.secondary} />
-                  </Pressable>
-                </View>
+                <CreateDeckWordRow
+                  key={`${card}-${index}`}
+                  card={card}
+                  index={index}
+                  onRemove={() => handleRemoveCard(index)}
+                />
               ))}
               <View style={styles.listEnd}>
                 <View style={styles.listEndDot} />
@@ -217,33 +251,35 @@ const CreateDeckScreen: React.FC = () => {
           )}
         </ScrollView>
 
-        <View style={styles.bottomActions}>
-          <Button
-            mode="outlined"
-            onPress={() => setShowNameModal(true)}
-            style={styles.nameButton}
-            icon="pencil"
-          >
-            Nombrar
-          </Button>
-          <Button
-            mode="contained"
-            onPress={handleSaveRequest}
-            style={styles.saveButton}
-            disabled={cards.length === 0}
-            icon="content-save"
-            loading={loading}
-          >
-            Guardar Baraja
-          </Button>
+        <View style={[styles.footerWrap, { paddingBottom: Math.max(insets.bottom, spacing.md) }]}>
+          <View style={styles.footerCard}>
+            <Button
+              mode="outlined"
+              onPress={() => setShowNameModal(true)}
+              style={styles.nameButton}
+              contentStyle={styles.footerBtnContent}
+              labelStyle={styles.nameButtonLabel}
+              icon="pencil"
+              textColor={colors.primary}
+            >
+              Nombrar
+            </Button>
+            <Button
+              mode="contained"
+              onPress={handleSaveRequest}
+              style={styles.saveButton}
+              contentStyle={styles.footerBtnContent}
+              labelStyle={styles.saveButtonLabel}
+              disabled={cards.length === 0}
+              icon="content-save"
+              loading={loading || saving}
+              buttonColor={colors.primary}
+            >
+              Guardar Baraja
+            </Button>
+          </View>
         </View>
-        <IconButton
-          icon="arrow-left"
-          size={24}
-          iconColor={colors.primary}
-          style={styles.backButton}
-          onPress={() => router.back()}
-        />
+      </View>
       </View>
 
       <Portal>
@@ -254,21 +290,20 @@ const CreateDeckScreen: React.FC = () => {
         >
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Nombra tu mazo</Text>
-            <Text style={styles.modalSubtitle}>Dale un nombre descriptivo a tu mazo de {cards.length} cartas</Text>
-            <TextInput
-              mode="outlined"
-              label="Nombre del mazo"
+            <Text style={styles.modalSubtitle}>
+              Dale un nombre descriptivo a tu mazo de {cards.length} cartas
+            </Text>
+            <RNTextInput
               value={deckName}
               onChangeText={(text) => {
-                setDeckName(text.trim());
+                setDeckName(text);
                 if (nameError) {
                   setNameError("");
                 }
               }}
-              style={styles.modalInput}
-              error={!!nameError}
-              maxLength={50}
               placeholder="Ej: Animales, Deportes, Comida..."
+              placeholderTextColor="#9CA3AF"
+              style={styles.modalInputNative}
             />
             {nameError ? <HelperText type="error">{nameError}</HelperText> : null}
             <View style={styles.modalButtons}>
@@ -285,7 +320,7 @@ const CreateDeckScreen: React.FC = () => {
                 onPress={handleSaveDeck}
                 style={[styles.modalButton, styles.modalSaveButton]}
                 loading={loading}
-                disabled={loading || !deckName}
+                disabled={loading || !deckName.trim()}
               >
                 Guardar
               </Button>
@@ -293,154 +328,222 @@ const CreateDeckScreen: React.FC = () => {
           </View>
         </Modal>
       </Portal>
-    </CustomScreen>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  root: {
     flex: 1,
-    paddingHorizontal: 0,
+    backgroundColor: "#FFFBF5",
   },
-  screen: {
+  shell: {
+    flex: 1,
+  },
+  body: {
     flex: 1,
     paddingHorizontal: spacing.lg,
-    paddingTop: spacing.sm,
   },
-  brandRow: {
-    alignItems: "center",
-    marginBottom: spacing.md,
+  scroll: {
+    flex: 1,
   },
-  brandTitle: {
-    fontFamily: typography.families.heading,
-    color: colors.primary,
-    fontSize: typography.sizes.xl,
-    letterSpacing: 0.8,
+  scrollContent: {
+    paddingBottom: spacing.xl,
+    gap: spacing.md,
   },
-  headerCard: {
-    borderRadius: borderRadius.xl,
-    backgroundColor: colors.background,
-    borderBottomWidth: 4,
-    borderBottomColor: colors.primary,
+  editorCard: {
     padding: spacing.lg,
-    gap: spacing.sm,
-    marginBottom: spacing.md,
+    gap: spacing.md,
   },
   headerBadgeRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    gap: spacing.sm,
   },
-  headerBadge: {
-    backgroundColor: "#c8ff7f",
-    color: "#2a2a2a",
-    alignSelf: "flex-start",
-    borderRadius: borderRadius.full,
-    paddingVertical: 4,
+  badgeActive: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    backgroundColor: ACTIVE_BADGE_BG,
+    paddingVertical: 6,
     paddingHorizontal: 12,
+    borderRadius: borderRadius.full,
+  },
+  badgeActiveLabel: {
+    fontFamily: typography.families.bodyBold,
+    fontSize: typography.sizes.xs,
+    color: ACTIVE_BADGE_FG,
+    letterSpacing: 0.6,
+  },
+  badgeWords: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    backgroundColor: "#fff",
+    borderWidth: 1,
+    borderColor: "#C5CAD3",
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: borderRadius.full,
+  },
+  badgeWordsLabel: {
     fontFamily: typography.families.bodyBold,
     fontSize: typography.sizes.sm,
-    letterSpacing: 1.2,
+    color: colors.primary,
   },
-  headerCount: {
-    fontFamily: typography.families.bodyBold,
-    color: "#5a4328",
-    fontSize: typography.sizes.xxl,
-  },
-  headerTitle: {
-    fontFamily: typography.families.heading,
-    color: "#2a1e12",
-    fontSize: 58,
-    lineHeight: 58,
-  },
-  headerSubtitle: {
-    fontFamily: typography.families.body,
-    color: "#544435",
-    fontSize: typography.sizes.xl,
-    lineHeight: 30,
-  },
-  addWordSection: {
-    gap: spacing.sm,
-    marginBottom: spacing.md,
-  },
-  addInputWrapper: {
+  titleRow: {
     flexDirection: "row",
-    gap: spacing.sm,
-    alignItems: "flex-start",
+    alignItems: "center",
+    gap: spacing.md,
   },
-  addWordInput: {
+  titleTexts: {
     flex: 1,
-    backgroundColor: colors.background,
+    gap: 4,
+  },
+  editorTitle: {
+    fontFamily: typography.families.bodyBold,
+    fontSize: typography.sizes.xxl,
+    color: NAVY,
+  },
+  editorSubtitle: {
+    fontFamily: typography.families.body,
+    fontSize: typography.sizes.md,
+    color: GREY_MUTED,
+    lineHeight: 22,
+  },
+  illustration: {
+    width: 72,
+    height: 64,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  pencilFloat: {
+    position: "absolute",
+    right: -4,
+    bottom: 4,
+    backgroundColor: "#FFF9E6",
+    borderRadius: 8,
+    padding: 2,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: colors.primary,
+    opacity: 0.35,
+    marginTop: spacing.xs,
+  },
+  inputShell: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    borderWidth: 1,
+    borderColor: LIGHT_INPUT_BORDER,
+    borderRadius: 14,
+    backgroundColor: "#fff",
+    paddingLeft: 10,
+    paddingRight: 12,
+    minHeight: 52,
+  },
+  inputGlyph: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    backgroundColor: "#DBEAFE",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  inputGlyphText: {
+    fontFamily: typography.families.bodyBold,
+    fontSize: typography.sizes.lg,
+    color: colors.primary,
+  },
+  nativeInput: {
+    flex: 1,
+    fontFamily: typography.families.body,
+    fontSize: typography.sizes.md,
+    color: NAVY,
+    paddingVertical: 10,
   },
   errorText: {
-    marginTop: -6,
+    marginTop: -4,
   },
-  addWordButton: {
-    borderRadius: borderRadius.xl,
+  addOutlineBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 12,
+    minHeight: 54,
+    borderRadius: 16,
+    borderWidth: 2,
+    borderColor: colors.primary,
+    backgroundColor: "#fff",
   },
-  addWordButtonContent: {
-    minHeight: 58,
+  addOutlineBtnDisabled: {
+    opacity: 0.45,
   },
-  cardsScrollView: {
-    flex: 1,
+  addOutlineBtnPressed: {
+    opacity: 0.85,
   },
-  cardsContainer: {
-    gap: spacing.md,
-    paddingBottom: 120,
+  addIconCircle: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    backgroundColor: colors.primary,
+    alignItems: "center",
+    justifyContent: "center",
   },
-  emptyState: {
-    borderRadius: borderRadius.xl,
-    borderWidth: 1,
-    borderColor: "#e8d9c3",
+  addOutlineLabel: {
+    fontFamily: typography.families.bodyBold,
+    fontSize: typography.sizes.md,
+    color: colors.primary,
+    letterSpacing: 0.8,
+  },
+  emptyCard: {
+    borderRadius: 18,
+    backgroundColor: EMPTY_CARD_BG,
+    borderWidth: 2,
+    borderColor: colors.primary,
     borderStyle: "dashed",
     alignItems: "center",
     paddingVertical: spacing.xl,
-    gap: spacing.xs,
+    paddingHorizontal: spacing.lg,
+    gap: spacing.sm,
+  },
+  emptyIconCluster: {
+    alignItems: "center",
+    marginBottom: spacing.xs,
+  },
+  raysRow: {
+    flexDirection: "row",
+    alignItems: "flex-end",
+    justifyContent: "center",
+    gap: 5,
+    marginBottom: 4,
+  },
+  ray: {
+    width: 3,
+    height: 10,
+    borderRadius: 2,
+    backgroundColor: colors.primary,
+    opacity: 0.85,
+  },
+  rayTall: {
+    height: 14,
   },
   emptyTitle: {
-    fontFamily: typography.families.heading,
-    color: "#2a1e12",
+    fontFamily: typography.families.bodyBold,
     fontSize: typography.sizes.xl,
+    color: NAVY,
+    textAlign: "center",
   },
   emptySubtitle: {
     fontFamily: typography.families.body,
-    color: "#6f5f50",
     fontSize: typography.sizes.md,
+    color: GREY_MUTED,
+    textAlign: "center",
   },
   cardRows: {
     gap: spacing.md,
-  },
-  cardRow: {
-    minHeight: 84,
-    borderRadius: borderRadius.xl,
-    backgroundColor: "#fff2df",
-    borderBottomWidth: 3,
-    borderBottomColor: "#f0d7b7",
-    paddingHorizontal: spacing.md,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.md,
-  },
-  cardRowIcon: {
-    width: 58,
-    height: 58,
-    borderRadius: borderRadius.md,
-    backgroundColor: "#dbe7f8",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  cardRowText: {
-    flex: 1,
-    fontFamily: typography.families.bodyBold,
-    color: "#1d160f",
-    fontSize: 44,
-    lineHeight: 44,
-  },
-  deleteButton: {
-    width: 42,
-    height: 42,
-    alignItems: "center",
-    justifyContent: "center",
   },
   listEnd: {
     alignItems: "center",
@@ -461,34 +564,47 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
     fontSize: typography.sizes.md,
   },
-  bottomActions: {
-    position: "absolute",
-    left: spacing.lg,
-    right: spacing.lg,
-    bottom: spacing.md,
+  footerWrap: {
+    paddingTop: spacing.sm,
+  },
+  footerCard: {
     flexDirection: "row",
     gap: spacing.sm,
+    alignItems: "stretch",
+    backgroundColor: "#fff",
+    borderRadius: 18,
+    padding: spacing.md,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
+    elevation: 3,
+  },
+  footerBtnContent: {
+    minHeight: 48,
   },
   nameButton: {
     flex: 1,
-    borderRadius: borderRadius.xl,
+    borderRadius: borderRadius.lg,
     borderColor: colors.primary,
   },
-  saveButton: {
-    flex: 1.4,
-    borderRadius: borderRadius.xl,
-    backgroundColor: colors.primary,
+  nameButtonLabel: {
+    fontFamily: typography.families.bodyBold,
+    fontSize: typography.sizes.sm,
   },
-  backButton: {
-    position: "absolute",
-    top: 2,
-    left: 2,
-    margin: 0,
+  saveButton: {
+    flex: 1.15,
+    borderRadius: borderRadius.lg,
+  },
+  saveButtonLabel: {
+    fontFamily: typography.families.bodyBold,
+    fontSize: typography.sizes.sm,
+    color: colors.textLight,
   },
   modalContainer: {
     paddingHorizontal: spacing.lg,
   },
-  modalContent: { 
+  modalContent: {
     backgroundColor: colors.background,
     borderRadius: borderRadius.xl,
     padding: spacing.lg,
@@ -504,8 +620,16 @@ const styles = StyleSheet.create({
     marginTop: spacing.xs,
     marginBottom: spacing.md,
   },
-  modalInput: {
-    backgroundColor: colors.background,
+  modalInputNative: {
+    borderWidth: 1,
+    borderColor: LIGHT_INPUT_BORDER,
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    fontFamily: typography.families.body,
+    fontSize: typography.sizes.md,
+    backgroundColor: "#fff",
+    color: NAVY,
   },
   modalButtons: {
     flexDirection: "row",
