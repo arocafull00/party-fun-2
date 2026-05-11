@@ -51,7 +51,7 @@ export const styles = StyleSheet.create({
     fontFamily: typography.families.heading,
     fontSize: typography.sizes.lg,
     letterSpacing: 0.2,
-    color: colors.appHeaderTitle,
+    color: colors.primary,
     textAlign: "center",
   },
   subtitle: {
@@ -59,7 +59,7 @@ export const styles = StyleSheet.create({
     fontFamily: typography.families.bodyBold,
     fontSize: typography.sizes.xs,
     letterSpacing: 0.8,
-    color: colors.textSecondary,
+    color: colors.text,
     textAlign: "center",
   },
 });
@@ -81,8 +81,8 @@ export const iconSlotStyles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: borderRadius.full,
-    backgroundColor: colors.appHeaderBadge,
+    backgroundColor: colors.primary,
     borderWidth: 1,
-    borderColor: colors.surfaceContainerLow,
+    borderColor: colors.background,
   },
 });

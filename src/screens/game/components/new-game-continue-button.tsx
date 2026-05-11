@@ -57,7 +57,7 @@ const NewGameContinueButton: React.FC<NewGameContinueButtonProps> = ({
     >
       <Animated.View style={[styles.row, animatedStyle, disabled ? { opacity: 0.45 } : null]}>
         <SparkleBurst />
-        <Icon source="arrow-right" size={22} color={colors.textLight} />
+        <Icon source="arrow-right" size={22} color={'#ffffff'} />
         <Text style={styles.label}>Continuar</Text>
         <SparkleBurst mirror />
       </Animated.View>

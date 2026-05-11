@@ -5,7 +5,7 @@ import { borderRadius, colors, spacing, typography } from "../../theme/theme";
 export const newGameScreenStyles = StyleSheet.create({
   screenContent: {
     paddingHorizontal: 0,
-    backgroundColor: colors.surfaceContainerLowest,
+    backgroundColor: '#ffffff',
   },
   screenBody: {
     flex: 1,
@@ -23,13 +23,13 @@ export const newGameScreenStyles = StyleSheet.create({
   },
   mainTitle: {
     fontFamily: typography.families.heading,
-    color: colors.titleNavy,
+    color: colors.text,
     fontSize: typography.sizes.display,
     lineHeight: typography.sizes.display + 4,
   },
   mainSubtitle: {
     fontFamily: typography.families.body,
-    color: colors.textSecondary,
+    color: colors.text,
     fontSize: typography.sizes.md,
     lineHeight: 22,
   },
@@ -45,7 +45,7 @@ export const newGameScreenStyles = StyleSheet.create({
     marginTop: spacing.xs,
   },
   modalContainer: {
-    backgroundColor: colors.surfaceContainerLowest,
+    backgroundColor: '#ffffff',
     margin: spacing.lg,
     borderRadius: borderRadius.xl,
     padding: spacing.lg,
@@ -62,7 +62,7 @@ export const newGameScreenStyles = StyleSheet.create({
   modalSubtitle: {
     fontSize: typography.sizes.md,
     marginBottom: spacing.lg,
-    color: colors.textSecondary,
+    color: colors.text,
   },
   textInput: {
     width: "100%",

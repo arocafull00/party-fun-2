@@ -83,7 +83,7 @@ const DeckSelectionPhase: React.FC<DeckSelectionPhaseProps> = ({
               <View style={styles.cardStackBack1} />
               <View style={styles.cardStackBack2} />
               <View style={styles.cardStackFront}>
-                <Ionicons name="add" size={20} color={colors.textLight} />
+                <Ionicons name="add" size={20} color={'#ffffff'} />
               </View>
             </View>
             <View style={styles.sparkleTopRight}>
@@ -101,7 +101,7 @@ const DeckSelectionPhase: React.FC<DeckSelectionPhaseProps> = ({
             style={styles.createButton}
             labelStyle={styles.createButtonLabel}
             buttonColor={colors.primary}
-            textColor={colors.textLight}
+            textColor={'#ffffff'}
           >
             NUEVO MAZO
           </Button>
@@ -150,7 +150,7 @@ const DeckSelectionPhase: React.FC<DeckSelectionPhaseProps> = ({
                   <IconButton
                     icon="dots-vertical"
                     size={20}
-                    iconColor={colors.textSecondary}
+                    iconColor={colors.text}
                     onPress={() => {}}
                     style={styles.menuButton}
                   />
@@ -172,7 +172,7 @@ const DeckSelectionPhase: React.FC<DeckSelectionPhaseProps> = ({
                     <Ionicons
                       name="time-outline"
                       size={14}
-                      color={colors.textSecondary}
+                      color={colors.text}
                       style={styles.tagIcon}
                     />
                     <Text style={styles.deckTagTextSecondary}>
@@ -208,7 +208,7 @@ const styles = StyleSheet.create({
   tabContainer: {
     flexDirection: "row",
     alignSelf: "center",
-    backgroundColor: colors.surface,
+    backgroundColor: colors.background,
     borderRadius: borderRadius.full,
     paddingHorizontal: spacing.xs,
     paddingVertical: spacing.xs,
@@ -228,7 +228,7 @@ const styles = StyleSheet.create({
   tabText: {
     fontFamily: typography.families.body,
     fontSize: typography.sizes.md,
-    color: colors.textSecondary,
+    color: colors.text,
   },
   tabTextActive: {
     fontFamily: typography.families.bodyBold,
@@ -251,7 +251,7 @@ const styles = StyleSheet.create({
     borderStyle: "dashed",
     borderColor: colors.primary,
     borderRadius: borderRadius.xl,
-    backgroundColor: colors.teamAzulTint,
+    backgroundColor: colors.secondary,
     padding: spacing.lg,
     alignItems: "center",
   },
@@ -314,7 +314,7 @@ const styles = StyleSheet.create({
   createCardDescription: {
     fontFamily: typography.families.body,
     fontSize: typography.sizes.sm,
-    color: colors.textSecondary,
+    color: colors.text,
     textAlign: "center",
     marginBottom: spacing.md,
     lineHeight: 20,
@@ -337,7 +337,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontFamily: typography.families.bodyBold,
     fontSize: typography.sizes.md,
-    color: colors.onSurface,
+    color: colors.text,
   },
   sortButton: {
     flexDirection: "row",
@@ -353,7 +353,7 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   deckCard: {
-    backgroundColor: colors.surface,
+    backgroundColor: colors.background,
     borderRadius: borderRadius.lg,
     marginBottom: spacing.md,
     elevation: 2,
@@ -374,7 +374,7 @@ const styles = StyleSheet.create({
   },
   deckImageBg: {
     flex: 1,
-    backgroundColor: colors.surfaceContainerHigh,
+    backgroundColor: colors.secondary,
     borderRadius: borderRadius.md,
     justifyContent: "center",
     alignItems: "center",
@@ -400,7 +400,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 42,
     borderRadius: 6,
-    backgroundColor: colors.surface,
+    backgroundColor: colors.background,
     borderWidth: 2,
     borderColor: colors.primary,
     justifyContent: "center",
@@ -429,7 +429,7 @@ const styles = StyleSheet.create({
   deckName: {
     fontFamily: typography.families.heading,
     fontSize: typography.sizes.lg,
-    color: colors.onSurface,
+    color: colors.text,
     flex: 1,
     marginTop: 2,
   },
@@ -445,7 +445,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     alignSelf: "flex-start",
-    backgroundColor: colors.teamAzulTint,
+    backgroundColor: colors.secondary,
     borderRadius: borderRadius.sm,
     paddingHorizontal: spacing.sm,
     paddingVertical: 4,
@@ -467,7 +467,7 @@ const styles = StyleSheet.create({
   deckTagTextSecondary: {
     fontFamily: typography.families.body,
     fontSize: typography.sizes.sm,
-    color: colors.textSecondary,
+    color: colors.text,
   },
   useDeckButton: {
     borderRadius: borderRadius.full,

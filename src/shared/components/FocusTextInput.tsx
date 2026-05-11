@@ -49,7 +49,7 @@ export const FocusTextInput: React.FC<FocusTextInputProps> = ({
           roundness: borderRadius.md,
           colors: {
             primary: colors.primary,
-            background: colors.surfaceContainerLowest,
+            background: '#ffffff',
           },
         }}
         {...props}
@@ -63,6 +63,6 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   input: {
-    backgroundColor: colors.surfaceContainerLowest,
+    backgroundColor: '#ffffff',
   },
 });

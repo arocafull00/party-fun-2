@@ -12,7 +12,7 @@ export const SparkleBurst: React.FC<SparkleBurstProps> = ({
   mirror,
   streakColor,
 }) => {
-  const c = streakColor ?? colors.sparkle;
+  const c = streakColor ?? colors.accent;
   return (
     <View
       style={[

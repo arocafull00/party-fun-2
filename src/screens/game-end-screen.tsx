@@ -105,7 +105,7 @@ const GameEndScreen: React.FC = () => {
   const getWinnerColor = () => {
     if (winner === 'azul') return colors.primary;
     if (winner === 'rojo') return colors.secondary;
-    return colors.textSecondary;
+    return colors.text;
   };
 
   const getWinnerText = () => {
@@ -301,18 +301,18 @@ const styles = StyleSheet.create({
     fontSize: typography.sizes.xxxl,
     fontWeight: '800',
     fontFamily: typography.families.heading,
-    color: colors.textLight,
+    color: '#ffffff',
     textAlign: 'center',
     marginBottom: 10,
   },
   winnerSubtext: {
     fontSize: typography.sizes.md,
-    color: colors.textLight,
+    color: '#ffffff',
     textAlign: 'center',
   },
   scoresCard: {
     marginBottom: spacing.lg,
-    backgroundColor: colors.surfaceContainerLowest,
+    backgroundColor: '#ffffff',
     elevation: 4,
   },
   sectionTitle: {
@@ -358,12 +358,12 @@ const styles = StyleSheet.create({
   },
   statsCard: {
     marginBottom: spacing.lg,
-    backgroundColor: colors.surfaceContainerLowest,
+    backgroundColor: '#ffffff',
     elevation: 4,
   },
   roundsCard: {
     marginBottom: spacing.lg,
-    backgroundColor: colors.surfaceContainerLowest,
+    backgroundColor: '#ffffff',
     elevation: 4,
   },
   roundResult: {
@@ -377,7 +377,7 @@ const styles = StyleSheet.create({
   },
   roundDescription: {
     fontSize: typography.sizes.sm,
-    color: colors.textSecondary,
+    color: colors.text,
     marginBottom: spacing.sm,
     fontStyle: 'italic',
   },
@@ -399,9 +399,9 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.xl,
   },
   secondaryButton: {
-    borderColor: colors.outlineVariant,
+    borderColor: colors.secondary,
     borderWidth: 0,
-    backgroundColor: colors.surfaceContainerLow,
+    backgroundColor: colors.background,
   },
   textButton: {
     // No specific styles needed

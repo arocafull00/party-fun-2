@@ -23,7 +23,7 @@ export const styles = StyleSheet.create({
   },
   sectionDivider: {
     height: StyleSheet.hairlineWidth,
-    backgroundColor: colors.statisticsSectionDivider,
+    backgroundColor: colors.secondary,
     marginVertical: spacing.xl,
   },
   loadingBlock: {
@@ -36,7 +36,7 @@ export const styles = StyleSheet.create({
   loadingLabel: {
     fontFamily: typography.families.body,
     fontSize: typography.sizes.md,
-    color: colors.titleNavy,
+    color: colors.text,
   },
   sectionHeadingRow: {
     flexDirection: "row",
@@ -56,7 +56,7 @@ export const styles = StyleSheet.create({
     flex: 1,
     fontFamily: typography.families.bodyBold,
     fontSize: typography.sizes.md,
-    color: colors.titleNavy,
+    color: colors.text,
     letterSpacing: 0.2,
   },
   generalGrid: {
@@ -77,13 +77,13 @@ export const styles = StyleSheet.create({
     justifyContent: "center",
   },
   generalGlyphTintBlue: {
-    backgroundColor: colors.teamAzulTint,
+    backgroundColor: colors.secondary,
   },
   generalGlyphTintRed: {
-    backgroundColor: colors.teamRojoTint,
+    backgroundColor: colors.secondary,
   },
   generalGlyphTintPurple: {
-    backgroundColor: colors.accuracyTint,
+    backgroundColor: colors.secondary,
   },
   generalStatValueGames: {
     fontFamily: typography.families.heading,
@@ -100,13 +100,13 @@ export const styles = StyleSheet.create({
   generalStatValueAccuracy: {
     fontFamily: typography.families.heading,
     fontSize: typography.sizes.xxxl,
-    color: colors.accuracyAccent,
+    color: colors.accent,
     lineHeight: typography.sizes.xxxl + spacing.xs,
   },
   generalStatLabel: {
     fontFamily: typography.families.bodyBold,
     fontSize: typography.sizes.xs,
-    color: colors.titleNavy,
+    color: colors.text,
     textAlign: "center",
   },
   teamsRow: {
@@ -123,11 +123,11 @@ export const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   teamPanelBlue: {
-    backgroundColor: colors.teamAzulTint,
+    backgroundColor: colors.secondary,
     marginRight: -spacing.sm,
   },
   teamPanelRed: {
-    backgroundColor: colors.teamRojoTint,
+    backgroundColor: colors.secondary,
     marginLeft: -spacing.sm,
   },
   teamCountBlue: {
@@ -145,21 +145,21 @@ export const styles = StyleSheet.create({
   teamName: {
     fontFamily: typography.families.bodyBold,
     fontSize: typography.sizes.sm,
-    color: colors.titleNavy,
+    color: colors.text,
     textAlign: "center",
   },
   teamPillBlue: {
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.xs,
     borderRadius: borderRadius.full,
-    backgroundColor: colors.teamAzulBadge,
+    backgroundColor: colors.accent,
     marginTop: spacing.xs,
   },
   teamPillRed: {
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.xs,
     borderRadius: borderRadius.full,
-    backgroundColor: colors.teamRojoBadge,
+    backgroundColor: colors.accent,
     marginTop: spacing.xs,
   },
   teamPillTextBlue: {
@@ -205,16 +205,16 @@ export const styles = StyleSheet.create({
     width: spacing.xxxl + spacing.md,
     height: spacing.xxxl + spacing.md,
     borderRadius: borderRadius.full,
-    backgroundColor: colors.surface,
+    backgroundColor: colors.background,
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 2,
-    borderColor: colors.outlineVariant,
+    borderColor: colors.secondary,
   },
   vsText: {
     fontFamily: typography.families.bodyBold,
     fontSize: typography.sizes.md,
-    color: colors.titleNavy,
+    color: colors.text,
   },
   tiesBanner: {
     marginTop: spacing.md,
@@ -223,7 +223,7 @@ export const styles = StyleSheet.create({
   tiesText: {
     fontFamily: typography.families.body,
     fontSize: typography.sizes.xs,
-    color: colors.textSecondary,
+    color: colors.text,
   },
   emptyHistoryRow: {
     flexDirection: "row",
@@ -237,7 +237,7 @@ export const styles = StyleSheet.create({
     width: spacing.xxl,
     height: spacing.xxl,
     borderRadius: borderRadius.full,
-    backgroundColor: colors.teamAzulTint,
+    backgroundColor: colors.secondary,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -248,17 +248,17 @@ export const styles = StyleSheet.create({
   emptyHistoryTitle: {
     fontFamily: typography.families.bodyBold,
     fontSize: typography.sizes.md,
-    color: colors.titleNavy,
+    color: colors.text,
   },
   emptyHistorySubtitle: {
     fontFamily: typography.families.body,
     fontSize: typography.sizes.sm,
-    color: colors.textSecondary,
+    color: colors.text,
     lineHeight: typography.sizes.md + spacing.xs,
   },
   historyDivider: {
     height: StyleSheet.hairlineWidth,
-    backgroundColor: colors.outlineVariant,
+    backgroundColor: colors.secondary,
     marginVertical: spacing.sm,
   },
   historyRowOuter: {},
@@ -272,22 +272,22 @@ export const styles = StyleSheet.create({
   historyRowTitle: {
     fontFamily: typography.families.bodyBold,
     fontSize: typography.sizes.md,
-    color: colors.titleNavy,
+    color: colors.text,
   },
   historyRowMeta: {
     fontFamily: typography.families.body,
     fontSize: typography.sizes.xs,
-    color: colors.textSecondary,
+    color: colors.text,
   },
   historyRowScores: {
     fontFamily: typography.families.bodyBold,
     fontSize: typography.sizes.sm,
-    color: colors.titleNavy,
+    color: colors.text,
   },
   historyRowDeck: {
     fontFamily: typography.families.body,
     fontSize: typography.sizes.sm,
-    color: colors.textSecondary,
+    color: colors.text,
   },
   chipsRow: {
     flexDirection: "row",
@@ -296,7 +296,7 @@ export const styles = StyleSheet.create({
     marginTop: spacing.sm,
   },
   historyChipGames: {
-    backgroundColor: colors.teamAzulTint,
+    backgroundColor: colors.secondary,
     height: 28,
   },
   historyChipGamesText: {
@@ -305,12 +305,12 @@ export const styles = StyleSheet.create({
     marginVertical: 0,
   },
   historyChipPrecision: {
-    backgroundColor: colors.accuracyTint,
+    backgroundColor: colors.secondary,
     height: 28,
   },
   historyChipPrecisionText: {
     fontSize: typography.sizes.xs,
-    color: colors.accuracyAccent,
+    color: colors.accent,
     marginVertical: 0,
   },
   footerDock: {
@@ -333,7 +333,7 @@ export const styles = StyleSheet.create({
     fontFamily: typography.families.heading,
     fontSize: typography.sizes.sm,
     letterSpacing: 0.9,
-    color: colors.surface,
+    color: colors.background,
     textAlign: "center",
   },
 });

@@ -160,7 +160,7 @@ const StatisticsScreen: React.FC = () => {
                 pressed && { opacity: 0.92 },
               ]}
             >
-              <Icon source="play" size={22} color={colors.surface} />
+              <Icon source="play" size={22} color={colors.background} />
               <Text style={styles.footerCtaLabel}>JUGAR PRIMERA PARTIDA</Text>
             </Pressable>
           </View>

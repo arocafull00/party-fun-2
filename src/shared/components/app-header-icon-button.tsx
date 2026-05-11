@@ -19,7 +19,7 @@ export function AppHeaderIconButton({
   icon,
   onPress,
   showBadge,
-  iconColor = colors.onSurface,
+  iconColor = colors.text,
 }: AppHeaderIconButtonProps) {
   const content = (
     <>

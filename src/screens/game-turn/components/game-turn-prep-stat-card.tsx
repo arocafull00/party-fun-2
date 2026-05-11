@@ -29,7 +29,7 @@ export function GameTurnPrepStatCard({
           isRound ? styles.prepStatIconBlue : styles.prepStatIconPurple,
         ]}
       >
-        <Icon source={icon} size={24} color={colors.textLight} />
+        <Icon source={icon} size={24} color={'#ffffff'} />
       </View>
       <View
         style={[
@@ -39,9 +39,9 @@ export function GameTurnPrepStatCard({
       >
         <Text style={styles.prepStatLabel}>{label}</Text>
         <View style={styles.prepStatValueRow}>
-          <SparkleBurst streakColor={isRound ? colors.teamAzulTint : colors.accuracyTint} />
+          <SparkleBurst streakColor={isRound ? colors.secondary : colors.secondary} />
           <Text style={styles.prepStatValue}>{value}</Text>
-          <SparkleBurst mirror streakColor={isRound ? colors.teamAzulTint : colors.accuracyTint} />
+          <SparkleBurst mirror streakColor={isRound ? colors.secondary : colors.secondary} />
         </View>
       </View>
     </View>

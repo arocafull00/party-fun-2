@@ -53,7 +53,7 @@ const PlayerInput: React.FC<PlayerInputProps> = ({
 
 const styles = StyleSheet.create({
   addPlayerCard: {
-    backgroundColor: colors.surface,
+    backgroundColor: colors.background,
     elevation: 4,
     width: "100%",
   },
@@ -70,7 +70,7 @@ const styles = StyleSheet.create({
   },
   playerNameInput: {
     flex: 1,
-    backgroundColor: colors.surface,
+    backgroundColor: colors.background,
     color: colors.text,
   },
   teamAddButton: {

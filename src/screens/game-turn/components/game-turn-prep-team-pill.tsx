@@ -20,7 +20,7 @@ export function GameTurnPrepTeamPill({ teamKey }: GameTurnPrepTeamPillProps) {
         isAzul ? styles.prepTeamPillAzul : styles.prepTeamPillRojo,
       ]}
     >
-      <Icon source="account-group" size={22} color={colors.textLight} />
+      <Icon source="account-group" size={22} color={'#ffffff'} />
       <Text style={styles.prepTeamPillText}>{label}</Text>
     </View>
   );

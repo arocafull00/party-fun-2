@@ -21,7 +21,7 @@ export const CreateDeckWordRow: React.FC<CreateDeckWordRowProps> = ({
     <View style={styles.cardRow}>
       <Text style={styles.cardRowText}>{card}</Text>
       <Pressable onPress={onRemove} style={styles.deleteButton}>
-        <Icon source="trash-can" size={26} color={colors.secondary} />
+        <Icon source="trash-can" size={26} color={colors.text} />
       </Pressable>
     </View>
   );
@@ -31,7 +31,7 @@ const styles = StyleSheet.create({
   cardRow: {
     minHeight: 84,
     borderRadius: borderRadius.xl,
-    backgroundColor: "#fff2df",
+    backgroundColor: colors.secondary,
     paddingHorizontal: spacing.md,
     flexDirection: "row",
     alignItems: "center",
@@ -41,15 +41,15 @@ const styles = StyleSheet.create({
     width: 58,
     height: 58,
     borderRadius: borderRadius.md,
-    backgroundColor: "#dbe7f8",
+    backgroundColor: colors.accent,
     alignItems: "center",
     justifyContent: "center",
   },
   cardRowText: {
     flex: 1,
     fontFamily: typography.families.bodyBold,
-    color: "#1d160f",
-    fontSize: 44,
+    color: colors.text,
+    fontSize: 28,
     lineHeight: 44,
   },
   deleteButton: {

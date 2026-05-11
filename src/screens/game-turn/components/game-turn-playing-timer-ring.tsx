@@ -33,7 +33,7 @@ export function GameTurnPlayingTimerRing({
           cx={CX}
           cy={CY}
           r={R}
-          stroke={colors.gameTurnTimerTrack}
+          stroke={colors.background}
           strokeWidth={STROKE}
           fill="none"
         />

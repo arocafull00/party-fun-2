@@ -56,7 +56,7 @@ export function GameTurnPrepStartButton({ onPress }: GameTurnPrepStartButtonProp
           style={styles.prepStartPressable}
         >
           <Animated.View style={[styles.prepStartAnimated, animatedStyle]}>
-            <Icon source="play" size={28} color={colors.textLight} />
+            <Icon source="play" size={28} color={'#ffffff'} />
             <Text style={styles.prepStartLabel}>¡Empezar!</Text>
           </Animated.View>
         </Pressable>

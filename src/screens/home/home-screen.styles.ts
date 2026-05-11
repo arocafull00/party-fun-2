@@ -22,7 +22,7 @@ export const styles = StyleSheet.create({
   loadingText: {
     fontFamily: typography.families.bodyBold,
     fontSize: typography.sizes.md,
-    color: colors.textLight,
+    color: '#ffffff',
     textTransform: "uppercase",
   },
   homeCenteredBody: {

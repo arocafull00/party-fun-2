@@ -36,10 +36,10 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
   },
   idleChip: {
-    backgroundColor: colors.surfaceContainerHigh,
+    backgroundColor: colors.secondary,
   },
   selectedChip: {
-    backgroundColor: colors.tertiary,
+    backgroundColor: colors.accent,
   },
   label: {
     fontFamily: typography.families.bodyBold,
@@ -47,9 +47,9 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   idleLabel: {
-    color: colors.textSecondary,
+    color: colors.text,
   },
   selectedLabel: {
-    color: colors.textLight,
+    color: '#ffffff',
   },
 });

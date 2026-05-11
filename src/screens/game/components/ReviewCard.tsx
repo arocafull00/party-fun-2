@@ -32,12 +32,12 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({
         </View>
         <View style={[
           styles.iconContainer,
-          { backgroundColor: isCorrect ? colors.tertiary : colors.error }
+          { backgroundColor: isCorrect ? colors.accent : colors.accent }
         ]}>
           <Ionicons
             name={isCorrect ? "checkmark" : "close"}
             size={horizontal ? 32 : 24}
-            color={colors.textLight}
+            color={'#ffffff'}
           />
         </View>
       </TouchableOpacity>
@@ -47,12 +47,12 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: colors.surface,
+    backgroundColor: colors.background,
     marginBottom: 8,
     elevation: 4,
   },
   horizontalCard: {
-    backgroundColor: colors.surface,
+    backgroundColor: colors.background,
     elevation: 6,
     borderRadius: 16,
     width: screenWidth * 0.25,

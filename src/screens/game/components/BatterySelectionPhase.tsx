@@ -31,7 +31,7 @@ const BatterySelectionPhase: React.FC<BatterySelectionPhaseProps> = ({
               <Chip
                 icon="cards"
                 style={styles.batteryChip}
-                textStyle={{ color: colors.textLight }}
+                textStyle={{ color: '#ffffff' }}
               >
                 {battery.nombre}
               </Chip>
@@ -66,7 +66,7 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   batteryCard: {
-    backgroundColor: colors.surface,
+    backgroundColor: colors.background,
     elevation: 4,
     marginBottom: 10,
     width: "48%",

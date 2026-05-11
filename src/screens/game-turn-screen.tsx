@@ -208,7 +208,7 @@ const GameTurnScreen: React.FC = () => {
                 right={
                   <AppHeaderIconButton
                     icon="cog"
-                    iconColor={colors.appHeaderBadge}
+                    iconColor={colors.primary}
                     onPress={() => setShowExitDialog(true)}
                   />
                 }
@@ -264,7 +264,7 @@ const GameTurnScreen: React.FC = () => {
             right={
               <AppHeaderIconButton
                 icon="cog"
-                iconColor={colors.appHeaderBadge}
+                iconColor={colors.primary}
                 onPress={() => setShowExitDialog(true)}
               />
             }

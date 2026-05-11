@@ -24,7 +24,7 @@ export const StatisticsTeamWinsSection: React.FC<
     <View>
       <View style={styles.sectionHeadingRow}>
         <View style={styles.sectionIconCircle}>
-          <Icon source="account-group" size={22} color={colors.surface} />
+          <Icon source="account-group" size={22} color={colors.background} />
         </View>
         <Text style={styles.sectionHeadingTitle}>Victorias por Equipo</Text>
       </View>

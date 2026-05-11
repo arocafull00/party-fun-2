@@ -29,12 +29,12 @@ export const HeroCard: React.FC<HeroCardProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: colors.surfaceContainerLow,
+    backgroundColor: colors.background,
     borderRadius: borderRadius.xl,
     overflow: 'hidden',
   },
   header: {
-    backgroundColor: colors.surfaceContainerHigh,
+    backgroundColor: colors.secondary,
     paddingHorizontal: 20,
     paddingVertical: 14,
     gap: 4,
@@ -46,13 +46,13 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
   subtitle: {
-    color: colors.textSecondary,
+    color: colors.text,
     fontFamily: typography.families.body,
     fontSize: typography.sizes.sm,
   },
   body: {
     paddingHorizontal: 20,
     paddingVertical: 18,
-    backgroundColor: colors.surfaceContainerLowest,
+    backgroundColor: '#ffffff',
   },
 });

@@ -26,7 +26,7 @@ const styles = StyleSheet.create({
   },
   currentPlayerText: {
     fontSize: typography.sizes.sm,
-    color: colors.textSecondary,
+    color: colors.text,
     marginBottom: 2,
   },
   nextPlayerText: {

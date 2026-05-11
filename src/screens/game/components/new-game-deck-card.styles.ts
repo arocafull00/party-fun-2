@@ -5,9 +5,9 @@ import { borderRadius, colors, spacing, typography } from "../../../theme/theme"
 export const newGameDeckCardStyles = StyleSheet.create({
   pressable: {
     borderRadius: borderRadius.xl,
-    backgroundColor: colors.surfaceContainerLowest,
+    backgroundColor: '#ffffff',
     borderWidth: 1,
-    borderColor: colors.outlineVariant,
+    borderColor: colors.secondary,
     flexDirection: "row",
     alignItems: "center",
     padding: spacing.md,
@@ -17,7 +17,7 @@ export const newGameDeckCardStyles = StyleSheet.create({
     width: 52,
     height: 52,
     borderRadius: borderRadius.full,
-    backgroundColor: colors.surface,
+    backgroundColor: colors.background,
     borderWidth: 2,
     borderColor: colors.primary,
     alignItems: "center",
@@ -30,12 +30,12 @@ export const newGameDeckCardStyles = StyleSheet.create({
   title: {
     fontFamily: typography.families.bodyBold,
     fontSize: typography.sizes.lg,
-    color: colors.titleNavy,
+    color: colors.text,
   },
   subtitle: {
     fontFamily: typography.families.body,
     fontSize: typography.sizes.sm,
-    color: colors.textSecondary,
+    color: colors.text,
   },
   chevronWrap: {
     marginRight: -4,

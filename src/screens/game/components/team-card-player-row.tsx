@@ -41,7 +41,7 @@ const TeamCardPlayerRow: React.FC<TeamCardPlayerRowProps> = ({
         <IconButton
           icon="trash-can"
           size={20}
-          iconColor={colors.error}
+          iconColor={colors.accent}
           onPress={onRemove}
           style={styles.actionIcon}
         />
@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
   playerRow: {
     minHeight: 72,
     borderRadius: borderRadius.xl,
-    backgroundColor: colors.surfaceContainerLowest,
+    backgroundColor: '#ffffff',
     paddingHorizontal: spacing.md,
     flexDirection: "row",
     alignItems: "center",
@@ -64,14 +64,14 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: borderRadius.full,
-    backgroundColor: colors.surface,
+    backgroundColor: colors.background,
     alignItems: "center",
     justifyContent: "center",
   },
   playerName: {
     flex: 1,
     fontFamily: typography.families.bodyBold,
-    color: colors.onSurface,
+    color: colors.text,
     fontSize: typography.sizes.xl,
   },
   playerActions: {

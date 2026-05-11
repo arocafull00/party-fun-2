@@ -37,8 +37,8 @@ const TeamCard: React.FC<TeamCardProps> = ({
   };
 
   const teamColor = team === "azul" ? colors.primary : colors.secondary;
-  const cardTint = team === "azul" ? colors.teamAzulTint : colors.teamRojoTint;
-  const badgeBg = team === "azul" ? colors.teamAzulBadge : colors.teamRojoBadge;
+  const cardTint = team === "azul" ? colors.secondary : colors.secondary;
+  const badgeBg = team === "azul" ? colors.accent : colors.accent;
   const showTeamMenu = onClearTeam != null || onShuffleTeams != null;
 
   return (
@@ -67,7 +67,7 @@ const TeamCard: React.FC<TeamCardProps> = ({
                 <IconButton
                   icon="dots-vertical"
                   size={22}
-                  iconColor={colors.navMuted}
+                  iconColor={colors.text}
                   onPress={() => setMenuOpen(true)}
                   style={teamCardStyles.menuAnchor}
                 />

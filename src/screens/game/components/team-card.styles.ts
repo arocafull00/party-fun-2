@@ -9,7 +9,7 @@ export const teamCardStyles = StyleSheet.create({
     borderRadius: borderRadius.xl,
     overflow: "hidden",
     borderWidth: 1,
-    borderColor: colors.outlineVariant,
+    borderColor: colors.secondary,
   },
   leftBar: {
     width: 8,
@@ -33,7 +33,7 @@ export const teamCardStyles = StyleSheet.create({
     width: 52,
     height: 52,
     borderRadius: borderRadius.full,
-    backgroundColor: colors.surfaceContainerLowest,
+    backgroundColor: '#ffffff',
     alignItems: "center",
     justifyContent: "center",
   },

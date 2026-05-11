@@ -63,7 +63,7 @@ export const BouncyButton: React.FC<BouncyButtonProps> = ({
   const isPrimary = variant === 'primary';
   const isSecondary = variant === 'secondary';
   const isLightTone = isPrimary || variant === 'surface' || variant === 'tonal';
-  const resolvedIconColor = iconColor ?? (isPrimary ? colors.text : isSecondary ? colors.textLight : isLightTone ? colors.primary : colors.textLight);
+  const resolvedIconColor = iconColor ?? (isPrimary ? colors.text : isSecondary ? '#ffffff' : isLightTone ? colors.primary : '#ffffff');
 
   return (
     <Pressable
@@ -116,26 +116,26 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
   },
   topLayerPrimary: {
-    backgroundColor: colors.backgroundLight,
+    backgroundColor: colors.background,
     borderWidth: 2,
-    borderColor: colors.primaryLight,
+    borderColor: colors.accent,
   },
   topLayerSecondary: {
-    backgroundColor: colors.primaryLight,
+    backgroundColor: colors.accent,
   },
   topLayerTertiary: {
-    backgroundColor: colors.tertiary,
+    backgroundColor: colors.accent,
   },
   topLayerSurface: {
-    backgroundColor: colors.surface,
+    backgroundColor: colors.background,
     borderWidth: 1,
-    borderColor: colors.outline,
+    borderColor: colors.secondary,
   },
   topLayerTonal: {
-    backgroundColor: colors.surfaceVariant,
+    backgroundColor: colors.secondary,
   },
   label: {
-    color: colors.textLight,
+    color: '#ffffff',
     fontFamily: typography.families.bodyBold,
     fontSize: typography.sizes.lg,
     textTransform: 'uppercase',

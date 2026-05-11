@@ -219,7 +219,7 @@ const styles = StyleSheet.create({
   },
   noCardsText: {
     fontSize: typography.sizes.md,
-    color: colors.textSecondary,
+    color: colors.text,
     textAlign: 'center',
   },
 });

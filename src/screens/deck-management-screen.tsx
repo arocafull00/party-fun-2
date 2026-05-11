@@ -211,13 +211,13 @@ export const DeckManagementScreen: React.FC = () => {
               onLongPress={() => handleDeckOptions(deck)}
             >
               <View style={styles.deckIconContainer}>
-                <Icon source={getDeckIcon(index)} size={18} color={colors.textLight} />
+                <Icon source={getDeckIcon(index)} size={18} color={'#ffffff'} />
               </View>
               <View style={styles.deckTextArea}>
                 <Text style={styles.deckName}>{deck.nombre}</Text>
                 <Text style={styles.deckDescription}>Vocabulario experto sobre este mundo culinario.</Text>
                 <View style={styles.deckMeta}>
-                  <Icon source="book-open-page-variant-outline" size={14} color={colors.textSecondary} />
+                  <Icon source="book-open-page-variant-outline" size={14} color={colors.text} />
                   <Text style={styles.deckMetaText}>{wordCounts[deck.id] ?? 0} PALABRAS</Text>
                 </View>
               </View>
@@ -368,7 +368,7 @@ const styles = StyleSheet.create({
   loadingText: {
     fontFamily: typography.families.bodyBold,
     fontSize: typography.sizes.md,
-    color: colors.textSecondary,
+    color: colors.text,
   },
   emptyContainer: {
     borderRadius: borderRadius.xl,
@@ -459,7 +459,7 @@ const styles = StyleSheet.create({
     fontSize: typography.sizes.lg,
   },
   modalContainer: {
-    backgroundColor: colors.surfaceContainerLowest,
+    backgroundColor: '#ffffff',
     margin: spacing.lg,
     borderRadius: borderRadius.xl,
     maxHeight: "80%",
@@ -469,7 +469,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     padding: spacing.lg,
-    backgroundColor: colors.surfaceContainerHigh,
+    backgroundColor: colors.secondary,
   },
   modalTitle: {
     fontSize: typography.sizes.xl,
@@ -484,7 +484,7 @@ const styles = StyleSheet.create({
   },
   cardItem: {
     marginBottom: spacing.sm,
-    backgroundColor: colors.surfaceContainerLow,
+    backgroundColor: colors.background,
   },
   cardText: {
     fontSize: typography.sizes.md,
@@ -492,7 +492,7 @@ const styles = StyleSheet.create({
   },
   noCardsText: {
     fontSize: typography.sizes.md,
-    color: colors.textSecondary,
+    color: colors.text,
     textAlign: "center",
     fontStyle: "italic",
     opacity: 0.7,
@@ -501,11 +501,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     padding: spacing.lg,
-    backgroundColor: colors.surfaceContainerLow,
+    backgroundColor: colors.background,
   },
   cardCount: {
     fontSize: typography.sizes.sm,
-    color: colors.textSecondary,
+    color: colors.text,
     opacity: 0.7,
   },
   modalButton: {
@@ -516,7 +516,7 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
   },
   textInput: {
-    backgroundColor: colors.surfaceContainerLowest,
+    backgroundColor: '#ffffff',
   },
   errorText: {
     color: colors.accent,

@@ -31,10 +31,10 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = ({ activeTab })
           >
             {isActive ? (
               <View style={styles.activeIconCircle}>
-                <Icon source={tab.icon} size={16} color={colors.textLight} />
+                <Icon source={tab.icon} size={16} color={'#ffffff'} />
               </View>
             ) : (
-              <Icon source={tab.icon} size={20} color={colors.navMuted} />
+              <Icon source={tab.icon} size={20} color={colors.text} />
             )}
             <Text style={isActive ? styles.tabLabelActive : styles.tabLabel}>{tab.label}</Text>
           </Pressable>
@@ -51,9 +51,9 @@ const styles = StyleSheet.create({
     left: 16,
     right: 16,
     borderRadius: borderRadius.xl,
-    backgroundColor: colors.surfaceContainerLowest,
+    backgroundColor: '#ffffff',
     borderWidth: 1,
-    borderColor: colors.outlineVariant,
+    borderColor: colors.secondary,
     flexDirection: 'row',
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.sm,
@@ -67,14 +67,14 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.xs,
   },
   tabLabel: {
-    color: colors.navMuted,
+    color: colors.text,
     fontFamily: typography.families.bodyBold,
     fontSize: 12,
   },
   tabItemActive: {
     flex: 1,
     borderRadius: borderRadius.full,
-    backgroundColor: colors.navActivePill,
+    backgroundColor: colors.secondary,
     alignItems: 'center',
     justifyContent: 'center',
     gap: 4,

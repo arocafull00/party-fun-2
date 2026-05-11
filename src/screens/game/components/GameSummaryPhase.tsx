@@ -34,7 +34,7 @@ const GameSummaryPhase: React.FC<GameSummaryPhaseProps> = ({
           <Chip
             icon="cards"
             style={styles.selectedDeckChip}
-            textStyle={{ color: colors.textLight }}
+            textStyle={{ color: '#ffffff' }}
           >
             {selectedDeck?.nombre}
           </Chip>
@@ -119,7 +119,7 @@ const styles = StyleSheet.create({
   },
   summaryCard: {
     marginBottom: 15,
-    backgroundColor: colors.surface,
+    backgroundColor: colors.background,
     elevation: 4,
     justifyContent: "center",
     alignItems: "center",
@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   selectedDeckChip: {
-    backgroundColor: colors.tertiary,
+    backgroundColor: colors.accent,
     alignSelf: "flex-start",
   },
   teamsSummaryRow: {

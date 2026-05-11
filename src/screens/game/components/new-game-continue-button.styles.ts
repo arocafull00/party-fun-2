@@ -18,7 +18,7 @@ export const newGameContinueButtonStyles = StyleSheet.create({
     paddingVertical: spacing.md,
   },
   label: {
-    color: colors.textLight,
+    color: '#ffffff',
     fontFamily: typography.families.bodyBold,
     fontSize: typography.sizes.lg,
     textTransform: "uppercase",

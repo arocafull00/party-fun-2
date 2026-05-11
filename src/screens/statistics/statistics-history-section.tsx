@@ -27,7 +27,7 @@ export const StatisticsHistorySection: React.FC<
     <View>
       <View style={styles.sectionHeadingRow}>
         <View style={styles.sectionIconCircle}>
-          <Icon source="history" size={22} color={colors.surface} />
+          <Icon source="history" size={22} color={colors.background} />
         </View>
         <Text style={styles.sectionHeadingTitle}>Historial de Partidas</Text>
       </View>

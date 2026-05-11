@@ -9,7 +9,7 @@ export const HomeLoadingState: React.FC = () => {
   return (
     <View style={styles.screen}>
       <View style={styles.loadingWrapper}>
-        <ActivityIndicator size="large" color={colors.textLight} />
+        <ActivityIndicator size="large" color={'#ffffff'} />
         <Text style={styles.loadingText}>Cargando inicio...</Text>
       </View>
     </View>

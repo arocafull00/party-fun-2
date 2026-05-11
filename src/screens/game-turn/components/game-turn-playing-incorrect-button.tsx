@@ -29,7 +29,7 @@ export function GameTurnPlayingIncorrectButton({
           <View style={[styles.playingIncorrectRay, styles.playingIncorrectRayC]} />
         </View>
         <View style={styles.playingIncorrectCircle}>
-          <Icon source="close" size={48} color={colors.textLight} />
+          <Icon source="close" size={48} color={'#ffffff'} />
         </View>
       </View>
     </Pressable>

@@ -140,22 +140,31 @@ const CreateDeckScreen: React.FC = () => {
     <View style={styles.root}>
       <CreateDeckScreenBackdrop />
       <View style={styles.shell}>
-        <AppHeader
-          left={
-            <AppHeaderIconButton
-              icon="chevron-left"
-              onPress={() => router.back()}
-            />
-          }
-        />
+        <View
+          style={{
+            paddingLeft: insets.left,
+            paddingRight: insets.right,
+          }}
+        >
+          <AppHeader
+            left={
+              <AppHeaderIconButton
+                icon="chevron-left"
+                onPress={() => router.back()}
+              />
+            }
+          />
+        </View>
 
-        <View style={styles.body}>
-          <ScrollView
-            style={styles.scroll}
-            contentContainerStyle={styles.scrollContent}
-            keyboardShouldPersistTaps="handled"
-            showsVerticalScrollIndicator={false}
-          >
+        <View
+          style={[
+            styles.body,
+            {
+              paddingLeft: spacing.lg + insets.left,
+              paddingRight: spacing.lg + insets.right,
+            },
+          ]}
+        >
           <View style={styles.editorCard}>
             <View style={styles.headerBadgeRow}>
               <View style={styles.badgeWords}>
@@ -218,52 +227,49 @@ const CreateDeckScreen: React.FC = () => {
             </Pressable>
           </View>
 
-          {cards.length === 0 ? (
-            <View style={styles.emptyCard}>
-              <View style={styles.emptyIconCluster}>
-                <View style={styles.raysRow}>
-                  <View style={[styles.ray, { transform: [{ rotate: "-28deg" }] }]} />
-                  <View style={[styles.ray, styles.rayTall]} />
-                  <View style={[styles.ray, { transform: [{ rotate: "28deg" }] }]} />
+          <View style={styles.listSection}>
+            {cards.length === 0 ? (
+              <View style={styles.emptyCardWrap}>
+                <View style={styles.emptyCard}>
+                  <View style={styles.emptyIconCluster}>
+                    <View style={styles.raysRow}>
+                      <View style={[styles.ray, { transform: [{ rotate: "-28deg" }] }]} />
+                      <View style={[styles.ray, styles.rayTall]} />
+                      <View style={[styles.ray, { transform: [{ rotate: "28deg" }] }]} />
+                    </View>
+                    <Icon source="package-variant" size={40} color={colors.primary} />
+                  </View>
+                  <Text style={styles.emptyTitle}>Tu baraja está vacía</Text>
+                  <Text style={styles.emptySubtitle}>Añade palabras para empezar a jugar.</Text>
                 </View>
-                <Icon source="package-variant" size={40} color={colors.primary} />
               </View>
-              <Text style={styles.emptyTitle}>Tu baraja está vacía</Text>
-              <Text style={styles.emptySubtitle}>Añade palabras para empezar a jugar.</Text>
-            </View>
-          ) : (
-            <View style={styles.cardRows}>
-              {cards.map((card, index) => (
-                <CreateDeckWordRow
-                  key={`${card}-${index}`}
-                  card={card}
-                  index={index}
-                  onRemove={() => handleRemoveCard(index)}
-                />
-              ))}
-              <View style={styles.listEnd}>
-                <View style={styles.listEndDot} />
-                <View style={styles.listEndDot} />
-                <View style={styles.listEndDot} />
-                <Text style={styles.listEndText}>FIN DE LA LISTA</Text>
-              </View>
-            </View>
-          )}
-        </ScrollView>
+            ) : (
+              <ScrollView
+                style={styles.listScroll}
+                contentContainerStyle={styles.listScrollContent}
+                contentInsetAdjustmentBehavior="automatic"
+                keyboardShouldPersistTaps="handled"
+                showsVerticalScrollIndicator={false}
+              >
+                <View style={styles.cardRows}>
+                  {cards
+                    .map((card, index) => ({ card, index }))
+                    .reverse()
+                    .map(({ card, index }) => (
+                      <CreateDeckWordRow
+                        key={`${card}-${index}`}
+                        card={card}
+                        index={index}
+                        onRemove={() => handleRemoveCard(index)}
+                      />
+                    ))}
+                </View>
+              </ScrollView>
+            )}
+          </View>
 
         <View style={[styles.footerWrap, { paddingBottom: Math.max(insets.bottom, spacing.md) }]}>
           <View style={styles.footerCard}>
-            <Button
-              mode="outlined"
-              onPress={() => setShowNameModal(true)}
-              style={styles.nameButton}
-              contentStyle={styles.footerBtnContent}
-              labelStyle={styles.nameButtonLabel}
-              icon="pencil"
-              textColor={colors.primary}
-            >
-              Nombrar
-            </Button>
             <Button
               mode="contained"
               onPress={handleSaveRequest}
@@ -342,14 +348,23 @@ const styles = StyleSheet.create({
   },
   body: {
     flex: 1,
-    paddingHorizontal: spacing.lg,
+    gap: spacing.md,
   },
-  scroll: {
+  listSection: {
+    flex: 1,
+    minHeight: 0,
+  },
+  listScroll: {
     flex: 1,
   },
-  scrollContent: {
-    paddingBottom: spacing.xl,
+  listScrollContent: {
+    paddingBottom: spacing.md,
     gap: spacing.md,
+  },
+  emptyCardWrap: {
+    flex: 1,
+    minHeight: 0,
+    justifyContent: "center",
   },
   editorCard: {
     padding: spacing.lg,
@@ -571,14 +586,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: spacing.sm,
     alignItems: "stretch",
-    backgroundColor: "#fff",
-    borderRadius: 18,
     padding: spacing.md,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 10,
-    elevation: 3,
   },
   footerBtnContent: {
     minHeight: 48,
@@ -599,7 +607,7 @@ const styles = StyleSheet.create({
   saveButtonLabel: {
     fontFamily: typography.families.bodyBold,
     fontSize: typography.sizes.sm,
-    color: colors.textLight,
+    color: "#fff",
   },
   modalContainer: {
     paddingHorizontal: spacing.lg,
@@ -641,6 +649,7 @@ const styles = StyleSheet.create({
   },
   modalSaveButton: {
     backgroundColor: colors.primary,
+    color: colors.text,
   },
 });
 

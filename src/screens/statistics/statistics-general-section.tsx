@@ -18,7 +18,7 @@ export const StatisticsGeneralSection: React.FC<
     <View>
       <View style={styles.sectionHeadingRow}>
         <View style={styles.sectionIconCircle}>
-          <Icon source="poll" size={22} color={colors.surface} />
+          <Icon source="poll" size={22} color={colors.background} />
         </View>
         <Text style={styles.sectionHeadingTitle}>Estadísticas Generales</Text>
       </View>
@@ -39,7 +39,7 @@ export const StatisticsGeneralSection: React.FC<
         </View>
         <View style={styles.generalCell}>
           <View style={[styles.generalGlyphCircle, styles.generalGlyphTintPurple]}>
-            <Icon source="target" size={28} color={colors.accuracyAccent} />
+            <Icon source="target" size={28} color={colors.accent} />
           </View>
           <Text style={styles.generalStatValueAccuracy}>
             {statistics.averageAccuracy}%
