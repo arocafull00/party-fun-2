@@ -1,12 +1,12 @@
 import React from 'react';
 import { View, StyleSheet, ScrollView } from 'react-native';
-import { Text, Card, List, Chip } from 'react-native-paper';
+import { Text, Card, List, Chip, Button } from 'react-native-paper';
 import { router } from 'expo-router';
 
 import { useGameStore } from '../store/game-store';
 import { borderRadius, colors, spacing, typography } from '../theme/theme';
 import { CustomScreen } from '../shared/components/CustomScreen';
-import { BouncyButton } from '../shared/components/BouncyButton';
+
 import { AppHeader } from '../shared/components/app-header';
 
 const RoundResultScreen: React.FC = () => {
@@ -167,11 +167,9 @@ const RoundResultScreen: React.FC = () => {
         </Card>
 
         <View style={styles.continueButton}>
-          <BouncyButton
-            label="Continuar"
-            onPress={handleNextRound}
-            icon="arrow-right"
-          />
+          <Button mode="contained" onPress={handleNextRound} icon="arrow-right">
+            Continuar
+          </Button>
         </View>
       </ScrollView>
     </CustomScreen>

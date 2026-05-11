@@ -14,7 +14,7 @@ import { useGameStore } from '../store/game-store';
 import { database } from '../database/database';
 import { borderRadius, colors, spacing, typography } from '../theme/theme';
 import { CustomScreen } from '../shared/components/CustomScreen';
-import { BouncyButton } from '../shared/components/BouncyButton';
+
 import { AppHeader } from '../shared/components/app-header';
 
 
@@ -237,26 +237,17 @@ const GameEndScreen: React.FC = () => {
         </Card>
 
         <View style={styles.actionsContainer}>
-          <BouncyButton
-            label="Nueva partida"
-            onPress={handleNewGame}
-            icon="play"
-            variant="primary"
-          />
+          <Button mode="contained" onPress={handleNewGame} icon="play">
+            Nueva partida
+          </Button>
 
-          <BouncyButton
-            onPress={handleViewStatistics}
-            variant="secondary"
-            icon="chart-line"
-            label="Ver Estadísticas"
-          />
+          <Button mode="contained-tonal" onPress={handleViewStatistics} icon="chart-line">
+            Ver Estadísticas
+          </Button>
 
-          <BouncyButton
-            label="Volver al Inicio"
-            onPress={handleBackToHome}
-            icon="home"
-            variant="secondary"
-          />
+          <Button mode="contained-tonal" onPress={handleBackToHome} icon="home">
+            Volver al Inicio
+          </Button>
         </View>
 
         {/* Save Status */}

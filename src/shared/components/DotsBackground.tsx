@@ -1,11 +1,10 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
 
-const BG = "#FFFBF5";
 const BLUE = "#B8D4F5";
 const YELLOW = "#FFE08A";
 
-export const CreateDeckScreenBackdrop: React.FC = () => {
+export const DotsBackground: React.FC = () => {
   return (
     <View style={styles.wrap} pointerEvents="none">
       <View style={styles.base} />

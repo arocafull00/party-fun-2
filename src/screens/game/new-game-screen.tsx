@@ -6,7 +6,6 @@ import { router } from "expo-router";
 import { useDecks } from "../../hooks/useDecks";
 import { useGameStore, Player } from "../../store/game-store";
 import { CustomScreen } from "../../shared/components/CustomScreen";
-import { BottomNavigation } from "../../shared/components/BottomNavigation";
 import { FocusTextInput } from "../../shared/components/FocusTextInput";
 import { AppHeader } from "../../shared/components/app-header";
 import { AppHeaderIconButton } from "../../shared/components/app-header-icon-button";
@@ -161,7 +160,6 @@ const NewGameScreen: React.FC = () => {
             <NewGameContinueButton onPress={handleStartGame} />
           </View>
         </ScrollView>
-        <BottomNavigation activeTab="play" />
       </View>
       <Portal>
         <Modal

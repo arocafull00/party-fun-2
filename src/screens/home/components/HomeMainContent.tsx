@@ -1,21 +1,22 @@
 import React from "react";
 import { ScrollView, View } from "react-native";
+import { Button } from "react-native-paper";
 
-import { BouncyButton } from "../../../shared/components/BouncyButton";
 import { styles } from "../home-screen.styles";
 import { HomeLogoSection } from "./HomeLogoSection";
+import { useRouter } from "expo-router";
 
-interface HomeMainContentProps {
-  onNewGame: () => void;
-  onOpenDeckManagement: () => void;
-  onOpenStatistics: () => void;
-}
-
-export const HomeMainContent: React.FC<HomeMainContentProps> = ({
-  onNewGame,
-  onOpenDeckManagement,
-  onOpenStatistics,
-}) => {
+export const HomeMainContent: React.FC = () => {
+  const router = useRouter();
+  const onNewGame = () => {
+    router.push("/new-game");
+  };
+  const onOpenDeckManagement = () => {
+    router.push("/deck-management");
+  };
+  const onOpenStatistics = () => {
+    router.push("/statistics");
+  };
   return (
     <View style={styles.screen}>
       <ScrollView
@@ -24,27 +25,27 @@ export const HomeMainContent: React.FC<HomeMainContentProps> = ({
       >
         <View style={styles.mainActionsColumn}>
           <HomeLogoSection />
-          <BouncyButton
-            label="Nueva partida"
-            onPress={onNewGame}
-            variant="primary"
-          />
+          <Button mode="contained" onPress={onNewGame}>
+            Nueva partida
+          </Button>
           <View style={styles.actionButtons}>
             <View style={styles.actionButtonItem}>
-              <BouncyButton
-                label="CARTAS"
+              <Button
+                mode="contained-tonal"
                 onPress={onOpenDeckManagement}
-                variant="secondary"
                 icon="cards"
-              />
+              >
+                CARTAS
+              </Button>
             </View>
             <View style={styles.actionButtonItem}>
-              <BouncyButton
-                label="REGLAS"
+              <Button
+                mode="contained-tonal"
                 onPress={onOpenStatistics}
-                variant="secondary"
                 icon="clipboard-text-outline"
-              />
+              >
+                REGLAS
+              </Button>
             </View>
           </View>
         </View>

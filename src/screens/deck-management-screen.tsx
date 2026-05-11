@@ -18,8 +18,7 @@ import { useDecks } from "../hooks/useDecks";
 import { useGameStore } from "../store/game-store";
 import { borderRadius, colors, spacing, typography } from "../theme/theme";
 import { CustomScreen } from "../shared/components/CustomScreen";
-import { BottomNavigation } from "../shared/components/BottomNavigation";
-import { BouncyButton } from "../shared/components/BouncyButton";
+
 import { AppHeader } from "../shared/components/app-header";
 import { AppHeaderIconButton } from "../shared/components/app-header-icon-button";
 
@@ -184,12 +183,9 @@ export const DeckManagementScreen: React.FC = () => {
           <Text style={styles.subtitle}>Elige una baraja para empezar a jugar o crea una nueva.</Text>
         </View>
         <View style={styles.primaryAction}>
-          <BouncyButton
-            label="Crear Nueva Baraja"
-            onPress={handleCreateNewDeck}
-            icon="plus-circle"
-            variant="tertiary"
-          />
+          <Button mode="elevated" onPress={handleCreateNewDeck} icon="plus-circle">
+            Crear Nueva Baraja
+          </Button>
         </View>
         <ScrollView
           style={styles.content}
@@ -231,7 +227,6 @@ export const DeckManagementScreen: React.FC = () => {
             <Text style={styles.customDeckText}>Nueva Baraja Personalizada</Text>
           </Pressable>
         </ScrollView>
-        <BottomNavigation activeTab="decks" />
       </View>
 
       <Portal>

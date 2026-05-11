@@ -106,4 +106,4 @@ For overlays and tooltips, use `background` with a 40% alpha and a `backdrop-blu
 - **Don't use pure black (#000000):** It kills the vibrancy of the party vibe. Use `text`.
 - **Don't use 1px dividers:** They feel like a spreadsheet. Use a 8px vertical gap or a tonal shift instead.
 - **Don't use sharp corners:** Nothing in this system should be sharper than the `sm` (0.25rem) token. Sharpness equals "danger" or "corporate"; roundness equals "play."
-- **Don't duplicate components:** Use the shared `BottomNavigation` and `BouncyButton` components instead of copying tabs/buttons across screens.
+- **Don't duplicate components:** Use the shared `BottomNavigation` component instead of copying tabs/buttons across screens. Use `Button` from `react-native-paper` for all buttons.

@@ -1,7 +1,7 @@
 import React from "react";
 import { StyleSheet, View, ViewStyle } from "react-native";
-import { BouncyButton } from "../../../shared/components/BouncyButton";
-import { borderRadius } from "../../../theme/theme";
+import { Button } from "react-native-paper";
+import { borderRadius, colors } from "../../../theme/theme";
 
 interface ButtonPrimaryActionProps {
   title: string;
@@ -22,14 +22,6 @@ const ButtonPrimaryAction: React.FC<ButtonPrimaryActionProps> = ({
   variant = "primary",
   style,
 }) => {
-  const getButtonStyle = (): ViewStyle[] => {
-    const baseStyles: ViewStyle[] = [styles.button];
-    if (style) {
-      baseStyles.push(style);
-    }
-    return baseStyles;
-  };
-
   const getSizeStyle = () => {
     if (size === "small") {
       return styles.smallButtonShell;
@@ -41,14 +33,17 @@ const ButtonPrimaryAction: React.FC<ButtonPrimaryActionProps> = ({
   };
 
   return (
-    <View style={[getButtonStyle(), getSizeStyle()]}>
-      <BouncyButton
-        label={title}
+    <View style={[styles.button, getSizeStyle(), style]}>
+      <Button
+        mode="contained"
         onPress={onPress}
         disabled={disabled}
-        variant={variant === "success" ? "tertiary" : "primary"}
         icon={icon}
-      />
+        buttonColor={variant === "success" ? colors.accent : undefined}
+        style={styles.innerButton}
+      >
+        {title}
+      </Button>
     </View>
   );
 };
@@ -57,6 +52,9 @@ const styles = StyleSheet.create({
   button: {
     marginBottom: 15,
     width: "100%",
+    borderRadius: borderRadius.xl,
+  },
+  innerButton: {
     borderRadius: borderRadius.xl,
   },
   smallButtonShell: {

@@ -5,7 +5,7 @@ import { Text } from 'react-native-paper';
 
 import { borderRadius, colors, spacing, typography } from '../src/theme/theme';
 import { CustomScreen } from '../src/shared/components/CustomScreen';
-import { BouncyButton } from '../src/shared/components/BouncyButton';
+import { Button } from 'react-native-paper';
 import { AppHeader } from "../src/shared/components/app-header";
 import { AppHeaderIconButton } from "../src/shared/components/app-header-icon-button";
 
@@ -29,7 +29,9 @@ export default function NotFoundScreen() {
           <Text style={styles.subtitle}>
             La pantalla que buscas no existe o ha sido movida.
           </Text>
-          <BouncyButton label="Ir al inicio" onPress={() => router.push('/')} variant="primary" />
+          <Button mode="contained" onPress={() => router.push('/')}>
+            Ir al inicio
+          </Button>
         </View>
       </CustomScreen>
     </>

@@ -1,12 +1,11 @@
 import React from "react";
 import { View, StyleSheet, FlatList } from "react-native";
-import { Text } from "react-native-paper";
+import { Text, Button } from "react-native-paper";
 import { router } from "expo-router";
 
 import { useGameStore } from "../store/game-store";
 import { borderRadius, colors, spacing, typography } from "../theme/theme";
 import { CustomScreen } from "../shared/components/CustomScreen";
-import { BouncyButton } from "../shared/components/BouncyButton";
 import { AppHeader } from "../shared/components/app-header";
 import { AppHeaderIconButton } from "../shared/components/app-header-icon-button";
 import { ReviewCard, RoundStats, PlayerInfo } from "./game/components";
@@ -148,11 +147,9 @@ const TurnReviewScreen: React.FC = () => {
             incorrectCount={incorrectCount}
           />
           
-          <BouncyButton
-            label="Siguiente turno"
-            onPress={handleNextTurn}
-            variant="primary"
-          />
+          <Button mode="contained" onPress={handleNextTurn}>
+            Siguiente turno
+          </Button>
         </View>
       </View>
     </CustomScreen>

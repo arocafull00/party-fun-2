@@ -13,13 +13,13 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useStatistics } from "../hooks/useStatistics";
 import { colors, spacing } from "../theme/theme";
 import { CustomScreen } from "../shared/components/CustomScreen";
-import { BottomNavigation } from "../shared/components/BottomNavigation";
 import { AppHeader } from "../shared/components/app-header";
 import { AppHeaderIconButton } from "../shared/components/app-header-icon-button";
 import { styles } from "./statistics-screen.styles";
 import { StatisticsGeneralSection } from "./statistics/statistics-general-section";
 import { StatisticsTeamWinsSection } from "./statistics/statistics-team-wins-section";
 import { StatisticsHistorySection } from "./statistics/statistics-history-section";
+import { DotsBackground } from "../shared/components/DotsBackground";
 
 const StatisticsScreen: React.FC = () => {
   const { stats: statistics, recentGames, loading, refetch } = useStatistics();
@@ -110,16 +110,16 @@ const StatisticsScreen: React.FC = () => {
 
   const bottomPadding =
     spacing.xxxl + spacing.xxl + insets.bottom;
-  const showFirstGameDock = recentGames.length === 0;
 
   return (
     <CustomScreen contentStyle={styles.screenContent} header={statsHeader}>
+      <DotsBackground />
       <View style={[styles.root, { paddingTop: spacing.sm }]}>
         <ScrollView
           style={styles.scroll}
           contentContainerStyle={[
             styles.scrollInner,
-            { paddingBottom: showFirstGameDock ? bottomPadding + firstPlayReserve : bottomPadding },
+            { paddingBottom: bottomPadding },
           ]}
           showsVerticalScrollIndicator={false}
           refreshControl={
@@ -140,32 +140,6 @@ const StatisticsScreen: React.FC = () => {
             getWinnerText={getWinnerText}
           />
         </ScrollView>
-        {showFirstGameDock ? (
-          <View
-            style={[
-              styles.footerDock,
-              {
-                position: "absolute",
-                bottom: clearAboveFloatingNav + spacing.sm + insets.bottom,
-                left: 0,
-                right: 0,
-              },
-            ]}
-          >
-            <Pressable
-              accessibilityRole="button"
-              onPress={() => router.push("/new-game")}
-              style={({ pressed }) => [
-                styles.footerCta,
-                pressed && { opacity: 0.92 },
-              ]}
-            >
-              <Icon source="play" size={22} color={colors.background} />
-              <Text style={styles.footerCtaLabel}>JUGAR PRIMERA PARTIDA</Text>
-            </Pressable>
-          </View>
-        ) : null}
-        <BottomNavigation activeTab="stats" />
       </View>
     </CustomScreen>
   );

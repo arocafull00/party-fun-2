@@ -1,9 +1,9 @@
 import React from "react";
 import { View } from "react-native";
-import { Icon, Text } from "react-native-paper";
+import { Button, Icon, Text } from "react-native-paper";
+
 
 import { colors } from "../../../theme/theme";
-import { BouncyButton } from "../../../shared/components/BouncyButton";
 import { styles } from "../home-screen.styles";
 import { HomeLogoSection } from "./HomeLogoSection";
 import { useRouter } from "expo-router";
@@ -23,12 +23,9 @@ export const HomeEmptyState: React.FC = () => {
           </View>
           <Text style={styles.emptyTitle}>SIN MAZOS</Text>
           <Text style={styles.emptyDescription}>Crea tu primer mazo para empezar a jugar.</Text>
-          <BouncyButton
-            label="Crear mazos"
-            onPress={onCreateDeck}
-            variant="primary"
-            icon="plus"
-          />
+          <Button mode="contained" onPress={onCreateDeck} icon="plus">
+            Crear mazos
+          </Button>
         </View>
       </View>
     </View>

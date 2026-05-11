@@ -32,7 +32,7 @@ export const StatisticsGeneralSection: React.FC<
         </View>
         <View style={styles.generalCell}>
           <View style={[styles.generalGlyphCircle, styles.generalGlyphTintRed]}>
-            <Icon source="alphabet-a-box" size={28} color={colors.accent} />
+            <Icon source="alpha-a-box" size={28} color={colors.accent} />
           </View>
           <Text style={styles.generalStatValueWords}>{statistics.totalCards}</Text>
           <Text style={styles.generalStatLabel}>Palabras</Text>

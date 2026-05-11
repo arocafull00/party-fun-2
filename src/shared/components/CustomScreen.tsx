@@ -18,7 +18,6 @@ export function CustomScreen({
 }: CustomScreenProps) {
   return (
     <View style={[{ flex: 1 }, containerStyle]}>
-      {header === null ? null : header ?? null}
       <View
         style={[
           {
@@ -30,6 +29,7 @@ export function CustomScreen({
           contentStyle,
         ]}
       >
+        {header && header}
         {children}
       </View>
     </View>

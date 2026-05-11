@@ -1,6 +1,4 @@
 import React from "react";
-import { Alert } from "react-native";
-import { useRouter } from "expo-router";
 
 import { useDecks } from "../hooks/useDecks";
 import { CustomScreen } from "../shared/components/CustomScreen";
@@ -11,19 +9,6 @@ import { styles } from "./home/home-screen.styles";
 
 export const HomeScreen: React.FC = () => {
   const { decks, loading } = useDecks();
-  const router = useRouter();
-
-  const handleNewGame = () => {
-    if (decks.length === 0) {
-      Alert.alert(
-        "Sin mazos",
-        "Necesitas crear al menos un mazo de cartas para jugar",
-        [{ text: "OK" }]
-      );
-      return;
-    }
-    router.push("/new-game");
-  };
 
   if (loading) {
     return (
@@ -52,11 +37,7 @@ export const HomeScreen: React.FC = () => {
       contentStyle={styles.screenContent}
       hideBackground
     >
-      <HomeMainContent
-        onNewGame={handleNewGame}
-        onOpenDeckManagement={() => router.push("/deck-management")}
-        onOpenStatistics={() => router.push("/statistics")}
-      />
+      <HomeMainContent/>
     </CustomScreen>
   );
 };

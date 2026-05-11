@@ -22,7 +22,7 @@ import { AppHeader } from "../shared/components/app-header";
 import { AppHeaderIconButton } from "../shared/components/app-header-icon-button";
 import { useCreateDeck } from "../hooks/useCreateDeck";
 import { borderRadius, colors, spacing, typography } from "../theme/theme";
-import { CreateDeckScreenBackdrop } from "./create-deck/CreateDeckScreenBackdrop";
+import { DotsBackground } from "../shared/components/DotsBackground";
 import { CreateDeckWordRow } from "./create-deck/CreateDeckWordRow";
 
 const NAVY = "#0F2847";
@@ -138,7 +138,7 @@ const CreateDeckScreen: React.FC = () => {
 
   return (
     <View style={styles.root}>
-      <CreateDeckScreenBackdrop />
+      <DotsBackground />
       <View style={styles.shell}>
         <View
           style={{
