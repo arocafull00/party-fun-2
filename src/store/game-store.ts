@@ -23,6 +23,11 @@ export interface Teams {
   rojo: Team;
 }
 
+const getInitialNextPlayerByTeam = (teams: Teams) => ({
+  azul: teams.azul.players.length > 1 ? 1 : 0,
+  rojo: 0,
+});
+
 export interface RoundHistory {
   roundNumber: number;
   correctCards: string[];
@@ -44,6 +49,10 @@ export interface GameState {
   currentPhase: number;
   currentTeam: "azul" | "rojo";
   currentPlayerIndex: number;
+  nextPlayerByTeam: {
+    azul: number;
+    rojo: number;
+  };
   teams: Teams;
 
   // Turn management
@@ -106,6 +115,7 @@ export const useGameStore = create<GameState>()(
       currentPhase: 1,
       currentTeam: "azul",
       currentPlayerIndex: 0,
+      nextPlayerByTeam: { azul: 0, rojo: 0 },
       teams: {
         azul: { players: [], score: 0 },
         rojo: { players: [], score: 0 },
@@ -180,6 +190,7 @@ export const useGameStore = create<GameState>()(
 
       clearTeams: () =>
         set({
+          nextPlayerByTeam: { azul: 0, rojo: 0 },
           teams: {
             azul: { players: [], score: 0 },
             rojo: { players: [], score: 0 },
@@ -189,12 +200,14 @@ export const useGameStore = create<GameState>()(
       // Game flow
       startGame: (cardsList: string[]) => {
         const shuffledCards = shuffleCards(cardsList);
+        const teams = get().teams;
 
         set({
           gameStarted: true,
           currentPhase: 1,
           currentTeam: "azul",
           currentPlayerIndex: 0,
+          nextPlayerByTeam: getInitialNextPlayerByTeam(teams),
           timer: TURN_TIME,
           isTimerRunning: false,
           currentCardIndex: 0,
@@ -203,8 +216,8 @@ export const useGameStore = create<GameState>()(
           gameHistory: [],
           currentTurnCards: { correct: [], incorrect: [] },
           teams: {
-            azul: { ...get().teams.azul, score: 0 },
-            rojo: { ...get().teams.rojo, score: 0 },
+            azul: { ...teams.azul, score: 0 },
+            rojo: { ...teams.rojo, score: 0 },
           },
           cards: [],
         });
@@ -272,8 +285,8 @@ export const useGameStore = create<GameState>()(
         const state = get();
         const result = calculateNextTurn(
           state.currentTeam,
-          state.currentPlayerIndex,
-          state.teams
+          state.teams,
+          state.nextPlayerByTeam
         );
         return (
           state.teams[result.currentTeam].players[result.currentPlayerIndex] || null
@@ -284,14 +297,15 @@ export const useGameStore = create<GameState>()(
         const state = get();
         const result = calculateNextTurn(
           state.currentTeam,
-          state.currentPlayerIndex,
-          state.teams
+          state.teams,
+          state.nextPlayerByTeam
         );
         if (!result.hasNextTurn) return false;
 
         set({
           currentTeam: result.currentTeam,
           currentPlayerIndex: result.currentPlayerIndex,
+          nextPlayerByTeam: result.nextPlayerByTeam,
           timer: TURN_TIME,
           isTimerRunning: false,
           currentCardIndex: 0,
@@ -309,6 +323,9 @@ export const useGameStore = create<GameState>()(
           currentPhase: result.nextPhase,
           currentTeam: result.nextTeam,
           currentPlayerIndex: result.nextPlayerIndex,
+          nextPlayerByTeam: result.phaseComplete
+            ? getInitialNextPlayerByTeam(prev.teams)
+            : prev.nextPlayerByTeam,
           currentCardIndex: 0,
           timer: TURN_TIME,
           isTimerRunning: false,
@@ -331,6 +348,7 @@ export const useGameStore = create<GameState>()(
           currentPhase: 1,
           currentTeam: "azul",
           currentPlayerIndex: 0,
+          nextPlayerByTeam: { azul: 0, rojo: 0 },
           timer: TURN_TIME,
           isTimerRunning: false,
           currentCardIndex: 0,

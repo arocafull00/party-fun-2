@@ -2,7 +2,6 @@ import React from "react";
 import { View } from "react-native";
 import { Text, Icon } from "react-native-paper";
 
-import { colors } from "../../../theme/theme";
 import { styles } from "../../game-turn-screen.styles";
 
 type GameTurnPrepTeamPillProps = {

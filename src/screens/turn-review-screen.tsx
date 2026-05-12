@@ -75,8 +75,8 @@ const TurnReviewScreen: React.FC = () => {
         style={[
           styles.content,
           {
-            paddingLeft: spacing.lg + insets.left,
-            paddingRight: spacing.lg + insets.right,
+            paddingLeft: spacing.md + insets.left,
+            paddingRight: spacing.md + insets.right,
             paddingBottom: spacing.lg + insets.bottom,
           },
         ]}
@@ -120,26 +120,23 @@ const TurnReviewScreen: React.FC = () => {
           </View>
         )}
 
-        {/* Botón fijo abajo */}
-        {reviewCards.length > 0 && (
-          <View style={styles.bottomSection}>
-            <Button
-              mode="contained"
-              onPress={handleNextTurn}
-              icon="arrow-right"
-              buttonColor={colors.primary}
-              textColor="#FFFFFF"
-              style={styles.nextButton}
-              contentStyle={styles.nextButtonContent}
-              labelStyle={styles.nextButtonLabel}
-            >
-              Siguiente ronda
-            </Button>
-            <Text style={styles.nextButtonSubtitle}>
-              Prepárate para la siguiente ronda
-            </Text>
-          </View>
-        )}
+        <View style={styles.bottomSection}>
+          <Button
+            mode="contained"
+            onPress={handleNextTurn}
+            icon="arrow-right"
+            buttonColor={colors.primary}
+            textColor="#FFFFFF"
+            style={styles.nextButton}
+            contentStyle={styles.nextButtonContent}
+            labelStyle={styles.nextButtonLabel}
+          >
+            Siguiente ronda
+          </Button>
+          <Text style={styles.nextButtonSubtitle}>
+            Prepárate para la siguiente ronda
+          </Text>
+        </View>
       </View>
     </CustomScreen>
   );

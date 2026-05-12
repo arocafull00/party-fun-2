@@ -1,412 +1,245 @@
-import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
-import {
-  Text,
-  Button,
-  Card,
-  List,
-  Surface,
-  Chip
-} from 'react-native-paper';
-import { router } from 'expo-router';
+import React, { useEffect, useMemo, useState } from "react";
+import { ScrollView, View } from "react-native";
+import { router } from "expo-router";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Button, Text } from "react-native-paper";
 
-import { useGameStore } from '../store/game-store';
-import { database } from '../database/database';
-import { borderRadius, colors, spacing, typography } from '../theme/theme';
-import { CustomScreen } from '../shared/components/CustomScreen';
-
-import { AppHeader } from '../shared/components/app-header';
-
-
+import { database } from "../database/database";
+import { useGameStore } from "../store/game-store";
+import { colors, spacing } from "../theme/theme";
+import { AppHeader } from "../shared/components/app-header";
+import { CustomScreen } from "../shared/components/CustomScreen";
+import { DotsBackground } from "../shared/components/DotsBackground";
+import { FinalTeamCard } from "./game-end/components/final-team-card";
+import { RoundSummaryRow } from "./game-end/components/round-summary-row";
+import { styles } from "./game-end-screen.styles";
 
 const GameEndScreen: React.FC = () => {
-  const {
-    teams,
-    selectedDeck,
-    gameHistory,
-    resetGame
-  } = useGameStore();
-
+  const insets = useSafeAreaInsets();
+  const { teams, selectedDeck, gameHistory, resetGame } = useGameStore();
   const [saving, setSaving] = useState(false);
   const [gameSaved, setGameSaved] = useState(false);
 
-  // Calculate winner and game stats
   const blueScore = teams.azul.score;
   const redScore = teams.rojo.score;
-  const winner = blueScore > redScore ? 'azul' : redScore > blueScore ? 'rojo' : 'empate';
-  const totalCards = gameHistory.reduce((total, round) => {
-    return total + round.correctCards.length + round.incorrectCards.length;
-  }, 0);
-  const totalCorrect = gameHistory.reduce((total, round) => {
-    return total + round.correctCards.length;
-  }, 0);
-  const accuracy = totalCards > 0 ? Math.round((totalCorrect / totalCards) * 100) : 0;
+
+  const winner = useMemo(() => {
+    if (blueScore > redScore) {
+      return "azul";
+    }
+
+    if (redScore > blueScore) {
+      return "rojo";
+    }
+
+    return "empate";
+  }, [blueScore, redScore]);
+
+  const totalCards = useMemo(() => {
+    return gameHistory.reduce((total, round) => {
+      return total + round.correctCards.length + round.incorrectCards.length;
+    }, 0);
+  }, [gameHistory]);
+
+  const totalCorrect = useMemo(() => {
+    return gameHistory.reduce((total, round) => {
+      return total + round.correctCards.length;
+    }, 0);
+  }, [gameHistory]);
+
+  const accuracy = useMemo(() => {
+    if (totalCards === 0) {
+      return 0;
+    }
+
+    return Math.round((totalCorrect / totalCards) * 100);
+  }, [totalCards, totalCorrect]);
+
+  const roundSummaries = useMemo(() => {
+    return gameHistory.map((round, index) => {
+      const previousScores =
+        index === 0 ? { azul: 0, rojo: 0 } : gameHistory[index - 1].teamScores;
+      const blueCorrect = Math.max(0, round.teamScores.azul - previousScores.azul);
+      const redCorrect = Math.max(0, round.teamScores.rojo - previousScores.rojo);
+
+      return {
+        roundNumber: round.roundNumber || index + 1,
+        blueCorrect,
+        redCorrect,
+      };
+    });
+  }, [gameHistory]);
 
   useEffect(() => {
-    saveGameToDatabase();
-  }, []);
-
-  const saveGameToDatabase = async () => {
-    if (gameSaved || saving) return;
-
-    setSaving(true);
-    try {
-      // Create game record
-      const gameData = {
-        fecha: new Date().toISOString(),
-        mazoId: selectedDeck?.id || 0,
-        equipoGanador: winner === 'empate' ? null : (winner as 'azul' | 'rojo'),
-        puntuacionAzul: blueScore,
-        puntuacionRojo: redScore,
-        totalCartas: totalCards,
-        cartasCorrectas: totalCorrect,
-        precision: accuracy
-      };
-
-      const gameId = await database.createPartida(gameData);
-
-      // Save players
-      const allPlayers = [...teams.azul.players, ...teams.rojo.players];
-      for (const player of allPlayers) {
-        const equipo: 'azul' | 'rojo' = teams.azul.players.includes(player) ? 'azul' : 'rojo';
-        const playerData = {
-          nombre: player.name,
-          equipo
-        };
-
-        const playerId = await database.createJugador(playerData);
-        await database.addPlayerToGame(gameId, playerId, equipo as 'azul' | 'rojo');
+    const saveGameToDatabase = async () => {
+      if (gameSaved) {
+        return;
       }
 
-      setGameSaved(true);
-      console.log('Game saved successfully with ID:', gameId);
-    } catch (error) {
-      console.error('Error saving game:', error);
-      // Don't show error to user, game can still be played
-    } finally {
-      setSaving(false);
-    }
-  };
+      if (saving) {
+        return;
+      }
+
+      setSaving(true);
+
+      try {
+        const gameData = {
+          fecha: new Date().toISOString(),
+          mazoId: selectedDeck?.id || 0,
+          equipoGanador: winner === "empate" ? null : (winner as "azul" | "rojo"),
+          puntuacionAzul: blueScore,
+          puntuacionRojo: redScore,
+          totalCartas: totalCards,
+          cartasCorrectas: totalCorrect,
+          precision: accuracy,
+        };
+
+        const gameId = await database.createPartida(gameData);
+        const allPlayers = [...teams.azul.players, ...teams.rojo.players];
+
+        for (const player of allPlayers) {
+          const equipo: "azul" | "rojo" = teams.azul.players.includes(player)
+            ? "azul"
+            : "rojo";
+          const playerData = {
+            nombre: player.name,
+            equipo,
+          };
+          const playerId = await database.createJugador(playerData);
+          await database.addPlayerToGame(gameId, playerId, equipo);
+        }
+
+        setGameSaved(true);
+      } catch {
+      } finally {
+        setSaving(false);
+      }
+    };
+
+    saveGameToDatabase();
+  }, [
+    accuracy,
+    blueScore,
+    gameSaved,
+    redScore,
+    saving,
+    selectedDeck?.id,
+    teams.azul.players,
+    teams.rojo.players,
+    totalCards,
+    totalCorrect,
+    winner,
+  ]);
 
   const handleNewGame = () => {
     resetGame();
-    router.push('/new-game');
+    router.push("/new-game");
   };
 
   const handleBackToHome = () => {
     resetGame();
-    router.push('/');
+    router.push("/");
   };
 
   const handleViewStatistics = () => {
-    router.push('/statistics');
-  };
-
-  const getWinnerColor = () => {
-    if (winner === 'azul') return colors.primary;
-    if (winner === 'rojo') return colors.secondary;
-    return colors.text;
-  };
-
-  const getWinnerText = () => {
-    if (winner === 'azul') return '¡EQUIPO AZUL GANA!';
-    if (winner === 'rojo') return '¡EQUIPO ROJO GANA!';
-    return '¡EMPATE!';
-  };
-
-  const getWinnerIcon = () => {
-    if (winner === 'empate') return '🤝';
-    return '🏆';
+    router.push("/statistics");
   };
 
   return (
     <CustomScreen contentStyle={styles.container} header={<AppHeader />}>
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        {/* Winner Announcement */}
-        <Surface style={[styles.winnerContainer, { backgroundColor: getWinnerColor() }]} elevation={4}>
-          <Text style={styles.winnerIcon}>{getWinnerIcon()}</Text>
-          <Text style={styles.winnerText}>
-            {getWinnerText()}
-          </Text>
-          {winner !== 'empate' && (
-            <Text style={styles.winnerSubtext}>
-              ¡Felicitaciones por la victoria!
-            </Text>
-          )}
-        </Surface>
+      <DotsBackground />
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={[
+          styles.scrollContent,
+          {
+            paddingLeft: spacing.md + insets.left,
+            paddingRight: spacing.md + insets.right,
+            paddingBottom: spacing.lg + insets.bottom,
+          },
+        ]}
+      >
+        <View style={styles.headerSection}>
+          <Text style={styles.title}>¡Juego terminado!</Text>
+          <Text style={styles.subtitle}>Así han quedado los equipos</Text>
+        </View>
 
-        {/* Final Scores */}
-        <Card style={styles.scoresCard}>
-          <Card.Content>
-            <Text style={styles.sectionTitle}>Puntuación Final</Text>
+        <View style={styles.teamCardsRow}>
+          <FinalTeamCard
+            title="Equipo Azul"
+            score={blueScore}
+            members={teams.azul.players.map((player) => player.name)}
+            color={colors.primary}
+            winnerLabel={winner === "azul" ? "GANADOR" : undefined}
+          />
+          <FinalTeamCard
+            title="Equipo Rojo"
+            score={redScore}
+            members={teams.rojo.players.map((player) => player.name)}
+            color={colors.redTeam}
+            winnerLabel={winner === "rojo" ? "GANADOR" : undefined}
+          />
+        </View>
 
-            <View style={styles.scoreRow}>
-              <View style={[styles.teamScore, { backgroundColor: colors.primary + '20' }]}>
-                <Text style={[styles.teamName, { color: colors.primary }]}>AZUL</Text>
-                <Text style={[styles.teamScoreText, { color: colors.primary }]}>{blueScore}</Text>
-                <Text style={styles.teamPlayersText}>
-                  {teams.azul.players.map(p => p.name).join(', ')}
-                </Text>
-              </View>
+        <View style={styles.roundsCard}>
+          <View style={styles.roundsHeader}>
+            <Text style={styles.roundsHeaderRound}>Ronda</Text>
+            <Text style={[styles.roundsHeaderTeam, { color: colors.primary }]}>Azul</Text>
+            <Text style={[styles.roundsHeaderTeam, { color: colors.redTeam }]}>Rojo</Text>
+          </View>
 
-              <Text style={styles.vs}>VS</Text>
-
-              <View style={[styles.teamScore, { backgroundColor: colors.secondary + '20' }]}>
-                <Text style={[styles.teamName, { color: colors.secondary }]}>ROJO</Text>
-                <Text style={[styles.teamScoreText, { color: colors.secondary }]}>{redScore}</Text>
-                <Text style={styles.teamPlayersText}>
-                  {teams.rojo.players.map(p => p.name).join(', ')}
-                </Text>
-              </View>
-            </View>
-          </Card.Content>
-        </Card>
-
-        {/* Game Statistics */}
-        <Card style={styles.statsCard}>
-          <Card.Content>
-            <Text style={styles.sectionTitle}>Estadísticas del Juego</Text>
-
-            <List.Item
-              title="Mazo utilizado"
-              description={selectedDeck?.nombre || 'Sin mazo'}
-              left={props => <List.Icon {...props} icon="cards" color={colors.primary} />}
-            />
-
-            <List.Item
-              title="Total de cartas"
-              description={`${totalCards} cartas jugadas`}
-              left={props => <List.Icon {...props} icon="format-list-numbered" color={colors.primary} />}
-            />
-
-            <List.Item
-              title="Cartas correctas"
-              description={`${totalCorrect} aciertos`}
-              left={props => <List.Icon {...props} icon="check-circle" color={colors.primary} />}
-            />
-
-            <List.Item
-              title="Precisión"
-              description={`${accuracy}% de acierto`}
-              left={props => <List.Icon {...props} icon="target" color={colors.primary} />}
-            />
-
-            <List.Item
-              title="Rondas completadas"
-              description="3 rondas (Libre, Una palabra, Mímica)"
-              left={props => <List.Icon {...props} icon="numeric-3-circle" color={colors.primary} />}
-            />
-          </Card.Content>
-        </Card>
-
-        {/* Round by Round Results */}
-        <Card style={styles.roundsCard}>
-          <Card.Content>
-            <Text style={styles.sectionTitle}>Resultados por Ronda</Text>
-
-            {gameHistory.map((round, index) => (
-              <View key={index} style={styles.roundResult}>
-                <Text style={styles.roundTitle}>Ronda {index + 1}</Text>
-                <Text style={styles.roundDescription}>
-                  {index === 0 && 'Pistas libres (excepto sinónimos)'}
-                  {index === 1 && 'Solo una palabra como pista'}
-                  {index === 2 && 'Solo mímica'}
-                </Text>
-
-                <View style={styles.roundStats}>
-                  <Chip
-                    icon="check"
-                    style={[styles.statChip, { backgroundColor: colors.primary + '20' }]}
-                    textStyle={{ color: colors.primary }}
-                  >
-                    {round.correctCards.length} correctas
-                  </Chip>
-                  <Chip
-                    icon="close"
-                    style={[styles.statChip, { backgroundColor: colors.accent + '20' }]}
-                    textStyle={{ color: colors.accent }}
-                  >
-                    {round.incorrectCards.length} incorrectas
-                  </Chip>
-                </View>
-
-                {index < gameHistory.length - 1 && <View style={styles.roundSpacer} />}
-              </View>
+          <View style={styles.roundsBody}>
+            {roundSummaries.map((round, index) => (
+              <RoundSummaryRow
+                key={`${round.roundNumber}-${index}`}
+                roundNumber={round.roundNumber}
+                blueCorrect={round.blueCorrect}
+                redCorrect={round.redCorrect}
+              />
             ))}
-          </Card.Content>
-        </Card>
+            {roundSummaries.length === 0 ? (
+              <Text style={styles.emptyRoundsText}>Sin rondas registradas</Text>
+            ) : null}
+          </View>
+        </View>
 
         <View style={styles.actionsContainer}>
-          <Button mode="contained" onPress={handleNewGame} icon="play">
+          <Button
+            mode="contained"
+            onPress={handleNewGame}
+            style={styles.primaryButton}
+            contentStyle={styles.buttonContent}
+            labelStyle={styles.buttonLabel}
+            buttonColor={colors.primary}
+          >
             Nueva partida
           </Button>
 
-          <Button mode="contained-tonal" onPress={handleViewStatistics} icon="chart-line">
-            Ver Estadísticas
+          <Button
+            mode="contained-tonal"
+            onPress={handleViewStatistics}
+            style={styles.secondaryButton}
+            contentStyle={styles.buttonContent}
+            labelStyle={styles.buttonLabel}
+          >
+            Ver estadísticas
           </Button>
 
-          <Button mode="contained-tonal" onPress={handleBackToHome} icon="home">
-            Volver al Inicio
+          <Button
+            mode="contained-tonal"
+            onPress={handleBackToHome}
+            style={styles.secondaryButton}
+            contentStyle={styles.buttonContent}
+            labelStyle={styles.buttonLabel}
+          >
+            Volver al inicio
           </Button>
         </View>
 
-        {/* Save Status */}
-        {gameSaved && (
-          <View style={styles.saveStatus}>
-            <Chip
-              icon="check-circle"
-              style={styles.savedChip}
-              textStyle={{ color: colors.primary }}
-            >
-              Partida guardada
-            </Chip>
-          </View>
-        )}
+        {gameSaved ? <Text style={styles.saveStatus}>Partida guardada</Text> : null}
       </ScrollView>
     </CustomScreen>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingHorizontal: 0,
-    paddingTop: 0,
-  },
-  content: {
-    flex: 1,
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.lg,
-  },
-  winnerContainer: {
-    padding: spacing.xl,
-    borderRadius: borderRadius.xl,
-    alignItems: 'center',
-    marginBottom: spacing.lg,
-  },
-  winnerIcon: {
-    fontSize: 60,
-    marginBottom: 10,
-  },
-  winnerText: {
-    fontSize: typography.sizes.xxxl,
-    fontWeight: '800',
-    fontFamily: typography.families.heading,
-    color: '#ffffff',
-    textAlign: 'center',
-    marginBottom: 10,
-  },
-  winnerSubtext: {
-    fontSize: typography.sizes.md,
-    color: '#ffffff',
-    textAlign: 'center',
-  },
-  scoresCard: {
-    marginBottom: spacing.lg,
-    backgroundColor: '#ffffff',
-    elevation: 4,
-  },
-  sectionTitle: {
-    fontSize: typography.sizes.lg,
-    fontWeight: '800',
-    fontFamily: typography.families.heading,
-    color: colors.text,
-    marginBottom: spacing.md,
-    textAlign: 'center',
-  },
-  scoreRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  teamScore: {
-    flex: 1,
-    padding: spacing.lg,
-    borderRadius: borderRadius.lg,
-    alignItems: 'center',
-  },
-  teamName: {
-    fontSize: typography.sizes.md,
-    fontWeight: '700',
-    marginBottom: 10,
-  },
-  teamScoreText: {
-    fontSize: typography.sizes.display,
-    fontWeight: '800',
-    marginBottom: spacing.sm,
-  },
-  teamPlayersText: {
-    fontSize: 12,
-    color: colors.text,
-    textAlign: 'center',
-    lineHeight: 16,
-  },
-  vs: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: colors.text,
-    marginHorizontal: spacing.md,
-  },
-  statsCard: {
-    marginBottom: spacing.lg,
-    backgroundColor: '#ffffff',
-    elevation: 4,
-  },
-  roundsCard: {
-    marginBottom: spacing.lg,
-    backgroundColor: '#ffffff',
-    elevation: 4,
-  },
-  roundResult: {
-    marginBottom: spacing.md,
-  },
-  roundTitle: {
-    fontSize: typography.sizes.md,
-    fontWeight: '700',
-    color: colors.text,
-    marginBottom: 5,
-  },
-  roundDescription: {
-    fontSize: typography.sizes.sm,
-    color: colors.text,
-    marginBottom: spacing.sm,
-    fontStyle: 'italic',
-  },
-  roundStats: {
-    flexDirection: 'row',
-    gap: spacing.sm,
-  },
-  statChip: {
-    alignSelf: 'flex-start',
-  },
-  roundSpacer: {
-    height: spacing.sm,
-  },
-  actionsContainer: {
-    gap: spacing.md,
-    marginBottom: spacing.lg,
-  },
-  primaryButton: {
-    borderRadius: borderRadius.xl,
-  },
-  secondaryButton: {
-    borderColor: colors.secondary,
-    borderWidth: 0,
-    backgroundColor: colors.background,
-  },
-  textButton: {
-    // No specific styles needed
-  },
-  buttonContent: {
-    minHeight: 50,
-  },
-  saveStatus: {
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  savedChip: {
-    backgroundColor: colors.primary + '20',
-  },
-});
-
-export default GameEndScreen; 
+export default GameEndScreen;

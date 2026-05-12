@@ -1,6 +1,6 @@
-import { Platform, StyleSheet } from "react-native";
+import { StyleSheet } from "react-native";
 
-import { borderRadius, colors, spacing, typography } from "../theme/theme";
+import { borderRadius, spacing, typography } from "../theme/theme";
 
 export const deckListCardStyles = StyleSheet.create({
   pressable: {
@@ -14,18 +14,7 @@ export const deckListCardStyles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: spacing.md,
-    ...Platform.select({
-      ios: {
-        shadowColor: "#251810",
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.1,
-        shadowRadius: 12,
-      },
-      android: {
-        elevation: 3,
-      },
-      default: {},
-    }),
+    elevation: 3,
   },
   pressablePressed: {
     opacity: 0.92,

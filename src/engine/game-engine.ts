@@ -32,25 +32,46 @@ export interface TurnResult {
   currentTeam: 'azul' | 'rojo';
   currentPlayerIndex: number;
   hasNextTurn: boolean;
+  nextPlayerByTeam: {
+    azul: number;
+    rojo: number;
+  };
 }
 
 export const calculateNextTurn = (
   currentTeam: 'azul' | 'rojo',
-  currentPlayerIndex: number,
-  teams: { azul: { players: unknown[] }; rojo: { players: unknown[] } }
+  teams: { azul: { players: unknown[] }; rojo: { players: unknown[] } },
+  nextPlayerByTeam: { azul: number; rojo: number }
 ): TurnResult => {
-  const currentTeamPlayers = teams[currentTeam].players;
-  const nextPlayerIndex = currentPlayerIndex + 1;
+  const nextTeam = currentTeam === 'azul' ? 'rojo' : 'azul';
+  const nextTeamPlayerCount = teams[nextTeam].players.length;
 
-  if (nextPlayerIndex >= currentTeamPlayers.length) {
-    const nextTeam = currentTeam === 'azul' ? 'rojo' : 'azul';
-    if (teams[nextTeam].players.length === 0) {
-      return { currentTeam, currentPlayerIndex, hasNextTurn: false };
-    }
-    return { currentTeam: nextTeam, currentPlayerIndex: 0, hasNextTurn: true };
+  if (nextTeamPlayerCount === 0) {
+    const currentTeamPlayerCount = teams[currentTeam].players.length;
+    const currentPlayerIndex =
+      currentTeamPlayerCount === 0
+        ? 0
+        : nextPlayerByTeam[currentTeam] % currentTeamPlayerCount;
+
+    return {
+      currentTeam,
+      currentPlayerIndex,
+      hasNextTurn: false,
+      nextPlayerByTeam,
+    };
   }
 
-  return { currentTeam, currentPlayerIndex: nextPlayerIndex, hasNextTurn: true };
+  const nextPlayerIndex = nextPlayerByTeam[nextTeam] % nextTeamPlayerCount;
+
+  return {
+    currentTeam: nextTeam,
+    currentPlayerIndex: nextPlayerIndex,
+    hasNextTurn: true,
+    nextPlayerByTeam: {
+      ...nextPlayerByTeam,
+      [nextTeam]: (nextPlayerIndex + 1) % nextTeamPlayerCount,
+    },
+  };
 };
 
 export interface EndTurnResult {

@@ -59,7 +59,7 @@ export const styles = StyleSheet.create({
     backgroundColor: colors.accent,
   },
   prepTeamPillRojo: {
-    backgroundColor: colors.secondary,
+    backgroundColor: colors.redTeam,
   },
   prepTeamPillText: {
     fontSize: typography.sizes.lg,
@@ -362,8 +362,8 @@ export const styles = StyleSheet.create({
   playingWordCard: {
     flex: 1,
     marginHorizontal: spacing.lg,
-    backgroundColor: colors.background,
     borderRadius: borderRadius.xxl,
+    overflow: "hidden",
     minHeight: 200,
     justifyContent: "center",
     alignItems: "center",
@@ -399,22 +399,23 @@ export const styles = StyleSheet.create({
     fontSize: typography.sizes.xxl,
   },
   playingWordText: {
-    fontSize: 48,
+    fontSize: 40,
     lineHeight: 52,
     fontFamily: typography.families.heading,
-    color: colors.text,
+    color: "#ffffff",
     textAlign: "center",
     textTransform: "uppercase",
     paddingHorizontal: spacing.sm,
+    alignSelf: "stretch",
+    width: "100%",
   },
   playingWordLabel: {
     fontFamily: typography.families.bodyBold,
     fontSize: typography.sizes.sm,
-    color: colors.primary,
+    color: "#ffffff",
     letterSpacing: 1.2,
     marginBottom: spacing.md,
     textTransform: "uppercase",
-    opacity: 0.85,
   },
   playingWordProgressTrack: {
     width: "88%",

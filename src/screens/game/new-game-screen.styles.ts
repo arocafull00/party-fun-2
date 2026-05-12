@@ -24,8 +24,8 @@ export const newGameScreenStyles = StyleSheet.create({
   mainTitle: {
     fontFamily: typography.families.heading,
     color: colors.text,
-    fontSize: typography.sizes.display,
-    lineHeight: typography.sizes.display + 4,
+    fontSize: typography.sizes.xxxl,
+    lineHeight: typography.sizes.xxxl + 4,
   },
   mainSubtitle: {
     fontFamily: typography.families.body,

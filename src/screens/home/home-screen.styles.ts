@@ -5,6 +5,7 @@ import { borderRadius, colors, spacing, typography } from "../../theme/theme";
 export const styles = StyleSheet.create({
   screenContent: {
     paddingHorizontal: 0,
+    position: "relative",
   },
   screen: {
     flex: 1,
@@ -125,6 +126,17 @@ export const styles = StyleSheet.create({
   createButton: {
     width: "100%",
     borderRadius: borderRadius.xl,
+  },
+  musicToggleWrapper: {
+    position: "absolute",
+    right: spacing.sm,
+    zIndex: 10,
+  },
+  musicToggleButton: {
+    margin: 0,
+    backgroundColor: "transparent",
+    elevation: 0,
+    shadowOpacity: 0,
   },
 });
 

@@ -14,7 +14,7 @@ export const styles = StyleSheet.create({
   headerSection: {
     alignItems: "center",
     marginBottom: spacing.lg,
-    paddingHorizontal: spacing.lg,
+    paddingHorizontal: spacing.md,
   },
   headerTitle: {
     fontFamily: typography.families.heading,
@@ -33,7 +33,7 @@ export const styles = StyleSheet.create({
   roundSection: {
     alignItems: "center",
     marginBottom: spacing.lg,
-    paddingHorizontal: spacing.lg,
+    paddingHorizontal: spacing.md,
   },
   roundTitle: {
     fontFamily: typography.families.heading,
@@ -43,10 +43,6 @@ export const styles = StyleSheet.create({
     marginBottom: spacing.sm,
   },
   roundBadge: {
-    backgroundColor: "#E8E0F7",
-    borderRadius: borderRadius.full,
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.xl,
   },
   roundBadgeText: {
     fontFamily: typography.families.bodyBold,
@@ -55,13 +51,13 @@ export const styles = StyleSheet.create({
   },
   listContainer: {
     flex: 1,
-    paddingHorizontal: spacing.lg,
+    paddingHorizontal: spacing.md,
   },
   listContent: {
     paddingBottom: spacing.md,
   },
   bottomSection: {
-    paddingHorizontal: spacing.lg,
+    paddingHorizontal: spacing.md,
     paddingTop: spacing.md,
     paddingBottom: spacing.lg,
     alignItems: "center",

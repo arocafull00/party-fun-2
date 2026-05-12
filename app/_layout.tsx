@@ -22,6 +22,7 @@ import {
 import { database } from "../src/database/database";
 import { theme } from "../src/theme/theme";
 import { CustomScreen } from "../src/shared/components/CustomScreen";
+import { GlobalMusicProvider } from "../src/shared/context/global-music-context";
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
@@ -84,6 +85,7 @@ export default function RootLayout() {
   return (
     <SafeAreaProvider>
       <PaperProvider theme={theme}>
+        <GlobalMusicProvider>
           <Stack
             screenOptions={{
               headerStyle: {
@@ -141,6 +143,7 @@ export default function RootLayout() {
             />
           </Stack>
           <StatusBar style="dark" hidden={true} />
+        </GlobalMusicProvider>
       </PaperProvider>
     </SafeAreaProvider>
   );

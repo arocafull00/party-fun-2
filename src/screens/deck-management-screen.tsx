@@ -333,8 +333,8 @@ const styles = StyleSheet.create({
     gap: spacing.xs,
   },
   title: {
-    fontSize: 52,
-    lineHeight: 52,
+    fontSize: 30,
+    lineHeight: 40,
     fontFamily: typography.families.heading,
     color: "#2a1e12",
   },

@@ -104,7 +104,6 @@ const NewGameScreen: React.FC = () => {
         Alert.alert("Mazo vacío", "El mazo seleccionado no tiene cartas");
         return;
       }
-      console.log("cardsList", cardsList);
       startGame(cardsList);
       router.push("/game-turn");
     } catch (error) {
@@ -132,9 +131,6 @@ const NewGameScreen: React.FC = () => {
           <View style={styles.titleRow}>
             <Text style={styles.mainTitle}>Configura tu Partida</Text>
           </View>
-          <Text style={styles.mainSubtitle}>
-            Añade a los jugadores y elige su bando para comenzar.
-          </Text>
         </View>
         <ScrollView
           style={styles.scroll}

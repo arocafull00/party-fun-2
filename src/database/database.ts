@@ -1,6 +1,7 @@
 import { eq, desc, count, sum, avg, sql } from 'drizzle-orm';
 import { getDb, runMigrations } from './connection';
 import * as schema from './schema';
+import defaultDecksJson from '../data/default-decks.json';
 
 import type {
   Mazo,
@@ -9,6 +10,12 @@ import type {
   Partida,
   NewPartida,
 } from './schema';
+
+type DefaultDeckSeed = { nombre: string; cartas: string[] };
+
+const defaultDecksSeed = defaultDecksJson as DefaultDeckSeed[];
+
+const defaultDeckNames = new Set(defaultDecksSeed.map((d) => d.nombre));
 
 class DatabaseManager {
   private isInitialized = false;
@@ -25,6 +32,7 @@ class DatabaseManager {
     try {
       console.log('Initializing database...');
       await runMigrations();
+      await this.ensureDefaultDecks();
       this.isInitialized = true;
       console.log('Database initialized successfully');
     } catch (error) {
@@ -33,9 +41,37 @@ class DatabaseManager {
     }
   }
 
+  public async syncDefaultDecks(): Promise<void> {
+    this.ensureInitialized();
+    await this.ensureDefaultDecks();
+  }
+
   private ensureInitialized(): void {
     if (!this.isInitialized) {
       throw new Error('Database not initialized. Call init() first.');
+    }
+  }
+
+  private async ensureDefaultDecks(): Promise<void> {
+    for (const deck of defaultDecksSeed) {
+      const found = await this.db
+        .select({ id: schema.mazos.id })
+        .from(schema.mazos)
+        .where(eq(schema.mazos.nombre, deck.nombre))
+        .limit(1);
+      if (found.length > 0) {
+        continue;
+      }
+
+      const inserted = await this.db
+        .insert(schema.mazos)
+        .values({ nombre: deck.nombre })
+        .returning({ id: schema.mazos.id });
+      const mazoId = inserted[0].id;
+
+      for (const texto of deck.cartas) {
+        await this.db.insert(schema.cartas).values({ mazoId, texto });
+      }
     }
   }
 
@@ -56,8 +92,15 @@ class DatabaseManager {
     this.ensureInitialized();
 
     try {
-      const result = await this.db.select().from(schema.mazos).orderBy(schema.mazos.nombre);
-      return result;
+      const result = await this.db.select().from(schema.mazos);
+      return result.sort((a, b) => {
+        const aIsDefault = defaultDeckNames.has(a.nombre);
+        const bIsDefault = defaultDeckNames.has(b.nombre);
+        if (aIsDefault !== bIsDefault) {
+          return aIsDefault ? 1 : -1;
+        }
+        return a.nombre.localeCompare(b.nombre, 'es');
+      });
     } catch (error) {
       console.error('Error getting mazos:', error);
       throw error;

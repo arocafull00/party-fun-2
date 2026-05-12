@@ -36,24 +36,15 @@ export const WordReviewRow: React.FC<WordReviewRowProps> = ({
             if (!isCorrect) onToggle();
           }}
           style={[
-            styles.button,
+            styles.iconButton,
             isCorrect ? styles.buttonCorrectActive : styles.buttonCorrectInactive,
           ]}
         >
           <Ionicons
             name="checkmark"
-            size={14}
+            size={18}
             color={isCorrect ? "#FFFFFF" : colors.accent}
-            style={styles.buttonIcon}
           />
-          <Text
-            style={[
-              styles.buttonLabel,
-              isCorrect ? styles.buttonLabelActive : styles.buttonLabelCorrectInactive,
-            ]}
-          >
-            Acierto
-          </Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -62,24 +53,15 @@ export const WordReviewRow: React.FC<WordReviewRowProps> = ({
             if (isCorrect) onToggle();
           }}
           style={[
-            styles.button,
+            styles.iconButton,
             !isCorrect ? styles.buttonFailActive : styles.buttonFailInactive,
           ]}
         >
           <Ionicons
             name="close"
-            size={14}
+            size={18}
             color={!isCorrect ? "#FFFFFF" : colors.redTeam}
-            style={styles.buttonIcon}
           />
-          <Text
-            style={[
-              styles.buttonLabel,
-              !isCorrect ? styles.buttonLabelActive : styles.buttonLabelFailInactive,
-            ]}
-          >
-            Fallo
-          </Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -92,23 +74,21 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#FFFFFF",
     borderRadius: borderRadius.lg,
-    paddingVertical: spacing.md,
-    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.sm,
     marginBottom: spacing.sm,
-    gap: spacing.md,
+    gap: spacing.sm,
   },
   leftSection: {
     flexDirection: "row",
     alignItems: "center",
-    gap: spacing.md,
+    gap: spacing.sm,
     flex: 1,
     flexShrink: 1,
   },
   numberCircle: {
     width: 32,
     height: 32,
-    borderRadius: 16,
-    backgroundColor: "#E8E0F7",
     justifyContent: "center",
     alignItems: "center",
   },
@@ -128,14 +108,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: spacing.sm,
   },
-  button: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 6,
-    paddingHorizontal: spacing.md,
+  iconButton: {
+    width: 40,
+    height: 36,
     borderRadius: borderRadius.md,
-    minWidth: 80,
+    justifyContent: "center",
+    alignItems: "center",
   },
   buttonCorrectActive: {
     backgroundColor: colors.accent,
@@ -152,21 +130,5 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
     borderWidth: 1.5,
     borderColor: colors.redTeam,
-  },
-  buttonIcon: {
-    marginRight: 4,
-  },
-  buttonLabel: {
-    fontFamily: typography.families.bodyBold,
-    fontSize: typography.sizes.sm,
-  },
-  buttonLabelActive: {
-    color: "#FFFFFF",
-  },
-  buttonLabelCorrectInactive: {
-    color: colors.accent,
-  },
-  buttonLabelFailInactive: {
-    color: colors.redTeam,
   },
 });

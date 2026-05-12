@@ -1,8 +1,10 @@
 import React from "react";
-import { View } from "react-native";
+import { ImageBackground } from "react-native";
 import { Text } from "react-native-paper";
 
 import { styles } from "../../game-turn-screen.styles";
+
+const cardBgImage = require("../../../../assets/card-bg.png");
 
 type GameTurnPlayingWordCardProps = {
   cardText: string;
@@ -12,11 +14,18 @@ export function GameTurnPlayingWordCard({
   cardText,
 }: GameTurnPlayingWordCardProps) {
   return (
-    <View style={styles.playingWordCard}>
+    <ImageBackground
+      source={cardBgImage}
+      style={styles.playingWordCard}
+      resizeMode="cover"
+    >
       <Text style={styles.playingWordLabel}>PALABRA</Text>
-      <Text style={styles.playingWordText} numberOfLines={3}>
+      <Text
+        style={styles.playingWordText}
+        textBreakStrategy="simple"
+      >
         {cardText}
       </Text>
-    </View>
+    </ImageBackground>
   );
 }

@@ -10,6 +10,7 @@ export const useDecks = () => {
   const loadDecks = useCallback(async () => {
     try {
       setLoading(true);
+      await database.syncDefaultDecks();
       const data = await database.getMazos();
       setDecks(data);
       setError(null);

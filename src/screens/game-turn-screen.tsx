@@ -1,12 +1,16 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { View, Alert, BackHandler, ImageBackground } from "react-native";
 import { Text, Button } from "react-native-paper";
-import { SafeAreaView } from "react-native-safe-area-context";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 import { router, useFocusEffect } from "expo-router";
+import { setAudioModeAsync, useAudioPlayer, type AudioPlayer } from "expo-audio";
 
 import { useGameStore, TURN_TIME } from "../store/game-store";
 import { TimerEngine } from "../engine/timer-engine";
-import { colors } from "../theme/theme";
+import { colors, spacing } from "../theme/theme";
 import { CustomScreen } from "../shared/components/CustomScreen";
 import { AppHeader } from "../shared/components/app-header";
 import { AppHeaderIconButton } from "../shared/components/app-header-icon-button";
@@ -20,10 +24,14 @@ import { GameTurnPlayingHeaderLeft } from "./game-turn/components/game-turn-play
 import { GameTurnPlayingStatsRow } from "./game-turn/components/game-turn-playing-stats-row";
 import { GameTurnPlayingWordCard } from "./game-turn/components/game-turn-playing-word-card";
 import { styles } from "./game-turn-screen.styles";
+import { DotsBackground } from "../shared/components/DotsBackground";
 
 const backgroundImage = require("../../assets/background.jpg");
+const successSoundAsset = require("../../assets/sound/success.mp3");
+const errorSoundAsset = require("../../assets/sound/error.wav");
 
 const GameTurnScreen: React.FC = () => {
+  const insets = useSafeAreaInsets();
   const {
     currentPhase,
     currentTeam,
@@ -46,13 +54,12 @@ const GameTurnScreen: React.FC = () => {
   );
 
   const timerEngineRef = useRef<TimerEngine | null>(null);
+  const successPlayer = useAudioPlayer(successSoundAsset);
+  const errorPlayer = useAudioPlayer(errorSoundAsset);
 
   const currentTeamData = teams[currentTeam];
   const currentPlayer = currentTeamData.players[currentPlayerIndex];
   const currentCard = phaseCards[currentCardIndex];
-  console.log("currentCard", currentCard);
-  console.log("currentCardIndex", currentCardIndex);
-  console.log("phaseCards", phaseCards);
   const cardsRemaining = phaseCards.length - currentCardIndex;
 
   const handleExitGame = useCallback(() => {
@@ -97,6 +104,28 @@ const GameTurnScreen: React.FC = () => {
     };
   }, []);
 
+  useEffect(() => {
+    void setAudioModeAsync({
+      playsInSilentMode: true,
+      interruptionMode: "duckOthers",
+      interruptionModeAndroid: "duckOthers",
+      allowsRecording: false,
+      shouldPlayInBackground: false,
+      shouldRouteThroughEarpiece: false,
+    });
+  }, []);
+
+  const playFeedback = useCallback((player: AudioPlayer) => {
+    void player
+      .seekTo(0)
+      .then(() => {
+        player.play();
+      })
+      .catch(() => {
+        player.play();
+      });
+  }, []);
+
   const handleTimeUp = useCallback(() => {
     setIsTimerRunning(false);
     setGamePhase("preparation");
@@ -128,6 +157,7 @@ const GameTurnScreen: React.FC = () => {
 
   const handleCorrect = () => {
     if (!currentCard) return;
+    playFeedback(successPlayer);
 
     markCardCorrect(currentCard);
 
@@ -144,6 +174,7 @@ const GameTurnScreen: React.FC = () => {
 
   const handleIncorrect = () => {
     if (!currentCard) return;
+    playFeedback(errorPlayer);
 
     markCardIncorrect(currentCard);
 
@@ -210,11 +241,19 @@ const GameTurnScreen: React.FC = () => {
                   />
                 }
               />
-              <View style={styles.prepContent}>
+              <View
+                style={[
+                  styles.prepContent,
+                  {
+                    paddingLeft: spacing.lg + insets.left,
+                    paddingRight: spacing.lg + insets.right,
+                    paddingBottom: spacing.xl + insets.bottom,
+                  },
+                ]}
+              >
                 <View style={styles.prepMainBlock}>
                   <GameTurnPrepTeamPill teamKey={currentTeam} />
                   <GameTurnPrepTurnHeading
-                    turnNumber={currentPlayerIndex + 1}
                   />
                   <GameTurnPrepPlayerCard name={currentPlayer.name} />
                   <GameTurnPrepStatsRow
@@ -233,8 +272,18 @@ const GameTurnScreen: React.FC = () => {
 
   return (
     <CustomScreen hideBackground contentStyle={styles.screenContent}>
-      <View style={styles.playingWhiteBg}>
+      <View
+        style={[
+          styles.playingWhiteBg,
+          {
+            paddingLeft: insets.left,
+            paddingRight: insets.right,
+            paddingBottom: insets.bottom,
+          },
+        ]}
+      >
         <View style={styles.prepInner}>
+        <DotsBackground />
           <AppHeader
             title="Party Fun 2"
             right={

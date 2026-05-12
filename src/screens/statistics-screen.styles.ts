@@ -318,7 +318,7 @@ export const styles = StyleSheet.create({
   },
   historyChipPrecisionText: {
     fontSize: typography.sizes.xs,
-    color: colors.accent,
+    color: colors.primary,
     marginVertical: 0,
   },
   footerDock: {

@@ -1,4 +1,4 @@
-import { Platform, StyleSheet } from "react-native";
+import { StyleSheet } from "react-native";
 
 import {
   borderRadius,
@@ -11,7 +11,7 @@ export const styles = StyleSheet.create({
   outer: {
     paddingHorizontal: spacing.sm,
     paddingBottom: spacing.xs,
-    zIndex: 2,
+    zIndex: 2,  
   },
   elevatedCard: {
     backgroundColor: "#ffffff",
