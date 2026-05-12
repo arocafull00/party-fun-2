@@ -30,24 +30,15 @@ export const StatisticsTeamWinsSection: React.FC<
       </View>
       <View style={styles.teamsRow}>
         <View style={[styles.teamPanel, styles.teamPanelBlue]}>
-          <Icon source="shield-star" size={32} color={colors.primary} />
           <Text style={styles.teamCountBlue}>{statistics.gamesWonByBlue}</Text>
           <Text style={styles.teamName}>Equipo Azul</Text>
           <View style={styles.teamPillBlue}>
             <Text style={styles.teamPillTextBlue}>{winPercentages.blue}%</Text>
           </View>
         </View>
-        <View style={styles.vsCluster}>
-          <View style={styles.vsTickLeft} />
-          <View style={styles.vsCircle}>
-            <Text style={styles.vsText}>VS</Text>
-          </View>
-          <View style={styles.vsTickRight} />
-        </View>
         <View style={[styles.teamPanel, styles.teamPanelRed]}>
-          <Icon source="shield-star" size={32} color={colors.accent} />
           <Text style={styles.teamCountRed}>{statistics.gamesWonByRed}</Text>
-          <Text style={styles.teamName}>Equipo Rojo</Text>
+          <Text style={styles.teamNameRed}>Equipo Rojo</Text>
           <View style={styles.teamPillRed}>
             <Text style={styles.teamPillTextRed}>{winPercentages.red}%</Text>
           </View>

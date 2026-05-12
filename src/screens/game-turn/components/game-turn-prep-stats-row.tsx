@@ -25,7 +25,7 @@ export function GameTurnPrepStatsRow({
         label="RESTANTES"
         value={`x${remaining}`}
         icon="timer-sand"
-        variant="remaining"
+        variant="round"
       />
     </View>
   );

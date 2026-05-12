@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   StyleSheet,
@@ -6,6 +6,7 @@ import {
   Alert,
   Pressable,
   TextInput as RNTextInput,
+  ActivityIndicator,
 } from "react-native";
 import {
   Text,
@@ -15,12 +16,14 @@ import {
   Portal,
   HelperText,
 } from "react-native-paper";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { AppHeader } from "../shared/components/app-header";
 import { AppHeaderIconButton } from "../shared/components/app-header-icon-button";
 import { useCreateDeck } from "../hooks/useCreateDeck";
+import { useEditDeck } from "../hooks/useEditDeck";
+import { database } from "../database/database";
 import { borderRadius, colors, spacing, typography } from "../theme/theme";
 import { DotsBackground } from "../shared/components/DotsBackground";
 import { CreateDeckWordRow } from "./create-deck/CreateDeckWordRow";
@@ -33,15 +36,43 @@ const LIGHT_INPUT_BORDER = "#D1D5DB";
 const EMPTY_CARD_BG = "#E3F0FF";
 
 const CreateDeckScreen: React.FC = () => {
+  const { id } = useLocalSearchParams<{ id?: string }>();
+  const isEditMode = !!id;
+  const deckId = id ? Number(id) : undefined;
+
   const insets = useSafeAreaInsets();
   const { createDeck, loading: saving } = useCreateDeck();
+  const { editDeck, loading: savingEdit } = useEditDeck();
   const [currentCard, setCurrentCard] = useState("");
   const [cards, setCards] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
+  const [isLoadingDeck, setIsLoadingDeck] = useState(false);
   const [cardError, setCardError] = useState("");
   const [showNameModal, setShowNameModal] = useState(false);
   const [deckName, setDeckName] = useState("");
   const [nameError, setNameError] = useState("");
+
+  useEffect(() => {
+    if (deckId) {
+      setIsLoadingDeck(true);
+      database
+        .getMazo(deckId)
+        .then((mazo) => {
+          if (mazo) {
+            setDeckName(mazo.nombre);
+          }
+          return database.getCartasByMazo(deckId);
+        })
+        .then((cartas) => {
+          setCards(cartas.map((c) => c.texto));
+        })
+        .catch((err) => {
+          console.error("Error loading deck:", err);
+          Alert.alert("Error", "No se pudo cargar la baraja");
+        })
+        .finally(() => setIsLoadingDeck(false));
+    }
+  }, [deckId]);
 
   const validateCard = (card: string): boolean => {
     const cardTrimmed = card.trim();
@@ -109,14 +140,23 @@ const CreateDeckScreen: React.FC = () => {
 
     setLoading(true);
     try {
-      await createDeck(deckName.trim(), cards);
-
-      setShowNameModal(false);
-      Alert.alert(
-        "Mazo creado",
-        `Se ha creado el mazo "${deckName.trim()}" con ${cards.length} cartas`,
-        [{ text: "OK", onPress: () => router.back() }]
-      );
+      if (isEditMode && deckId) {
+        await editDeck(deckId, deckName.trim(), cards);
+        setShowNameModal(false);
+        Alert.alert(
+          "Mazo actualizado",
+          `Se ha actualizado el mazo "${deckName.trim()}" con ${cards.length} cartas`,
+          [{ text: "OK", onPress: () => router.back() }]
+        );
+      } else {
+        await createDeck(deckName.trim(), cards);
+        setShowNameModal(false);
+        Alert.alert(
+          "Mazo creado",
+          `Se ha creado el mazo "${deckName.trim()}" con ${cards.length} cartas`,
+          [{ text: "OK", onPress: () => router.back() }]
+        );
+      }
     } catch (error) {
       console.error("Error saving deck:", error);
       Alert.alert(
@@ -130,7 +170,9 @@ const CreateDeckScreen: React.FC = () => {
 
   const handleCloseModal = () => {
     setShowNameModal(false);
-    setDeckName("");
+    if (!isEditMode) {
+      setDeckName("");
+    }
     setNameError("");
   };
 
@@ -168,7 +210,7 @@ const CreateDeckScreen: React.FC = () => {
           <View style={styles.editorCard}>
             <View style={styles.headerBadgeRow}>
               <View style={styles.badgeWords}>
-                <Icon source="file-document-outline" size={18} color={colors.primary} />
+                <Icon source="file-document-outline" size={16} color={colors.primary} />
                 <Text style={styles.badgeWordsLabel}>{cards.length} Palabras</Text>
               </View>
             </View>
@@ -179,7 +221,7 @@ const CreateDeckScreen: React.FC = () => {
                 <Text style={styles.editorSubtitle}>Añade todas las palabras que quieras!</Text>
               </View>
               <View style={styles.illustration}>
-                <Icon source="cards-playing-outline" size={42} color={colors.primary} />
+                <Icon source="cards-playing-outline" size={32} color={colors.primary} />
               </View>
             </View>
 
@@ -278,10 +320,10 @@ const CreateDeckScreen: React.FC = () => {
               labelStyle={styles.saveButtonLabel}
               disabled={cards.length === 0}
               icon="content-save"
-              loading={loading || saving}
+              loading={loading || saving || savingEdit}
               buttonColor={colors.primary}
             >
-              Guardar Baraja
+              {isEditMode ? "Guardar Cambios" : "Guardar Baraja"}
             </Button>
           </View>
         </View>
@@ -295,7 +337,7 @@ const CreateDeckScreen: React.FC = () => {
           contentContainerStyle={styles.modalContainer}
         >
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Nombra tu mazo</Text>
+            <Text style={styles.modalTitle}>{isEditMode ? "Editar nombre del mazo" : "Nombra tu mazo"}</Text>
             <Text style={styles.modalSubtitle}>
               Dale un nombre descriptivo a tu mazo de {cards.length} cartas
             </Text>
@@ -334,6 +376,13 @@ const CreateDeckScreen: React.FC = () => {
           </View>
         </Modal>
       </Portal>
+
+      {isLoadingDeck ? (
+        <View style={styles.loadingOverlay}>
+          <ActivityIndicator size="large" color={colors.primary} />
+          <Text style={styles.loadingText}>Cargando baraja...</Text>
+        </View>
+      ) : null}
     </View>
   );
 };
@@ -367,8 +416,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   editorCard: {
-    padding: spacing.lg,
-    gap: spacing.md,
+    padding: spacing.md,
+    gap: spacing.sm,
   },
   headerBadgeRow: {
     flexDirection: "row",
@@ -410,26 +459,26 @@ const styles = StyleSheet.create({
   titleRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: spacing.md,
+    gap: spacing.sm,
   },
   titleTexts: {
     flex: 1,
-    gap: 4,
+    gap: 2,
   },
   editorTitle: {
     fontFamily: typography.families.bodyBold,
-    fontSize: typography.sizes.xxl,
+    fontSize: typography.sizes.xl,
     color: NAVY,
   },
   editorSubtitle: {
     fontFamily: typography.families.body,
-    fontSize: typography.sizes.md,
+    fontSize: typography.sizes.sm,
     color: GREY_MUTED,
-    lineHeight: 22,
+    lineHeight: 18,
   },
   illustration: {
-    width: 72,
-    height: 64,
+    width: 56,
+    height: 48,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -453,15 +502,15 @@ const styles = StyleSheet.create({
     gap: 10,
     borderWidth: 1,
     borderColor: LIGHT_INPUT_BORDER,
-    borderRadius: 14,
+    borderRadius: 12,
     backgroundColor: "#fff",
     paddingLeft: 10,
     paddingRight: 12,
-    minHeight: 52,
+    minHeight: 46,
   },
   inputGlyph: {
-    width: 36,
-    height: 36,
+    width: 32,
+    height: 32,
     borderRadius: 10,
     backgroundColor: "#DBEAFE",
     alignItems: "center",
@@ -469,7 +518,7 @@ const styles = StyleSheet.create({
   },
   inputGlyphText: {
     fontFamily: typography.families.bodyBold,
-    fontSize: typography.sizes.lg,
+    fontSize: typography.sizes.md,
     color: colors.primary,
   },
   nativeInput: {
@@ -477,7 +526,7 @@ const styles = StyleSheet.create({
     fontFamily: typography.families.body,
     fontSize: typography.sizes.md,
     color: NAVY,
-    paddingVertical: 10,
+    paddingVertical: 8,
   },
   errorText: {
     marginTop: -4,
@@ -486,9 +535,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    gap: 12,
-    minHeight: 54,
-    borderRadius: 16,
+    gap: 10,
+    minHeight: 46,
+    borderRadius: 14,
     borderWidth: 2,
     borderColor: colors.primary,
     backgroundColor: "#fff",
@@ -500,16 +549,16 @@ const styles = StyleSheet.create({
     opacity: 0.85,
   },
   addIconCircle: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
+    width: 30,
+    height: 30,
+    borderRadius: 15,
     backgroundColor: colors.primary,
     alignItems: "center",
     justifyContent: "center",
   },
   addOutlineLabel: {
     fontFamily: typography.families.bodyBold,
-    fontSize: typography.sizes.md,
+    fontSize: typography.sizes.sm,
     color: colors.primary,
     letterSpacing: 0.8,
   },
@@ -649,6 +698,19 @@ const styles = StyleSheet.create({
   },
   modalSaveButton: {
     backgroundColor: colors.primary,
+    color: colors.text,
+  },
+  loadingOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(255, 251, 245, 0.85)",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: spacing.md,
+    zIndex: 10,
+  },
+  loadingText: {
+    fontFamily: typography.families.bodyBold,
+    fontSize: typography.sizes.md,
     color: colors.text,
   },
 });

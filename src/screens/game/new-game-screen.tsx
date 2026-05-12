@@ -5,11 +5,11 @@ import { router } from "expo-router";
 
 import { useDecks } from "../../hooks/useDecks";
 import { useGameStore, Player } from "../../store/game-store";
+import { database } from "../../database/database";
 import { CustomScreen } from "../../shared/components/CustomScreen";
 import { FocusTextInput } from "../../shared/components/FocusTextInput";
 import { AppHeader } from "../../shared/components/app-header";
 import { AppHeaderIconButton } from "../../shared/components/app-header-icon-button";
-import { SparkleBurst } from "../home/components/SparkleBurst";
 import NewGameDeckCard from "./components/new-game-deck-card";
 import NewGameContinueButton from "./components/new-game-continue-button";
 import TeamCard from "./components/TeamCard";
@@ -77,24 +77,34 @@ const NewGameScreen: React.FC = () => {
   };
 
   const handleOpenDeckSelection = () => {
-    router.push("/deck-selection");
+    router.push("/deck-management?selectMode=true");
   };
 
-  const handleStartGame = () => {
+  const handleStartGame = async () => {
     if (!selectedDeck) {
-      router.push("/deck-selection");
+      router.push("/deck-management?selectMode=true");
       return;
     }
     if (teams.azul.players.length === 0 || teams.rojo.players.length === 0) {
       Alert.alert("Equipos incompletos", "Cada equipo debe tener al menos un jugador");
       return;
     }
-    startGameConfirmed();
+    await startGameConfirmed();
   };
 
-  const startGameConfirmed = () => {
+  const startGameConfirmed = async () => {
     try {
-      const cardsList = useGameStore.getState().cards.map((c) => c.texto);
+      if (!selectedDeck) {
+        Alert.alert("Error", "No hay un mazo seleccionado");
+        return;
+      }
+      const cartas = await database.getCartasByMazo(selectedDeck.id);
+      const cardsList = cartas.map((c) => c.texto);
+      if (cardsList.length === 0) {
+        Alert.alert("Mazo vacío", "El mazo seleccionado no tiene cartas");
+        return;
+      }
+      console.log("cardsList", cardsList);
       startGame(cardsList);
       router.push("/game-turn");
     } catch (error) {
@@ -121,7 +131,6 @@ const NewGameScreen: React.FC = () => {
         <View style={styles.headerTitleBlock}>
           <View style={styles.titleRow}>
             <Text style={styles.mainTitle}>Configura tu Partida</Text>
-            <SparkleBurst />
           </View>
           <Text style={styles.mainSubtitle}>
             Añade a los jugadores y elige su bando para comenzar.

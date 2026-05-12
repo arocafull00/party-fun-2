@@ -1,8 +1,6 @@
 import React from "react";
 import { Pressable, View } from "react-native";
-import { Icon } from "react-native-paper";
-
-import { colors } from "../../../theme/theme";
+import { Icon, Text } from "react-native-paper";
 
 import { styles } from "../../game-turn-screen.styles";
 
@@ -18,19 +16,16 @@ export function GameTurnPlayingIncorrectButton({
       accessibilityRole="button"
       onPress={onPress}
       style={({ pressed }) => [
-        styles.playingRoundActionHit,
+        styles.playingIncorrectButton,
         pressed && styles.playingRoundActionPressed,
       ]}
     >
-      <View style={styles.playingRoundActionInner}>
-        <View style={styles.playingIncorrectDecorWrap}>
-          <View style={[styles.playingIncorrectRay, styles.playingIncorrectRayA]} />
-          <View style={[styles.playingIncorrectRay, styles.playingIncorrectRayB]} />
-          <View style={[styles.playingIncorrectRay, styles.playingIncorrectRayC]} />
+      <View style={styles.playingButtonContent}>
+        <View style={styles.playingButtonIconCircle}>
+          <Icon source="close" size={32} color="#ffffff" />
         </View>
-        <View style={styles.playingIncorrectCircle}>
-          <Icon source="close" size={48} color={'#ffffff'} />
-        </View>
+        <Text style={styles.playingButtonMainText}>NO</Text>
+        <Text style={styles.playingButtonSubText}>HE FALLADO</Text>
       </View>
     </Pressable>
   );

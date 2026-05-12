@@ -2,7 +2,7 @@ import React from "react";
 import { ScrollView, View } from "react-native";
 import { Button } from "react-native-paper";
 
-import { styles } from "../home-screen.styles";
+import { homeScreenColors, styles } from "../home-screen.styles";
 import { HomeLogoSection } from "./HomeLogoSection";
 import { useRouter } from "expo-router";
 
@@ -25,26 +25,47 @@ export const HomeMainContent: React.FC = () => {
       >
         <View style={styles.mainActionsColumn}>
           <HomeLogoSection />
-          <Button mode="contained" onPress={onNewGame}>
+          <Button
+            mode="elevated"
+            onPress={onNewGame}
+            icon="play"
+            buttonColor={homeScreenColors.ctaBlue}
+            textColor="#FFFFFF"
+            style={styles.homePrimaryButton}
+            contentStyle={styles.homePrimaryButtonContent}
+            labelStyle={styles.homePrimaryButtonLabel}
+          >
             Nueva partida
           </Button>
           <View style={styles.actionButtons}>
             <View style={styles.actionButtonItem}>
               <Button
-                mode="contained-tonal"
+                mode="contained"
                 onPress={onOpenDeckManagement}
                 icon="cards"
+                buttonColor="transparent"
+                textColor="#FFFFFF"
+                rippleColor="rgba(255, 255, 255, 0.18)"
+                style={styles.homeSecondaryButton}
+                contentStyle={styles.homeSecondaryButtonContent}
+                labelStyle={styles.homeSecondaryButtonLabel}
               >
-                CARTAS
+                Cartas
               </Button>
             </View>
             <View style={styles.actionButtonItem}>
               <Button
-                mode="contained-tonal"
+                mode="contained"
                 onPress={onOpenStatistics}
                 icon="clipboard-text-outline"
+                buttonColor="transparent"
+                textColor="#FFFFFF"
+                rippleColor="rgba(255, 255, 255, 0.18)"
+                style={styles.homeSecondaryButton}
+                contentStyle={styles.homeSecondaryButtonContent}
+                labelStyle={styles.homeSecondaryButtonLabel}
               >
-                REGLAS
+                Reglas
               </Button>
             </View>
           </View>

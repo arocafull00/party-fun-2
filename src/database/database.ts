@@ -88,6 +88,37 @@ class DatabaseManager {
     }
   }
 
+  async getMazo(id: number): Promise<Mazo | undefined> {
+    this.ensureInitialized();
+
+    try {
+      const result = await this.db.select().from(schema.mazos).where(eq(schema.mazos.id, id));
+      return result[0];
+    } catch (error) {
+      console.error('Error getting mazo:', error);
+      throw error;
+    }
+  }
+
+  async updateMazoWithCards(id: number, nombre: string, cards: string[]): Promise<void> {
+    this.ensureInitialized();
+
+    try {
+      await this.db.update(schema.mazos)
+        .set({ nombre })
+        .where(eq(schema.mazos.id, id));
+
+      await this.db.delete(schema.cartas).where(eq(schema.cartas.mazoId, id));
+
+      for (const card of cards) {
+        await this.addCarta(id, card);
+      }
+    } catch (error) {
+      console.error('Error updating mazo with cards:', error);
+      throw error;
+    }
+  }
+
   // Carta methods
   async addCarta(mazo_id: number, texto: string): Promise<number> {
     this.ensureInitialized();
@@ -115,6 +146,20 @@ class DatabaseManager {
       return result;
     } catch (error) {
       console.error('Error getting cartas by mazo:', error);
+      throw error;
+    }
+  }
+
+  async countCartasByMazo(mazo_id: number): Promise<number> {
+    this.ensureInitialized();
+
+    try {
+      const result = await this.db.select({ value: count() })
+        .from(schema.cartas)
+        .where(eq(schema.cartas.mazoId, mazo_id));
+      return result[0]?.value ?? 0;
+    } catch (error) {
+      console.error('Error counting cartas by mazo:', error);
       throw error;
     }
   }

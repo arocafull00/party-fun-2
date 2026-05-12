@@ -77,7 +77,7 @@ export const styles = StyleSheet.create({
     justifyContent: "center",
   },
   generalGlyphTintBlue: {
-    backgroundColor: colors.secondary,
+    backgroundColor: colors.background,
   },
   generalGlyphTintRed: {
     backgroundColor: colors.secondary,
@@ -111,11 +111,15 @@ export const styles = StyleSheet.create({
   },
   teamsRow: {
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "stretch",
+    gap: spacing.lg,
     marginTop: spacing.xs,
   },
   teamPanel: {
-    flex: 1,
+    flexGrow: 1,
+    flexShrink: 1,
+    flexBasis: 0,
+    minWidth: 0,
     paddingVertical: spacing.lg,
     paddingHorizontal: spacing.sm,
     borderRadius: borderRadius.xl,
@@ -124,11 +128,9 @@ export const styles = StyleSheet.create({
   },
   teamPanelBlue: {
     backgroundColor: colors.secondary,
-    marginRight: -spacing.sm,
   },
   teamPanelRed: {
-    backgroundColor: colors.secondary,
-    marginLeft: -spacing.sm,
+    backgroundColor: colors.redTeam,
   },
   teamCountBlue: {
     fontFamily: typography.families.heading,
@@ -139,13 +141,19 @@ export const styles = StyleSheet.create({
   teamCountRed: {
     fontFamily: typography.families.heading,
     fontSize: typography.sizes.xxxl,
-    color: colors.accent,
+    color: colors.background,
     lineHeight: typography.sizes.xxxl + spacing.xs,
   },
   teamName: {
     fontFamily: typography.families.bodyBold,
     fontSize: typography.sizes.sm,
     color: colors.text,
+    textAlign: "center",
+  },
+  teamNameRed: {
+    fontFamily: typography.families.bodyBold,
+    fontSize: typography.sizes.sm,
+    color: colors.background,
     textAlign: "center",
   },
   teamPillBlue: {
@@ -159,7 +167,7 @@ export const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.xs,
     borderRadius: borderRadius.full,
-    backgroundColor: colors.accent,
+    backgroundColor: colors.background,
     marginTop: spacing.xs,
   },
   teamPillTextBlue: {
@@ -170,7 +178,7 @@ export const styles = StyleSheet.create({
   teamPillTextRed: {
     fontFamily: typography.families.bodyBold,
     fontSize: typography.sizes.xs,
-    color: colors.accent,
+    color: colors.text,
   },
   vsCluster: {
     width: spacing.xxxl + spacing.sm,

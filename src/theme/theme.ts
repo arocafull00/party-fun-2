@@ -6,6 +6,7 @@ export const colors = {
   primary: '#005ab2',
   secondary: '#99c7d3',
   accent: '#76bccf',
+  redTeam: '#c05555',
 };
 
 export const spacing = {
@@ -75,6 +76,7 @@ export const theme = {
     error: colors.accent,
     outline: colors.secondary,
     outlineVariant: colors.secondary,
+    redTeam: colors.redTeam,
   },
   roundness: borderRadius.md,
   fonts: {

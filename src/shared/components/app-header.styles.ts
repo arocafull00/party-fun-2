@@ -19,8 +19,14 @@ export const styles = StyleSheet.create({
     paddingVertical: spacing.xs,
     paddingHorizontal: spacing.xs,
   },
-  elevatedCardTransparent: {
+  elevatedCardGame: {
     backgroundColor: "transparent",
+  },
+  titleGame: {
+    color: "#ffffff",
+  },
+  subtitleGame: {
+    color: "rgba(255,255,255,0.88)",
   },
   barRow: {
     flexDirection: "row",

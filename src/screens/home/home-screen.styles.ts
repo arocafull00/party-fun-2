@@ -63,6 +63,39 @@ export const styles = StyleSheet.create({
   },
   actionButtonItem: {
     flex: 1,
+    minWidth: 0,
+  },
+  homePrimaryButton: {
+    width: "100%",
+    borderRadius: borderRadius.full,
+  },
+  homePrimaryButtonContent: {
+    minHeight: 52,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.lg,
+    gap: spacing.sm,
+  },
+  homePrimaryButtonLabel: {
+    fontFamily: typography.families.bodyBold,
+    fontSize: typography.sizes.lg,
+    letterSpacing: 0.15,
+  },
+  homeSecondaryButton: {
+    borderRadius: borderRadius.full,
+    borderWidth: 1.5,
+    borderColor: "rgba(255, 255, 255, 0.45)",
+    backgroundColor: "rgba(255, 255, 255, 0.14)",
+  },
+  homeSecondaryButtonContent: {
+    minHeight: 48,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.lg,
+    gap: spacing.sm,
+  },
+  homeSecondaryButtonLabel: {
+    fontFamily: typography.families.bodyBold,
+    fontSize: typography.sizes.lg,
+    letterSpacing: 0.2,
   },
   emptyCard: {
     width: "100%",

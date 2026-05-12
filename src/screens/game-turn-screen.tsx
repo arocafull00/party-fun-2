@@ -1,10 +1,10 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { View, Alert, BackHandler, ImageBackground } from "react-native";
-import { Text, Button, Dialog, Portal } from "react-native-paper";
+import { Text, Button } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router, useFocusEffect } from "expo-router";
 
-import { useGameStore } from "../store/game-store";
+import { useGameStore, TURN_TIME } from "../store/game-store";
 import { TimerEngine } from "../engine/timer-engine";
 import { colors } from "../theme/theme";
 import { CustomScreen } from "../shared/components/CustomScreen";
@@ -16,14 +16,10 @@ import { GameTurnPrepPlayerCard } from "./game-turn/components/game-turn-prep-pl
 import { GameTurnPrepStatsRow } from "./game-turn/components/game-turn-prep-stats-row";
 import { GameTurnPrepStartButton } from "./game-turn/components/game-turn-prep-start-button";
 import { GameTurnPlayingActionRow } from "./game-turn/components/game-turn-playing-action-row";
-import { GameTurnPlayingBackground } from "./game-turn/components/game-turn-playing-background";
-import { GameTurnPlayingFooter } from "./game-turn/components/game-turn-playing-footer";
 import { GameTurnPlayingHeaderLeft } from "./game-turn/components/game-turn-playing-header-left";
 import { GameTurnPlayingStatsRow } from "./game-turn/components/game-turn-playing-stats-row";
 import { GameTurnPlayingWordCard } from "./game-turn/components/game-turn-playing-word-card";
 import { styles } from "./game-turn-screen.styles";
-
-const TURN_TIME = 30;
 
 const backgroundImage = require("../../assets/background.jpg");
 
@@ -36,6 +32,7 @@ const GameTurnScreen: React.FC = () => {
     timer,
     currentCardIndex,
     phaseCards,
+    currentTurnCards,
     setTimer,
     setIsTimerRunning,
     markCardCorrect,
@@ -44,7 +41,6 @@ const GameTurnScreen: React.FC = () => {
     gameStarted,
   } = useGameStore();
 
-  const [showExitDialog, setShowExitDialog] = useState(false);
   const [gamePhase, setGamePhase] = useState<"preparation" | "playing">(
     "preparation"
   );
@@ -54,12 +50,31 @@ const GameTurnScreen: React.FC = () => {
   const currentTeamData = teams[currentTeam];
   const currentPlayer = currentTeamData.players[currentPlayerIndex];
   const currentCard = phaseCards[currentCardIndex];
+  console.log("currentCard", currentCard);
+  console.log("currentCardIndex", currentCardIndex);
+  console.log("phaseCards", phaseCards);
   const cardsRemaining = phaseCards.length - currentCardIndex;
+
+  const handleExitGame = useCallback(() => {
+    timerEngineRef.current?.stop();
+    router.push("/");
+  }, []);
+
+  const confirmExitGame = useCallback(() => {
+    Alert.alert(
+      "Terminar Partida",
+      "¿Quieres terminar la partida? Se perderá todo el progreso del juego.",
+      [
+        { text: "Cancelar", style: "cancel" },
+        { text: "Terminar", onPress: handleExitGame },
+      ]
+    );
+  }, [handleExitGame]);
 
   useFocusEffect(
     useCallback(() => {
       const onBackPress = () => {
-        setShowExitDialog(true);
+        confirmExitGame();
         return true;
       };
 
@@ -69,7 +84,7 @@ const GameTurnScreen: React.FC = () => {
       );
 
       return () => subscription.remove();
-    }, [])
+    }, [confirmExitGame])
   );
 
   useEffect(() => {
@@ -154,24 +169,6 @@ const GameTurnScreen: React.FC = () => {
     router.push("/turn-review");
   };
 
-  const handleExitGame = () => {
-    timerEngineRef.current?.stop();
-    setShowExitDialog(false);
-    router.push("/");
-  };
-
-  const phaseLabel =
-    currentPhase === 1
-      ? "PISTA LIBRE"
-      : currentPhase === 2
-        ? "¡UNA PALABRA!"
-        : "MÍMICA";
-
-  const deckProgress =
-    phaseCards.length > 0
-      ? Math.min(1, (currentCardIndex + 1) / phaseCards.length)
-      : 0;
-
   if (!gameStarted || !currentPlayer) {
     return (
       <SafeAreaView style={styles.container}>
@@ -203,13 +200,13 @@ const GameTurnScreen: React.FC = () => {
             <View style={styles.prepRoot}>
             <View style={styles.prepInner}>
               <AppHeader
+                variant="game"
                 title="Party Fun 2"
-                left={<AppHeaderIconButton icon="account" />}
                 right={
                   <AppHeaderIconButton
-                    icon="cog"
-                    iconColor={colors.primary}
-                    onPress={() => setShowExitDialog(true)}
+                    icon="exit-to-app"
+                    iconColor="#ffffff"
+                    onPress={confirmExitGame}
                   />
                 }
               />
@@ -230,86 +227,43 @@ const GameTurnScreen: React.FC = () => {
             </View>
           </View>
         </ImageBackground>
-        <Portal>
-          <Dialog
-            visible={showExitDialog}
-            onDismiss={() => setShowExitDialog(false)}
-          >
-            <Dialog.Title>Terminar Partida</Dialog.Title>
-            <Dialog.Content>
-              <Text>
-                ¿Quieres terminar la partida? Se perderá todo el progreso del
-                juego.
-              </Text>
-            </Dialog.Content>
-            <Dialog.Actions>
-              <Button onPress={() => setShowExitDialog(false)}>Cancelar</Button>
-              <Button onPress={handleExitGame} textColor={colors.accent}>
-                Terminar
-              </Button>
-            </Dialog.Actions>
-          </Dialog>
-        </Portal>
       </CustomScreen>
     );
   }
 
   return (
     <CustomScreen hideBackground contentStyle={styles.screenContent}>
-      <GameTurnPlayingBackground>
+      <View style={styles.playingWhiteBg}>
         <View style={styles.prepInner}>
           <AppHeader
             title="Party Fun 2"
-            left={<GameTurnPlayingHeaderLeft playerName={currentPlayer.name} />}
             right={
               <AppHeaderIconButton
-                icon="cog"
+                icon="exit-to-app"
                 iconColor={colors.primary}
-                onPress={() => setShowExitDialog(true)}
+                onPress={confirmExitGame}
               />
             }
           />
           <View style={styles.screen}>
             <GameTurnPlayingStatsRow
-              rojoScore={teams.rojo.score}
-              azulScore={teams.azul.score}
+              playerName={currentPlayer.name}
+              currentTeam={currentTeam}
+              correctCount={currentTurnCards.correct.length}
+              incorrectCount={currentTurnCards.incorrect.length}
               timerSeconds={timer}
               maxTimerSeconds={TURN_TIME}
             />
             <GameTurnPlayingWordCard
-              phase={currentPhase}
               cardText={currentCard ?? ""}
-              progressInDeck={deckProgress}
             />
             <GameTurnPlayingActionRow
-              phaseLabel={phaseLabel}
               onIncorrect={handleIncorrect}
               onCorrect={handleCorrect}
             />
-            <GameTurnPlayingFooter playerName={currentPlayer.name} />
           </View>
         </View>
-      </GameTurnPlayingBackground>
-      <Portal>
-        <Dialog
-          visible={showExitDialog}
-          onDismiss={() => setShowExitDialog(false)}
-        >
-          <Dialog.Title>Terminar Partida</Dialog.Title>
-          <Dialog.Content>
-            <Text>
-              ¿Quieres terminar la partida? Se perderá todo el progreso del
-              juego.
-            </Text>
-          </Dialog.Content>
-          <Dialog.Actions>
-            <Button onPress={() => setShowExitDialog(false)}>Cancelar</Button>
-            <Button onPress={handleExitGame} textColor={colors.accent}>
-              Terminar
-            </Button>
-          </Dialog.Actions>
-        </Dialog>
-      </Portal>
+      </View>
     </CustomScreen>
   );
 };

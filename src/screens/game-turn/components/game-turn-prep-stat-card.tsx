@@ -3,7 +3,6 @@ import { View } from "react-native";
 import { Text, Icon } from "react-native-paper";
 
 import { colors } from "../../../theme/theme";
-import { SparkleBurst } from "../../home/components/SparkleBurst";
 import { styles } from "../../game-turn-screen.styles";
 
 type GameTurnPrepStatCardProps = {
@@ -39,9 +38,7 @@ export function GameTurnPrepStatCard({
       >
         <Text style={styles.prepStatLabel}>{label}</Text>
         <View style={styles.prepStatValueRow}>
-          <SparkleBurst streakColor={isRound ? colors.secondary : colors.secondary} />
           <Text style={styles.prepStatValue}>{value}</Text>
-          <SparkleBurst mirror streakColor={isRound ? colors.secondary : colors.secondary} />
         </View>
       </View>
     </View>

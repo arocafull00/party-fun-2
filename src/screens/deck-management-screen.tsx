@@ -11,20 +11,29 @@ import {
   Icon,
   ActivityIndicator,
 } from "react-native-paper";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 
 import { database, Mazo, Carta } from "../database/database";
 import { useDecks } from "../hooks/useDecks";
+import { useDeckWordCounts } from "../hooks/useDeckWordCounts";
 import { useGameStore } from "../store/game-store";
 import { borderRadius, colors, spacing, typography } from "../theme/theme";
 import { CustomScreen } from "../shared/components/CustomScreen";
 
 import { AppHeader } from "../shared/components/app-header";
 import { AppHeaderIconButton } from "../shared/components/app-header-icon-button";
+import { DotsBackground } from "../shared/components/DotsBackground";
+import { DeckListCard } from "./deck-list-card";
 
 export const DeckManagementScreen: React.FC = () => {
+  const { selectMode } = useLocalSearchParams<{ selectMode?: string }>();
+  const isSelectMode = selectMode === "true";
+
   const { decks, loading, refetch } = useDecks();
-  const [wordCounts, setWordCounts] = useState<Record<number, number>>({});
+  const wordCounts = useDeckWordCounts(decks);
+  const storeSetSelectedDeck = useGameStore((s) => s.setSelectedDeck);
+  const storeSetCards = useGameStore((s) => s.setCards);
+
   const [selectedDeck, setSelectedDeck] = useState<Mazo | null>(null);
   const [deckCards, setDeckCards] = useState<Carta[]>([]);
   const [showCardsModal, setShowCardsModal] = useState(false);
@@ -137,11 +146,6 @@ export const DeckManagementScreen: React.FC = () => {
     ]);
   };
 
-  const getDeckIcon = (index: number) => {
-    const icons = ["silverware-fork-knife", "compass-outline", "leaf", "castle"];
-    return icons[index % icons.length];
-  };
-
   const handleDeckBack = () => {
     if (router.canGoBack()) {
       router.back();
@@ -158,7 +162,6 @@ export const DeckManagementScreen: React.FC = () => {
           onPress={handleDeckBack}
         />
       }
-      right={<AppHeaderIconButton icon="cog-outline" />}
     />
   );
 
@@ -177,15 +180,15 @@ export const DeckManagementScreen: React.FC = () => {
 
   return (
     <CustomScreen contentStyle={styles.screenContent} header={deckManagementHeader}>
+      <DotsBackground />
       <View style={styles.screen}>
         <View style={styles.header}>
-          <Text style={styles.title}>Mis Barajas</Text>
-          <Text style={styles.subtitle}>Elige una baraja para empezar a jugar o crea una nueva.</Text>
-        </View>
-        <View style={styles.primaryAction}>
-          <Button mode="elevated" onPress={handleCreateNewDeck} icon="plus-circle">
-            Crear Nueva Baraja
-          </Button>
+          <Text style={styles.title}>{isSelectMode ? "Selecciona un Mazo" : "Mis Barajas"}</Text>
+          <Text style={styles.subtitle}>
+            {isSelectMode
+              ? "Elige una baraja para usar en la partida."
+              : "Elige una baraja para empezar a jugar o crea una nueva."}
+          </Text>
         </View>
         <ScrollView
           style={styles.content}
@@ -200,29 +203,33 @@ export const DeckManagementScreen: React.FC = () => {
           ) : null}
 
           {decks.map((deck, index) => (
-            <Pressable
+            <DeckListCard
               key={deck.id}
-              style={styles.deckCard}
-              onPress={() => handleViewCards(deck)}
+              name={deck.nombre}
+              wordCount={wordCounts[deck.id] ?? 0}
+              deckIndex={index}
+              onPress={async () => {
+                if (isSelectMode) {
+                  try {
+                    storeSetSelectedDeck(deck);
+                    const cards = await database.getCartasByMazo(deck.id);
+                    storeSetCards(cards);
+                    router.back();
+                  } catch (error) {
+                    console.error("Error loading cards:", error);
+                    Alert.alert("Error", "No se pudieron cargar las cartas del mazo");
+                  }
+                } else {
+                  router.push(`/edit/${deck.id}`);
+                }
+              }}
               onLongPress={() => handleDeckOptions(deck)}
-            >
-              <View style={styles.deckIconContainer}>
-                <Icon source={getDeckIcon(index)} size={18} color={'#ffffff'} />
-              </View>
-              <View style={styles.deckTextArea}>
-                <Text style={styles.deckName}>{deck.nombre}</Text>
-                <Text style={styles.deckDescription}>Vocabulario experto sobre este mundo culinario.</Text>
-                <View style={styles.deckMeta}>
-                  <Icon source="book-open-page-variant-outline" size={14} color={colors.text} />
-                  <Text style={styles.deckMetaText}>{wordCounts[deck.id] ?? 0} PALABRAS</Text>
-                </View>
-              </View>
-            </Pressable>
+            />
           ))}
 
           <Pressable style={styles.customDeckCard} onPress={handleCreateNewDeck}>
             <View style={styles.customDeckPlus}>
-              <Icon source="plus" size={26} color={colors.accent} />
+              <Icon source="plus" size={26} color={colors.primary} />
             </View>
             <Text style={styles.customDeckText}>Nueva Baraja Personalizada</Text>
           </Pressable>
@@ -341,10 +348,19 @@ const styles = StyleSheet.create({
     marginBottom: spacing.lg,
   },
   createDeckButton: {
-    borderRadius: borderRadius.xl,
+    width: "100%",
+    borderRadius: borderRadius.full,
   },
   createDeckButtonContent: {
-    minHeight: 62,
+    minHeight: 52,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.lg,
+    gap: spacing.sm,
+  },
+  createDeckButtonLabel: {
+    fontFamily: typography.families.bodyBold,
+    fontSize: typography.sizes.lg,
+    letterSpacing: 0.15,
   },
   content: {
     flex: 1,
@@ -384,50 +400,11 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontFamily: typography.families.body,
   },
-  deckCard: {
-    backgroundColor: "#ffe8c6",
-    borderRadius: borderRadius.xl,
-    minHeight: 176,
-    padding: spacing.md,
-    borderBottomWidth: 4,
-    borderBottomColor: "#f2c89b",
-    flexDirection: "row",
-    gap: spacing.md,
-  },
-  deckIconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: borderRadius.sm,
-    backgroundColor: "#2d1c16",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  deckTextArea: {
-    flex: 1,
-    gap: spacing.sm,
-  },
-  deckName: {
-    fontFamily: typography.families.heading,
-    color: "#2a1e12",
-    fontSize: typography.sizes.xxxl,
-    lineHeight: typography.sizes.xxxl + 2,
-  },
   deckDescription: {
     fontFamily: typography.families.body,
     color: "#665648",
     fontSize: typography.sizes.md,
     lineHeight: 22,
-  },
-  deckMeta: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.xs,
-  },
-  deckMetaText: {
-    fontFamily: typography.families.bodyBold,
-    color: "#5e4e40",
-    fontSize: typography.sizes.sm,
-    letterSpacing: 0.5,
   },
   customDeckCard: {
     marginTop: spacing.sm,
@@ -450,7 +427,7 @@ const styles = StyleSheet.create({
   },
   customDeckText: {
     fontFamily: typography.families.bodyBold,
-    color: "#684d2f",
+    color: colors.text,
     fontSize: typography.sizes.lg,
   },
   modalContainer: {

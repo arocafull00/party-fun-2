@@ -10,12 +10,14 @@ import { styles } from "./app-header.styles";
 
 const DEFAULT_TITLE = "Party Fun 2";
 
+export type AppHeaderVariant = "default" | "game";
+
 interface AppHeaderProps {
   title?: string;
   subtitle?: string | null;
   left?: React.ReactNode | null;
   right?: React.ReactNode | null;
-  transparent?: boolean;
+  variant?: AppHeaderVariant;
 }
 
 export function AppHeader({
@@ -23,7 +25,7 @@ export function AppHeader({
   subtitle,
   left,
   right,
-  transparent,
+  variant = "default",
 }: AppHeaderProps) {
   const insets = useSafeAreaInsets();
   const leftNode =
@@ -39,17 +41,27 @@ export function AppHeader({
       right
     );
 
+  const isGameVariant = variant === "game";
+
   return (
     <View style={[styles.outer, { paddingTop: Math.max(insets.top, spacing.sm) }]}>
-      <View style={[styles.elevatedCard, transparent && styles.elevatedCardTransparent]}>
+      <View
+        style={[styles.elevatedCard, isGameVariant && styles.elevatedCardGame]}
+      >
         <View style={styles.barRow}>
           <View style={styles.side}>{leftNode}</View>
           <View style={styles.titleLayer} pointerEvents="none">
-            <Text style={styles.title} numberOfLines={subtitle ? 1 : 2}>
+            <Text
+              style={[styles.title, isGameVariant && styles.titleGame]}
+              numberOfLines={subtitle ? 1 : 2}
+            >
               {title}
             </Text>
             {subtitle ? (
-              <Text style={styles.subtitle} numberOfLines={1}>
+              <Text
+                style={[styles.subtitle, isGameVariant && styles.subtitleGame]}
+                numberOfLines={1}
+              >
                 {subtitle}
               </Text>
             ) : null}

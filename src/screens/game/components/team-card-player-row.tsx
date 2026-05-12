@@ -1,6 +1,6 @@
 import React from "react";
 import { View, StyleSheet } from "react-native";
-import { Text, IconButton, Icon } from "react-native-paper";
+import { Text, IconButton } from "react-native-paper";
 
 import { Player } from "../../../store/game-store";
 import { borderRadius, colors, spacing, typography } from "../../../theme/theme";
@@ -22,25 +22,18 @@ const TeamCardPlayerRow: React.FC<TeamCardPlayerRowProps> = ({
 }) => {
   return (
     <View style={styles.playerRow}>
-      <View style={styles.avatarCircle}>
-        <Icon
-          source={index % 2 === 0 ? "account" : "account-star"}
-          size={24}
-          color={teamColor}
-        />
-      </View>
       <Text style={styles.playerName}>{player.name}</Text>
       <View style={styles.playerActions}>
         <IconButton
           icon="swap-horizontal"
-          size={20}
+          size={18}
           iconColor={teamColor}
           onPress={onSwap}
           style={styles.actionIcon}
         />
         <IconButton
           icon="trash-can"
-          size={20}
+          size={18}
           iconColor={colors.accent}
           onPress={onRemove}
           style={styles.actionIcon}
@@ -52,17 +45,17 @@ const TeamCardPlayerRow: React.FC<TeamCardPlayerRowProps> = ({
 
 const styles = StyleSheet.create({
   playerRow: {
-    minHeight: 72,
-    borderRadius: borderRadius.xl,
+    minHeight: 52,
+    borderRadius: borderRadius.lg,
     backgroundColor: '#ffffff',
-    paddingHorizontal: spacing.md,
+    paddingHorizontal: spacing.sm,
     flexDirection: "row",
     alignItems: "center",
-    gap: spacing.sm,
+    gap: spacing.xs,
   },
   avatarCircle: {
-    width: 44,
-    height: 44,
+    width: 36,
+    height: 36,
     borderRadius: borderRadius.full,
     backgroundColor: colors.background,
     alignItems: "center",
@@ -72,12 +65,12 @@ const styles = StyleSheet.create({
     flex: 1,
     fontFamily: typography.families.bodyBold,
     color: colors.text,
-    fontSize: typography.sizes.xl,
+    fontSize: typography.sizes.md,
   },
   playerActions: {
     flexDirection: "row",
     alignItems: "center",
-    marginRight: -10,
+    marginRight: -6,
   },
   actionIcon: {
     margin: 0,

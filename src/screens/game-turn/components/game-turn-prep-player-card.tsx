@@ -2,7 +2,6 @@ import React, { useMemo } from "react";
 import { View } from "react-native";
 import { Text } from "react-native-paper";
 
-import { SparkleBurst } from "../../home/components/SparkleBurst";
 import { styles } from "../../game-turn-screen.styles";
 
 type GameTurnPrepPlayerCardProps = {
@@ -32,12 +31,6 @@ export function GameTurnPrepPlayerCard({ name }: GameTurnPrepPlayerCardProps) {
   return (
     <View style={styles.prepPlayerCardOuter}>
       <View style={styles.prepPlayerCard}>
-        <View style={styles.prepPlayerCardSparkleTL}>
-          <SparkleBurst />
-        </View>
-        <View style={styles.prepPlayerCardSparkleBR}>
-          <SparkleBurst mirror />
-        </View>
         <Text style={styles.prepPlayerNameLine}>{lineA}</Text>
         {lineB ? (
           <Text

@@ -36,25 +36,43 @@ const TeamCard: React.FC<TeamCardProps> = ({
     onMovePlayer(playerId, team, toTeam);
   };
 
-  const teamColor = team === "azul" ? colors.primary : colors.secondary;
-  const cardTint = team === "azul" ? colors.secondary : colors.secondary;
-  const badgeBg = team === "azul" ? colors.accent : colors.accent;
+  const isBlue = team === "azul";
+  const palette = isBlue
+    ? {
+        cardBg: "#c5dff2",
+        bar: colors.primary,
+        accent: "#003566",
+        badgeBg: "#005ab2",
+        badgeFg: "#ffffff",
+        cardBorder: "#6ba8d4",
+        menuIcon: "#003566",
+      }
+    : {
+        cardBg: "#f9d6da",
+        bar: colors.redTeam,
+        accent: "#6b1218",
+        badgeBg: "#a82d35",
+        badgeFg: "#ffffff",
+        cardBorder: "#d8606a",
+        menuIcon: "#4a0e12",
+      };
+  const teamColor = palette.bar;
   const showTeamMenu = onClearTeam != null || onShuffleTeams != null;
 
   return (
-    <View style={[teamCardStyles.teamCardOuter, { backgroundColor: cardTint }]}>
-      <View style={[teamCardStyles.leftBar, { backgroundColor: teamColor }]} />
+    <View
+      style={[
+        teamCardStyles.teamCardOuter,
+        { backgroundColor: palette.cardBg, borderColor: palette.cardBorder },
+      ]}
+    >
+      <View style={[teamCardStyles.leftBar, { backgroundColor: palette.bar }]} />
       <View style={teamCardStyles.teamMain}>
         <View style={teamCardStyles.topRow}>
-          <View style={teamCardStyles.iconBadgeWrap}>
-            <View style={teamCardStyles.teamIconCircle}>
-              <Icon source="account-group" size={28} color={teamColor} />
-            </View>
-          </View>
           <View style={teamCardStyles.titleCol}>
-            <Text style={[teamCardStyles.teamTitle, { color: teamColor }]}>{title}</Text>
-            <View style={[teamCardStyles.countBadge, { backgroundColor: badgeBg }]}>
-              <Text style={[teamCardStyles.countBadgeText, { color: teamColor }]}>
+            <Text style={[teamCardStyles.teamTitle, { color: palette.accent }]}>{title}</Text>
+            <View style={[teamCardStyles.countBadge, { backgroundColor: palette.badgeBg }]}>
+              <Text style={[teamCardStyles.countBadgeText, { color: palette.badgeFg }]}>
                 {players.length} jugador{players.length === 1 ? "" : "es"}
               </Text>
             </View>
@@ -67,7 +85,7 @@ const TeamCard: React.FC<TeamCardProps> = ({
                 <IconButton
                   icon="dots-vertical"
                   size={22}
-                  iconColor={colors.text}
+                  iconColor={palette.menuIcon}
                   onPress={() => setMenuOpen(true)}
                   style={teamCardStyles.menuAnchor}
                 />
@@ -114,11 +132,11 @@ const TeamCard: React.FC<TeamCardProps> = ({
           onPress={onAddPlayer}
           style={({ pressed }) => [
             teamCardStyles.addPlayerPressable,
-            { borderColor: teamColor, opacity: pressed ? 0.85 : 1 },
+            { borderColor: palette.accent, opacity: pressed ? 0.85 : 1 },
           ]}
         >
-          <Icon source="plus" size={22} color={teamColor} />
-          <Text style={[teamCardStyles.addPlayerText, { color: teamColor }]}>Añadir jugador</Text>
+          <Icon source="plus" size={22} color={palette.accent} />
+          <Text style={[teamCardStyles.addPlayerText, { color: palette.accent }]}>Añadir jugador</Text>
         </Pressable>
       </View>
     </View>

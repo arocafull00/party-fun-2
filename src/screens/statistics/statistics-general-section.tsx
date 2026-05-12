@@ -31,17 +31,17 @@ export const StatisticsGeneralSection: React.FC<
           <Text style={styles.generalStatLabel}>Partidas</Text>
         </View>
         <View style={styles.generalCell}>
-          <View style={[styles.generalGlyphCircle, styles.generalGlyphTintRed]}>
-            <Icon source="alpha-a-box" size={28} color={colors.accent} />
+          <View style={[styles.generalGlyphCircle, styles.generalGlyphTintBlue]}>
+            <Icon source="alpha-a-box" size={28} color={colors.primary} />
           </View>
-          <Text style={styles.generalStatValueWords}>{statistics.totalCards}</Text>
+          <Text style={styles.generalStatValueGames}>{statistics.totalCards}</Text>
           <Text style={styles.generalStatLabel}>Palabras</Text>
         </View>
         <View style={styles.generalCell}>
-          <View style={[styles.generalGlyphCircle, styles.generalGlyphTintPurple]}>
-            <Icon source="target" size={28} color={colors.accent} />
+          <View style={[styles.generalGlyphCircle, styles.generalGlyphTintBlue]}>
+            <Icon source="target" size={28} color={colors.primary} />
           </View>
-          <Text style={styles.generalStatValueAccuracy}>
+          <Text style={styles.generalStatValueGames}>
             {statistics.averageAccuracy}%
           </Text>
           <Text style={styles.generalStatLabel}>Precisión</Text>
