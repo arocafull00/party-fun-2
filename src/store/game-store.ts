@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -112,6 +113,56 @@ const getPersistedGameState = (state: GameState): Partial<PersistedGameState> =>
   return {
     selectedDeck: state.selectedDeck,
   };
+};
+
+export const useTimer = () => useGameStore((s) => s.timer);
+export const useIsTimerRunning = () => useGameStore((s) => s.isTimerRunning);
+export const useCurrentTurnCards = () => useGameStore((s) => s.currentTurnCards);
+export const useCurrentTeam = () => useGameStore((s) => s.currentTeam);
+export const useCurrentPlayerIndex = () => useGameStore((s) => s.currentPlayerIndex);
+export const useTeams = () => useGameStore((s) => s.teams);
+export const useCurrentPhase = () => useGameStore((s) => s.currentPhase);
+export const useGameStarted = () => useGameStore((s) => s.gameStarted);
+export const usePhaseCards = () => useGameStore((s) => s.phaseCards);
+export const useAllGameCards = () => useGameStore((s) => s.allGameCards);
+export const useGameHistory = () => useGameStore((s) => s.gameHistory);
+export const useSelectedDeck = () => useGameStore((s) => s.selectedDeck);
+export const useDecksFromStore = () => useGameStore((s) => s.decks);
+
+export const useGameActions = () => {
+  const setTimer = useGameStore((s) => s.setTimer);
+  const setIsTimerRunning = useGameStore((s) => s.setIsTimerRunning);
+  const markCardCorrect = useGameStore((s) => s.markCardCorrect);
+  const markCardIncorrect = useGameStore((s) => s.markCardIncorrect);
+  const endGame = useGameStore((s) => s.endGame);
+  const nextTurn = useGameStore((s) => s.nextTurn);
+  const endTurn = useGameStore((s) => s.endTurn);
+  const startGame = useGameStore((s) => s.startGame);
+  const resetGame = useGameStore((s) => s.resetGame);
+  return useMemo(
+    () => ({
+      setTimer,
+      setIsTimerRunning,
+      markCardCorrect,
+      markCardIncorrect,
+      endGame,
+      nextTurn,
+      endTurn,
+      startGame,
+      resetGame,
+    }),
+    [
+      setTimer,
+      setIsTimerRunning,
+      markCardCorrect,
+      markCardIncorrect,
+      endGame,
+      nextTurn,
+      endTurn,
+      startGame,
+      resetGame,
+    ]
+  );
 };
 
 export const useGameStore = create<GameState>()(

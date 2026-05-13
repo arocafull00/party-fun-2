@@ -12,7 +12,7 @@ type GameTurnPlayingActionRowProps = {
   onCorrect: () => void;
 };
 
-export function GameTurnPlayingActionRow({
+export const GameTurnPlayingActionRow = React.memo(function GameTurnPlayingActionRow({
   onIncorrect,
   onCorrect,
 }: GameTurnPlayingActionRowProps) {
@@ -25,4 +25,4 @@ export function GameTurnPlayingActionRow({
       </View>
     </View>
   );
-}
+});

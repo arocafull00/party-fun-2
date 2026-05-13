@@ -10,7 +10,7 @@ type GameTurnPlayingWordCardProps = {
   cardText: string;
 };
 
-export function GameTurnPlayingWordCard({
+export const GameTurnPlayingWordCard = React.memo(function GameTurnPlayingWordCard({
   cardText,
 }: GameTurnPlayingWordCardProps) {
   return (
@@ -28,4 +28,4 @@ export function GameTurnPlayingWordCard({
       </Text>
     </ImageBackground>
   );
-}
+});

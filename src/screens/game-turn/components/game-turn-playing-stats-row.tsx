@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { View } from "react-native";
 import { Text } from "react-native-paper";
 
@@ -14,7 +14,7 @@ type GameTurnPlayingStatsRowProps = {
   maxTimerSeconds: number;
 };
 
-export function GameTurnPlayingStatsRow({
+export const GameTurnPlayingStatsRow = React.memo(function GameTurnPlayingStatsRow({
   playerName,
   currentTeam,
   correctCount,
@@ -23,14 +23,18 @@ export function GameTurnPlayingStatsRow({
   maxTimerSeconds,
 }: GameTurnPlayingStatsRowProps) {
   const teamColor = currentTeam === "rojo" ? colors.redTeam : colors.primary;
-  const safeSeconds = Math.max(0, Math.floor(timerSeconds));
-  const m = Math.floor(safeSeconds / 60);
-  const s = safeSeconds % 60;
-  const timeLabel = `${m}:${s.toString().padStart(2, "0")}`;
-  const progress =
-    maxTimerSeconds > 0
-      ? Math.min(1, Math.max(0, timerSeconds / maxTimerSeconds))
-      : 0;
+
+  const timeLabel = useMemo(() => {
+    const safeSeconds = Math.max(0, Math.floor(timerSeconds));
+    const m = Math.floor(safeSeconds / 60);
+    const s = safeSeconds % 60;
+    return `${m}:${s.toString().padStart(2, "0")}`;
+  }, [timerSeconds]);
+
+  const progress = useMemo(() => {
+    if (maxTimerSeconds <= 0) return 0;
+    return Math.min(1, Math.max(0, timerSeconds / maxTimerSeconds));
+  }, [timerSeconds, maxTimerSeconds]);
 
   return (
     <View style={styles.playingStatsCompactWrap}>
@@ -67,4 +71,4 @@ export function GameTurnPlayingStatsRow({
       </View>
     </View>
   );
-}
+});

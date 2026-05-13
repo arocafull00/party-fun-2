@@ -25,7 +25,7 @@ function splitDisplayName(name: string): [string, string] {
   return [t.slice(0, mid), t.slice(mid)];
 }
 
-export function GameTurnPrepPlayerCard({ name }: GameTurnPrepPlayerCardProps) {
+export const GameTurnPrepPlayerCard = React.memo(function GameTurnPrepPlayerCard({ name }: GameTurnPrepPlayerCardProps) {
   const [lineA, lineB] = useMemo(() => splitDisplayName(name), [name]);
 
   return (
@@ -42,4 +42,4 @@ export function GameTurnPrepPlayerCard({ name }: GameTurnPrepPlayerCardProps) {
       </View>
     </View>
   );
-}
+});

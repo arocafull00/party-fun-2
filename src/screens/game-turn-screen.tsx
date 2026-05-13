@@ -8,7 +8,17 @@ import {
 import { router, useFocusEffect } from "expo-router";
 import { setAudioModeAsync, useAudioPlayer, type AudioPlayer } from "expo-audio";
 
-import { useGameStore, TURN_TIME } from "../store/game-store";
+import {
+  TURN_TIME,
+  useTimer,
+  useCurrentTurnCards,
+  useCurrentTeam,
+  useCurrentPlayerIndex,
+  useTeams,
+  useCurrentPhase,
+  useGameStarted,
+  useGameActions,
+} from "../store/game-store";
 import { TimerEngine } from "../engine/timer-engine";
 import { colors, spacing } from "../theme/theme";
 import { CustomScreen } from "../shared/components/CustomScreen";
@@ -34,20 +44,15 @@ const HOW_TO_PLAY_MESSAGE =
 
 const GameTurnScreen: React.FC = () => {
   const insets = useSafeAreaInsets();
-  const {
-    currentPhase,
-    currentTeam,
-    currentPlayerIndex,
-    teams,
-    timer,
-    currentTurnCards,
-    setTimer,
-    setIsTimerRunning,
-    markCardCorrect,
-    markCardIncorrect,
-    endGame,
-    gameStarted,
-  } = useGameStore();
+  const currentPhase = useCurrentPhase();
+  const currentTeam = useCurrentTeam();
+  const currentPlayerIndex = useCurrentPlayerIndex();
+  const teams = useTeams();
+  const timer = useTimer();
+  const currentTurnCards = useCurrentTurnCards();
+  const gameStarted = useGameStarted();
+  const { setTimer, setIsTimerRunning, markCardCorrect, markCardIncorrect, endGame } =
+    useGameActions();
 
   const [gamePhase, setGamePhase] = useState<"preparation" | "playing">(
     "preparation"
@@ -131,14 +136,8 @@ const GameTurnScreen: React.FC = () => {
   }, []);
 
   const playFeedback = useCallback((player: AudioPlayer) => {
-    void player
-      .seekTo(0)
-      .then(() => {
-        player.play();
-      })
-      .catch(() => {
-        player.play();
-      });
+    player.play();
+    void player.seekTo(0);
   }, []);
 
   const handleTimeUp = useCallback(() => {

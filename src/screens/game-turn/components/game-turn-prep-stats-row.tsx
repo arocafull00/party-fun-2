@@ -16,7 +16,7 @@ function roundModeSubtitle(phase: number): string {
   return "pista libre";
 }
 
-export function GameTurnPrepStatsRow({
+export const GameTurnPrepStatsRow = React.memo(function GameTurnPrepStatsRow({
   round,
   remaining,
   onRoundPress,
@@ -40,4 +40,4 @@ export function GameTurnPrepStatsRow({
       />
     </View>
   );
-}
+});

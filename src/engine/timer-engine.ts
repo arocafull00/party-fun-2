@@ -35,7 +35,7 @@ export class TimerEngine {
           this.onComplete();
         }
       }
-    }, 100);
+    }, 250);
   }
 
   stop() {
