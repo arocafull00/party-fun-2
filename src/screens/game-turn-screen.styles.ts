@@ -158,6 +158,7 @@ export const styles = StyleSheet.create({
   },
   prepStatCard: {
     width: "100%",
+    height: 148,
     paddingTop: spacing.xl,
     paddingBottom: spacing.md,
     borderRadius: borderRadius.xl,
@@ -187,6 +188,15 @@ export const styles = StyleSheet.create({
     lineHeight: typography.sizes.display,
     color: '#ffffff',
     fontFamily: typography.families.heading,
+  },
+  prepStatSubtitle: {
+    marginTop: spacing.xs,
+    paddingHorizontal: spacing.sm,
+    fontSize: typography.sizes.sm,
+    lineHeight: typography.sizes.sm * 1.25,
+    color: "#ffffff",
+    fontFamily: typography.families.bodyBold,
+    textAlign: "center",
   },
   prepStartShell: {
     width: "100%",

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, ScrollView, Alert } from "react-native";
+import { View, ScrollView, Alert, KeyboardAvoidingView, Platform } from "react-native";
 import { Text, Button, Portal, Modal } from "react-native-paper";
 import { router } from "expo-router";
 
@@ -73,7 +73,6 @@ const NewGameScreen: React.FC = () => {
     };
     addPlayerToTeam(selectedTeamForPlayer, newPlayer);
     setNewPlayerName("");
-    setShowPlayerModal(false);
   };
 
   const handleOpenDeckSelection = () => {
@@ -175,39 +174,46 @@ const NewGameScreen: React.FC = () => {
           }}
           contentContainerStyle={styles.modalContainer}
         >
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Añadir Jugador</Text>
-            <Text style={styles.modalSubtitle}>
-              Equipo {selectedTeamForPlayer === "azul" ? "Azul" : "Rojo"}
-            </Text>
-            <FocusTextInput
-              label="Nombre del jugador"
-              value={newPlayerName}
-              onChangeText={setNewPlayerName}
-              style={styles.textInput}
-              autoFocus
-            />
-            <View style={styles.modalActions}>
-              <Button
-                mode="outlined"
-                onPress={() => {
-                  setShowPlayerModal(false);
-                  setNewPlayerName("");
-                }}
-                style={styles.modalButton}
-              >
-                Cancelar
-              </Button>
-              <Button
-                mode="contained"
-                onPress={handleAddPlayer}
-                style={styles.modalButton}
-                disabled={!newPlayerName.trim()}
-              >
-                Añadir
-              </Button>
+          <KeyboardAvoidingView
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            keyboardVerticalOffset={24}
+          >
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Añadir Jugador</Text>
+              <Text style={styles.modalSubtitle}>
+                Equipo {selectedTeamForPlayer === "azul" ? "Azul" : "Rojo"}
+              </Text>
+              <FocusTextInput
+                label="Nombre del jugador"
+                value={newPlayerName}
+                onChangeText={setNewPlayerName}
+                onSubmitEditing={handleAddPlayer}
+                blurOnSubmit={false}
+                style={styles.textInput}
+                autoFocus
+              />
+              <View style={styles.modalActions}>
+                <Button
+                  mode="outlined"
+                  onPress={() => {
+                    setShowPlayerModal(false);
+                    setNewPlayerName("");
+                  }}
+                  style={styles.modalButton}
+                >
+                  Cerrar
+                </Button>
+                <Button
+                  mode="contained"
+                  onPress={handleAddPlayer}
+                  style={styles.modalButton}
+                  disabled={!newPlayerName.trim()}
+                >
+                  Añadir
+                </Button>
+              </View>
             </View>
-          </View>
+          </KeyboardAvoidingView>
         </Modal>
       </Portal>
     </CustomScreen>

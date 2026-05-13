@@ -23,11 +23,11 @@ export const NextRoundPreviewCard: React.FC<NextRoundPreviewCardProps> = ({
 
       <View style={styles.nextRoundCard}>
         <View style={styles.iconCircle}>
-          <MaterialCommunityIcons name={phaseIcon} size={42} color={colors.accent} />
+          <MaterialCommunityIcons name={phaseIcon} size={30} color={colors.accent} />
         </View>
         <View style={styles.textWrap}>
           <Text style={styles.label}>Siguiente ronda:</Text>
-          <Text style={styles.phaseName}>¡{phaseName.toUpperCase()}!</Text>
+          <Text style={styles.phaseName}>{phaseName.toUpperCase()}!</Text>
         </View>
       </View>
     </View>
@@ -60,8 +60,8 @@ const styles = StyleSheet.create({
     gap: spacing.md,
   },
   iconCircle: {
-    width: spacing.xxxl + spacing.lg,
-    height: spacing.xxxl + spacing.lg,
+    width: spacing.lg,
+    height: spacing.lg,
     borderRadius: borderRadius.full,
     alignItems: "center",
     justifyContent: "center",

@@ -1,8 +1,7 @@
 import React from "react";
-import { View } from "react-native";
+import { Pressable, View } from "react-native";
 import { Text, Icon } from "react-native-paper";
 
-import { colors } from "../../../theme/theme";
 import { styles } from "../../game-turn-screen.styles";
 
 type GameTurnPrepStatCardProps = {
@@ -10,6 +9,9 @@ type GameTurnPrepStatCardProps = {
   value: string;
   icon: string;
   variant: "round" | "remaining";
+  subtitle?: string;
+  onPress?: () => void;
+  accessibilityLabel?: string;
 };
 
 export function GameTurnPrepStatCard({
@@ -17,18 +19,21 @@ export function GameTurnPrepStatCard({
   value,
   icon,
   variant,
+  subtitle,
+  onPress,
+  accessibilityLabel,
 }: GameTurnPrepStatCardProps) {
   const isRound = variant === "round";
 
-  return (
-    <View style={styles.prepStatWrap}>
+  const inner = (
+    <>
       <View
         style={[
           styles.prepStatIconCircle,
           isRound ? styles.prepStatIconBlue : styles.prepStatIconPurple,
         ]}
       >
-        <Icon source={icon} size={24} color={'#ffffff'} />
+        <Icon source={icon} size={24} color={"#ffffff"} />
       </View>
       <View
         style={[
@@ -40,7 +45,25 @@ export function GameTurnPrepStatCard({
         <View style={styles.prepStatValueRow}>
           <Text style={styles.prepStatValue}>{value}</Text>
         </View>
+        {subtitle ? (
+          <Text style={styles.prepStatSubtitle}>{subtitle}</Text>
+        ) : null}
       </View>
-    </View>
+    </>
   );
+
+  if (onPress) {
+    return (
+      <Pressable
+        style={styles.prepStatWrap}
+        onPress={onPress}
+        accessibilityRole="button"
+        accessibilityLabel={accessibilityLabel}
+      >
+        {inner}
+      </Pressable>
+    );
+  }
+
+  return <View style={styles.prepStatWrap}>{inner}</View>;
 }

@@ -28,6 +28,11 @@ const getInitialNextPlayerByTeam = (teams: Teams) => ({
   rojo: 0,
 });
 
+const areSameCards = (a: string[], b: string[]) => {
+  if (a.length !== b.length) return false;
+  return a.every((card, index) => card === b[index]);
+};
+
 export interface RoundHistory {
   roundNumber: number;
   correctCards: string[];
@@ -58,7 +63,6 @@ export interface GameState {
   // Turn management
   timer: number;
   isTimerRunning: boolean;
-  currentCardIndex: number;
   phaseCards: string[];
   allGameCards: string[];
 
@@ -67,6 +71,7 @@ export interface GameState {
   currentTurnCards: {
     correct: string[];
     incorrect: string[];
+    unplayed: string[];
   };
 
   // Actions
@@ -91,16 +96,52 @@ export interface GameState {
   markCardCorrect: (card: string) => void;
   markCardIncorrect: (card: string) => void;
   updateCurrentRoundCards: (correct: string[], incorrect: string[]) => void;
-  nextCard: () => void;
   getCurrentPlayer: () => Player | null;
   getNextPlayer: () => Player | null;
   nextTurn: () => boolean;
   endTurn: () => { phaseComplete: boolean; gameComplete: boolean };
   endGame: () => void;
   resetGame: () => void;
+  clearPersistedGame: () => Promise<void>;
 }
 
 export const TURN_TIME = 30;
+type PersistedGameState = Pick<
+  GameState,
+  | "selectedDeck"
+  | "gameStarted"
+  | "currentPhase"
+  | "currentTeam"
+  | "currentPlayerIndex"
+  | "nextPlayerByTeam"
+  | "teams"
+  | "timer"
+  | "phaseCards"
+  | "allGameCards"
+  | "gameHistory"
+  | "currentTurnCards"
+>;
+
+const getPersistedGameState = (state: GameState): Partial<PersistedGameState> => {
+  if (!state.gameStarted) {
+    return {};
+  }
+
+  return {
+    selectedDeck: state.selectedDeck,
+    gameStarted: state.gameStarted,
+    currentPhase: state.currentPhase,
+    currentTeam: state.currentTeam,
+    currentPlayerIndex: state.currentPlayerIndex,
+    nextPlayerByTeam: state.nextPlayerByTeam,
+    teams: state.teams,
+    timer: state.timer,
+    phaseCards: state.phaseCards,
+    allGameCards: state.allGameCards,
+    gameHistory: state.gameHistory,
+    currentTurnCards: state.currentTurnCards,
+  };
+};
 
 export const useGameStore = create<GameState>()(
   persist(
@@ -124,7 +165,6 @@ export const useGameStore = create<GameState>()(
       // Turn management
       timer: TURN_TIME,
       isTimerRunning: false,
-      currentCardIndex: 0,
       phaseCards: [],
       allGameCards: [],
 
@@ -133,6 +173,7 @@ export const useGameStore = create<GameState>()(
       currentTurnCards: {
         correct: [],
         incorrect: [],
+        unplayed: [],
       },
 
       // Actions
@@ -210,11 +251,14 @@ export const useGameStore = create<GameState>()(
           nextPlayerByTeam: getInitialNextPlayerByTeam(teams),
           timer: TURN_TIME,
           isTimerRunning: false,
-          currentCardIndex: 0,
           phaseCards: shuffledCards,
           allGameCards: shuffledCards,
           gameHistory: [],
-          currentTurnCards: { correct: [], incorrect: [] },
+          currentTurnCards: {
+            correct: [],
+            incorrect: [],
+            unplayed: shuffledCards,
+          },
           teams: {
             azul: { ...teams.azul, score: 0 },
             rojo: { ...teams.rojo, score: 0 },
@@ -227,32 +271,58 @@ export const useGameStore = create<GameState>()(
       setIsTimerRunning: (isTimerRunning) => set({ isTimerRunning }),
 
       markCardCorrect: (card: string) => {
-        set((state) => ({
-          currentTurnCards: {
-            ...state.currentTurnCards,
-            correct: [...state.currentTurnCards.correct, card],
-          },
-          teams: {
-            ...state.teams,
-            [state.currentTeam]: {
-              ...state.teams[state.currentTeam],
-              score: state.teams[state.currentTeam].score + 1,
+        set((state) => {
+          const [currentCard, ...remainingUnplayed] = state.currentTurnCards.unplayed;
+          if (!currentCard) return state;
+
+          const playedCard = card || currentCard;
+
+          return {
+            currentTurnCards: {
+              ...state.currentTurnCards,
+              correct: [...state.currentTurnCards.correct, playedCard],
+              unplayed: remainingUnplayed,
             },
-          },
-        }));
+            teams: {
+              ...state.teams,
+              [state.currentTeam]: {
+                ...state.teams[state.currentTeam],
+                score: state.teams[state.currentTeam].score + 1,
+              },
+            },
+          };
+        });
       },
 
       markCardIncorrect: (card: string) => {
-        set((state) => ({
-          currentTurnCards: {
-            ...state.currentTurnCards,
-            incorrect: [...state.currentTurnCards.incorrect, card],
-          },
-        }));
+        set((state) => {
+          const [currentCard, ...remainingUnplayed] = state.currentTurnCards.unplayed;
+          if (!currentCard) return state;
+
+          const playedCard = card || currentCard;
+
+          return {
+            currentTurnCards: {
+              ...state.currentTurnCards,
+              incorrect: [...state.currentTurnCards.incorrect, playedCard],
+              unplayed: remainingUnplayed,
+            },
+          };
+        });
       },
 
       updateCurrentRoundCards: (correct: string[], incorrect: string[]) => {
         set((state) => {
+          const hasSameCorrectCards = areSameCards(
+            correct,
+            state.currentTurnCards.correct
+          );
+          const hasSameIncorrectCards = areSameCards(
+            incorrect,
+            state.currentTurnCards.incorrect
+          );
+          if (hasSameCorrectCards && hasSameIncorrectCards) return state;
+
           const scoreDifference =
             correct.length - state.currentTurnCards.correct.length;
           const newTeamScore = Math.max(
@@ -261,7 +331,11 @@ export const useGameStore = create<GameState>()(
           );
 
           return {
-            currentTurnCards: { correct, incorrect },
+            currentTurnCards: {
+              ...state.currentTurnCards,
+              correct,
+              incorrect,
+            },
             teams: {
               ...state.teams,
               [state.currentTeam]: {
@@ -272,9 +346,6 @@ export const useGameStore = create<GameState>()(
           };
         });
       },
-
-      nextCard: () =>
-        set((state) => ({ currentCardIndex: state.currentCardIndex + 1 })),
 
       getCurrentPlayer: () => {
         const state = get();
@@ -308,8 +379,11 @@ export const useGameStore = create<GameState>()(
           nextPlayerByTeam: result.nextPlayerByTeam,
           timer: TURN_TIME,
           isTimerRunning: false,
-          currentCardIndex: 0,
-          currentTurnCards: { correct: [], incorrect: [] },
+          currentTurnCards: {
+            correct: [],
+            incorrect: [],
+            unplayed: state.phaseCards,
+          },
         });
         return true;
       },
@@ -326,13 +400,20 @@ export const useGameStore = create<GameState>()(
           nextPlayerByTeam: result.phaseComplete
             ? getInitialNextPlayerByTeam(prev.teams)
             : prev.nextPlayerByTeam,
-          currentCardIndex: 0,
           timer: TURN_TIME,
           isTimerRunning: false,
-          currentTurnCards: { correct: [], incorrect: [] },
           phaseCards: result.remainingCards,
+          currentTurnCards: {
+            correct: [],
+            incorrect: [],
+            unplayed: result.remainingCards,
+          },
           gameStarted: result.gameComplete ? false : prev.gameStarted,
         }));
+
+        if (result.gameComplete) {
+          void useGameStore.persist.clearStorage();
+        }
 
         return {
           phaseComplete: result.phaseComplete,
@@ -340,9 +421,12 @@ export const useGameStore = create<GameState>()(
         };
       },
 
-      endGame: () => set({ gameStarted: false, isTimerRunning: false }),
+      endGame: () => {
+        set({ gameStarted: false, isTimerRunning: false });
+        void useGameStore.persist.clearStorage();
+      },
 
-      resetGame: () =>
+      resetGame: () => {
         set((state) => ({
           gameStarted: false,
           currentPhase: 1,
@@ -351,22 +435,44 @@ export const useGameStore = create<GameState>()(
           nextPlayerByTeam: { azul: 0, rojo: 0 },
           timer: TURN_TIME,
           isTimerRunning: false,
-          currentCardIndex: 0,
           phaseCards: [],
           allGameCards: [],
           gameHistory: [],
-          currentTurnCards: { correct: [], incorrect: [] },
+          currentTurnCards: { correct: [], incorrect: [], unplayed: [] },
           teams: {
             azul: { players: state.teams.azul.players, score: 0 },
             rojo: { players: state.teams.rojo.players, score: 0 },
           },
           cards: [],
-        })),
+        }));
+        void useGameStore.persist.clearStorage();
+      },
+
+      clearPersistedGame: async () => {
+        await useGameStore.persist.clearStorage();
+      },
     }),
     {
       name: "game-store",
+      version: 2,
       storage: createJSONStorage(() => AsyncStorage),
-      partialize: (state) => ({ teams: state.teams, selectedDeck: state.selectedDeck }),
+      partialize: (state) => getPersistedGameState(state),
+      merge: (persistedState, currentState) => {
+        const typedPersistedState = persistedState as Partial<GameState>;
+        const mergedState = {
+          ...currentState,
+          ...typedPersistedState,
+        };
+
+        if (!mergedState.gameStarted) {
+          return mergedState;
+        }
+
+        return {
+          ...mergedState,
+          isTimerRunning: false,
+        };
+      },
     }
   )
 );

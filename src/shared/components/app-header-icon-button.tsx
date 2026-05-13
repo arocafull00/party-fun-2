@@ -13,6 +13,7 @@ interface AppHeaderIconButtonProps {
   onPress?: () => void;
   showBadge?: boolean;
   iconColor?: string;
+  accessibilityLabel?: string;
 }
 
 export function AppHeaderIconButton({
@@ -20,6 +21,7 @@ export function AppHeaderIconButton({
   onPress,
   showBadge,
   iconColor = colors.text,
+  accessibilityLabel,
 }: AppHeaderIconButtonProps) {
   const content = (
     <>
@@ -35,6 +37,7 @@ export function AppHeaderIconButton({
   return (
     <Pressable
       accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel}
       hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
       onPress={onPress}
       style={({ pressed }) => [styles.hit, pressed && { opacity: 0.88 }]}

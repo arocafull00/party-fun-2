@@ -28,8 +28,8 @@ const RoundResultScreen: React.FC = () => {
   const insets = useSafeAreaInsets();
   const { currentPhase, teams } = useGameStore();
 
-  const isLastRound = currentPhase >= 3;
-  const nextPhase = PHASE_CONFIG[currentPhase + 1];
+  const nextPhase = PHASE_CONFIG[currentPhase];
+  const isLastRound = nextPhase === undefined;
 
   const handleNext = () => {
     if (isLastRound) {
@@ -78,8 +78,8 @@ const RoundResultScreen: React.FC = () => {
 
         {!isLastRound && (
           <NextRoundPreviewCard
-            phaseName={nextPhase?.name ?? "Mímica"}
-            phaseIcon={nextPhase?.icon ?? "drama-masks"}
+            phaseName={nextPhase.name}
+            phaseIcon={nextPhase.icon}
           />
         )}
 

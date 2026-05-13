@@ -95,14 +95,14 @@ export const calculateEndTurn = (
     currentTeam: 'azul' | 'rojo';
     currentPlayerIndex: number;
     teams: { azul: { score: number }; rojo: { score: number } };
-    phaseCards: string[];
-    currentTurnCards: { correct: string[]; incorrect: string[] };
+    currentTurnCards: { correct: string[]; incorrect: string[]; unplayed: string[] };
     allGameCards: string[];
   }
 ): EndTurnResult => {
-  const remainingCards = state.phaseCards.filter(
-    (card) => !state.currentTurnCards.correct.includes(card)
-  );
+  const remainingCards = shuffleCards([
+    ...state.currentTurnCards.unplayed,
+    ...state.currentTurnCards.incorrect,
+  ]);
 
   const roundHistory = {
     roundNumber: state.currentPhase,

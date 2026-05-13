@@ -20,7 +20,6 @@ import { GameTurnPrepPlayerCard } from "./game-turn/components/game-turn-prep-pl
 import { GameTurnPrepStatsRow } from "./game-turn/components/game-turn-prep-stats-row";
 import { GameTurnPrepStartButton } from "./game-turn/components/game-turn-prep-start-button";
 import { GameTurnPlayingActionRow } from "./game-turn/components/game-turn-playing-action-row";
-import { GameTurnPlayingHeaderLeft } from "./game-turn/components/game-turn-playing-header-left";
 import { GameTurnPlayingStatsRow } from "./game-turn/components/game-turn-playing-stats-row";
 import { GameTurnPlayingWordCard } from "./game-turn/components/game-turn-playing-word-card";
 import { styles } from "./game-turn-screen.styles";
@@ -30,6 +29,9 @@ const backgroundImage = require("../../assets/background.jpg");
 const successSoundAsset = require("../../assets/sound/success.mp3");
 const errorSoundAsset = require("../../assets/sound/error.wav");
 
+const HOW_TO_PLAY_MESSAGE =
+  "Ronda 1 — Pista libre\nPuedes hablar y dar pistas, pero no digas la palabra objetivo ni palabras demasiado relacionadas con ella. Si marcas un fallo, pierdes 5 segundos del tiempo restante.\n\nRonda 2 — Una palabra\nSolo puedes usar una única palabra como pista por carta. Los fallos no restan tiempo.\n\nRonda 3 — Mímica\nExplica la carta solo con gestos y movimientos, sin hablar. Los fallos no restan tiempo.\n\nLos equipos alternan turnos. Cuando se acabe el tiempo o las cartas del turno, se revisan los aciertos y la partida sigue.";
+
 const GameTurnScreen: React.FC = () => {
   const insets = useSafeAreaInsets();
   const {
@@ -38,14 +40,12 @@ const GameTurnScreen: React.FC = () => {
     currentPlayerIndex,
     teams,
     timer,
-    currentCardIndex,
-    phaseCards,
     currentTurnCards,
     setTimer,
     setIsTimerRunning,
     markCardCorrect,
     markCardIncorrect,
-    nextCard,
+    endGame,
     gameStarted,
   } = useGameStore();
 
@@ -59,13 +59,14 @@ const GameTurnScreen: React.FC = () => {
 
   const currentTeamData = teams[currentTeam];
   const currentPlayer = currentTeamData.players[currentPlayerIndex];
-  const currentCard = phaseCards[currentCardIndex];
-  const cardsRemaining = phaseCards.length - currentCardIndex;
+  const currentCard = currentTurnCards.unplayed[0];
+  const cardsRemaining = currentTurnCards.unplayed.length;
 
   const handleExitGame = useCallback(() => {
     timerEngineRef.current?.stop();
+    endGame();
     router.push("/");
-  }, []);
+  }, [endGame]);
 
   const confirmExitGame = useCallback(() => {
     Alert.alert(
@@ -77,6 +78,10 @@ const GameTurnScreen: React.FC = () => {
       ]
     );
   }, [handleExitGame]);
+
+  const showHowToPlay = useCallback(() => {
+    Alert.alert("Cómo jugar", HOW_TO_PLAY_MESSAGE, [{ text: "Entendido" }]);
+  }, []);
 
   useFocusEffect(
     useCallback(() => {
@@ -97,6 +102,16 @@ const GameTurnScreen: React.FC = () => {
   useEffect(() => {
     setGamePhase("preparation");
   }, [currentTeam, currentPlayerIndex]);
+
+  useEffect(() => {
+    if (gamePhase !== "playing") return;
+    if (cardsRemaining > 0) return;
+
+    timerEngineRef.current?.stop();
+    setIsTimerRunning(false);
+    setGamePhase("preparation");
+    router.push("/turn-review?reason=out-of-cards");
+  }, [cardsRemaining, gamePhase, setIsTimerRunning]);
 
   useEffect(() => {
     return () => {
@@ -127,30 +142,31 @@ const GameTurnScreen: React.FC = () => {
   }, []);
 
   const handleTimeUp = useCallback(() => {
+    timerEngineRef.current?.stop();
     setIsTimerRunning(false);
     setGamePhase("preparation");
-
-    Alert.alert("¡Tiempo!", `Se acabó el tiempo para ${currentPlayer?.name}`, [
-      {
-        text: "Continuar",
-        onPress: handleEndTurn,
-      },
-    ]);
-  }, [currentPlayer?.name, setIsTimerRunning]);
+    setTimer(TURN_TIME);
+    router.push("/turn-review");
+  }, [setIsTimerRunning, setTimer]);
 
   const handleStartTurn = () => {
+    if (cardsRemaining === 0) {
+      timerEngineRef.current?.stop();
+      setIsTimerRunning(false);
+      setGamePhase("preparation");
+      router.push("/turn-review?reason=out-of-cards");
+      return;
+    }
+
+    const initialTimer = timer > 0 ? timer : TURN_TIME;
     setGamePhase("playing");
     setIsTimerRunning(true);
-
-    if (!timerEngineRef.current) {
-      timerEngineRef.current = new TimerEngine(
-        TURN_TIME,
-        (remaining) => setTimer(remaining),
-        handleTimeUp
-      );
-    } else {
-      timerEngineRef.current.reset();
-    }
+    timerEngineRef.current?.stop();
+    timerEngineRef.current = new TimerEngine(
+      initialTimer,
+      (remaining) => setTimer(remaining),
+      handleTimeUp
+    );
 
     timerEngineRef.current.start();
   };
@@ -161,15 +177,13 @@ const GameTurnScreen: React.FC = () => {
 
     markCardCorrect(currentCard);
 
-    if (currentCardIndex >= phaseCards.length - 1) {
+    if (cardsRemaining <= 1) {
       timerEngineRef.current?.stop();
       setIsTimerRunning(false);
       setGamePhase("preparation");
-      router.push("/turn-review");
+      router.push("/turn-review?reason=out-of-cards");
       return;
     }
-
-    nextCard();
   };
 
   const handleIncorrect = () => {
@@ -182,22 +196,13 @@ const GameTurnScreen: React.FC = () => {
       timerEngineRef.current?.reduceTime(5);
     }
 
-    if (currentCardIndex >= phaseCards.length - 1) {
+    if (cardsRemaining <= 1) {
       timerEngineRef.current?.stop();
       setIsTimerRunning(false);
       setGamePhase("preparation");
-      router.push("/turn-review");
+      router.push("/turn-review?reason=out-of-cards");
       return;
     }
-
-    nextCard();
-  };
-
-  const handleEndTurn = () => {
-    timerEngineRef.current?.stop();
-    setIsTimerRunning(false);
-    setTimer(TURN_TIME);
-    router.push("/turn-review");
   };
 
   if (!gameStarted || !currentPlayer) {
@@ -233,6 +238,14 @@ const GameTurnScreen: React.FC = () => {
               <AppHeader
                 variant="game"
                 title="Party Fun 2"
+                left={
+                  <AppHeaderIconButton
+                    icon="help-circle-outline"
+                    iconColor="#ffffff"
+                    accessibilityLabel="Cómo jugar"
+                    onPress={showHowToPlay}
+                  />
+                }
                 right={
                   <AppHeaderIconButton
                     icon="exit-to-app"
@@ -259,6 +272,7 @@ const GameTurnScreen: React.FC = () => {
                   <GameTurnPrepStatsRow
                     round={currentPhase}
                     remaining={cardsRemaining}
+                    onRoundPress={showHowToPlay}
                   />
                 </View>
                 <GameTurnPrepStartButton onPress={handleStartTurn} />
@@ -286,6 +300,14 @@ const GameTurnScreen: React.FC = () => {
         <DotsBackground />
           <AppHeader
             title="Party Fun 2"
+            left={
+              <AppHeaderIconButton
+                icon="help-circle-outline"
+                iconColor={colors.primary}
+                accessibilityLabel="Cómo jugar"
+                onPress={showHowToPlay}
+              />
+            }
             right={
               <AppHeaderIconButton
                 icon="exit-to-app"

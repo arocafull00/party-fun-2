@@ -242,6 +242,7 @@ const CreateDeckScreen: React.FC = () => {
                 placeholderTextColor="#9CA3AF"
                 style={styles.nativeInput}
                 maxLength={30}
+                blurOnSubmit={false}
                 onSubmitEditing={handleAddCard}
                 returnKeyType="done"
               />

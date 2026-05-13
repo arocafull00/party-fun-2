@@ -9,6 +9,8 @@ export const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
+  },
+  scrollContent: {
     paddingTop: spacing.md,
   },
   headerSection: {
@@ -50,7 +52,6 @@ export const styles = StyleSheet.create({
     color: colors.primary,
   },
   listContainer: {
-    flex: 1,
     paddingHorizontal: spacing.md,
   },
   listContent: {

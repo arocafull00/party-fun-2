@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "PartyFun Game",
+    "name": "PartyFun 2",
     "slug": "party-fun-2",
     "version": "1.0.0",
     "platforms": [
@@ -14,7 +14,7 @@
     "splash": {
       "image": "./assets/icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#0f0f0f"
+      "backgroundColor": "#005ab2"
     },
     "assetBundlePatterns": [
       "**/*"
