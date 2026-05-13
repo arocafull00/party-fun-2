@@ -44,13 +44,6 @@ export const StatisticsTeamWinsSection: React.FC<
           </View>
         </View>
       </View>
-      {statistics.ties > 0 ? (
-        <View style={styles.tiesBanner}>
-          <Text style={styles.tiesText}>
-            {statistics.ties} empate{statistics.ties === 1 ? "" : "s"}
-          </Text>
-        </View>
-      ) : null}
     </View>
   );
 };

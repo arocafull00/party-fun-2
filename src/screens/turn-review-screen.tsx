@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 import { View, ScrollView } from "react-native";
 import { Text, Button } from "react-native-paper";
-import { router, useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams, useNavigation } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useGameStore } from "../store/game-store";
@@ -17,6 +17,8 @@ import { styles } from "./turn-review-screen.styles";
 
 const TurnReviewScreen: React.FC = () => {
   const insets = useSafeAreaInsets();
+  const navigation = useNavigation();
+  const isAdvancingRef = useRef(false);
   const { reason } = useLocalSearchParams<{ reason?: string }>();
   const headerTitle =
     reason === "out-of-cards"
@@ -35,7 +37,12 @@ const TurnReviewScreen: React.FC = () => {
   const { reviewCards, toggleCard, getCorrectCards, getIncorrectCards } =
     useCardReview(currentTurnCards.correct, currentTurnCards.incorrect);
 
-  const handleNextTurn = () => {
+  const handleNextTurn = useCallback((navigationType: "push" | "replace" = "push") => {
+    if (isAdvancingRef.current) {
+      return;
+    }
+    isAdvancingRef.current = true;
+
     const updatedCorrect = getCorrectCards();
     const updatedIncorrect = getIncorrectCards();
     updateCurrentRoundCards(updatedCorrect, updatedIncorrect);
@@ -43,18 +50,42 @@ const TurnReviewScreen: React.FC = () => {
     const { phaseComplete, gameComplete } = endTurn();
 
     if (gameComplete) {
-      router.push("/game-end");
+      router[navigationType]("/game-end");
       return;
     }
 
     if (phaseComplete) {
-      router.push("/round-result");
+      router[navigationType]("/round-result");
       return;
     }
 
-    const hasNextTurn = nextTurn();
-    router.push(hasNextTurn ? "/game-turn" : "/game-turn");
-  };
+    nextTurn();
+    router[navigationType]("/game-turn");
+  }, [
+    endTurn,
+    getCorrectCards,
+    getIncorrectCards,
+    nextTurn,
+    updateCurrentRoundCards,
+  ]);
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener("beforeRemove", (event) => {
+      const actionType = event.data.action.type;
+      const isBackAction =
+        actionType === "GO_BACK" ||
+        actionType === "POP" ||
+        actionType === "POP_TO_TOP";
+      if (!isBackAction) {
+        return;
+      }
+
+      event.preventDefault();
+      handleNextTurn("replace");
+    });
+
+    return unsubscribe;
+  }, [handleNextTurn, navigation]);
 
   const totalWords = reviewCards.length;
 
@@ -118,7 +149,7 @@ const TurnReviewScreen: React.FC = () => {
         <View style={styles.bottomSection}>
           <Button
             mode="contained"
-            onPress={handleNextTurn}
+            onPress={() => handleNextTurn()}
             icon="arrow-right"
             buttonColor={colors.primary}
             textColor="#FFFFFF"
@@ -126,10 +157,10 @@ const TurnReviewScreen: React.FC = () => {
             contentStyle={styles.nextButtonContent}
             labelStyle={styles.nextButtonLabel}
           >
-            Siguiente ronda
+            Continuar
           </Button>
           <Text style={styles.nextButtonSubtitle}>
-            Prepárate para la siguiente ronda
+            Prepárate para lo siguiente
           </Text>
         </View>
       </ScrollView>

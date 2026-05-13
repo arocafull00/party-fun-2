@@ -15,6 +15,13 @@
       "when": 1778440902129,
       "tag": "0001_chunky_catseye",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1778704800000,
+      "tag": "0002_slim_partida_stats",
+      "breakpoints": true
     }
   ]
 }

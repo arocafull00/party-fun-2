@@ -31,11 +31,6 @@ export const partidas = sqliteTable('partidas', {
   fecha: text('fecha').notNull(),
   mazoId: integer('mazo_id').references(() => mazos.id),
   equipoGanador: text('equipo_ganador', { enum: ['azul', 'rojo'] }),
-  puntuacionAzul: integer('puntuacion_azul').notNull().default(0),
-  puntuacionRojo: integer('puntuacion_rojo').notNull().default(0),
-  totalCartas: integer('total_cartas').notNull().default(0),
-  cartasCorrectas: integer('cartas_correctas').notNull().default(0),
-  precision: integer('precision').notNull().default(0),
   createdAt: text('created_at').default(sql`CURRENT_TIMESTAMP`),
 });
 

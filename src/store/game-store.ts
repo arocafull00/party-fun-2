@@ -106,40 +106,11 @@ export interface GameState {
 }
 
 export const TURN_TIME = 30;
-type PersistedGameState = Pick<
-  GameState,
-  | "selectedDeck"
-  | "gameStarted"
-  | "currentPhase"
-  | "currentTeam"
-  | "currentPlayerIndex"
-  | "nextPlayerByTeam"
-  | "teams"
-  | "timer"
-  | "phaseCards"
-  | "allGameCards"
-  | "gameHistory"
-  | "currentTurnCards"
->;
+type PersistedGameState = Pick<GameState, "selectedDeck">;
 
 const getPersistedGameState = (state: GameState): Partial<PersistedGameState> => {
-  if (!state.gameStarted) {
-    return {};
-  }
-
   return {
     selectedDeck: state.selectedDeck,
-    gameStarted: state.gameStarted,
-    currentPhase: state.currentPhase,
-    currentTeam: state.currentTeam,
-    currentPlayerIndex: state.currentPlayerIndex,
-    nextPlayerByTeam: state.nextPlayerByTeam,
-    teams: state.teams,
-    timer: state.timer,
-    phaseCards: state.phaseCards,
-    allGameCards: state.allGameCards,
-    gameHistory: state.gameHistory,
-    currentTurnCards: state.currentTurnCards,
   };
 };
 
@@ -454,25 +425,9 @@ export const useGameStore = create<GameState>()(
     }),
     {
       name: "game-store",
-      version: 2,
+      version: 3,
       storage: createJSONStorage(() => AsyncStorage),
       partialize: (state) => getPersistedGameState(state),
-      merge: (persistedState, currentState) => {
-        const typedPersistedState = persistedState as Partial<GameState>;
-        const mergedState = {
-          ...currentState,
-          ...typedPersistedState,
-        };
-
-        if (!mergedState.gameStarted) {
-          return mergedState;
-        }
-
-        return {
-          ...mergedState,
-          isTimerRunning: false,
-        };
-      },
     }
   )
 );

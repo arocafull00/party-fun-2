@@ -35,26 +35,6 @@ const GameEndScreen: React.FC = () => {
     return "empate";
   }, [blueScore, redScore]);
 
-  const totalCards = useMemo(() => {
-    return gameHistory.reduce((total, round) => {
-      return total + round.correctCards.length + round.incorrectCards.length;
-    }, 0);
-  }, [gameHistory]);
-
-  const totalCorrect = useMemo(() => {
-    return gameHistory.reduce((total, round) => {
-      return total + round.correctCards.length;
-    }, 0);
-  }, [gameHistory]);
-
-  const accuracy = useMemo(() => {
-    if (totalCards === 0) {
-      return 0;
-    }
-
-    return Math.round((totalCorrect / totalCards) * 100);
-  }, [totalCards, totalCorrect]);
-
   const roundSummaries = useMemo(() => {
     return gameHistory.map((round, index) => {
       const previousScores =
@@ -87,11 +67,6 @@ const GameEndScreen: React.FC = () => {
           fecha: new Date().toISOString(),
           mazoId: selectedDeck?.id || 0,
           equipoGanador: winner === "empate" ? null : (winner as "azul" | "rojo"),
-          puntuacionAzul: blueScore,
-          puntuacionRojo: redScore,
-          totalCartas: totalCards,
-          cartasCorrectas: totalCorrect,
-          precision: accuracy,
         };
 
         const gameId = await database.createPartida(gameData);
@@ -118,16 +93,11 @@ const GameEndScreen: React.FC = () => {
 
     saveGameToDatabase();
   }, [
-    accuracy,
-    blueScore,
     gameSaved,
-    redScore,
     saving,
     selectedDeck?.id,
     teams.azul.players,
     teams.rojo.players,
-    totalCards,
-    totalCorrect,
     winner,
   ]);
 

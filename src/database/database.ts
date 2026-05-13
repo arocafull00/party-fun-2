@@ -1,4 +1,4 @@
-import { eq, desc, count, sum, avg, sql } from 'drizzle-orm';
+import { eq, desc, count, sum, sql } from 'drizzle-orm';
 import { getDb, runMigrations } from './connection';
 import * as schema from './schema';
 import defaultDecksJson from '../data/default-decks.json';
@@ -248,11 +248,6 @@ class DatabaseManager {
     fecha: string;
     mazoId: number;
     equipoGanador: 'azul' | 'rojo' | null;
-    puntuacionAzul: number;
-    puntuacionRojo: number;
-    totalCartas: number;
-    cartasCorrectas: number;
-    precision: number;
   }): Promise<number> {
     this.ensureInitialized();
 
@@ -299,33 +294,21 @@ class DatabaseManager {
 
   // Get game statistics
   async getGameStatistics(): Promise<{
-    totalGames: number;
-    totalCards: number;
-    averageAccuracy: number;
     gamesWonByBlue: number;
     gamesWonByRed: number;
-    ties: number;
   }> {
     this.ensureInitialized();
 
     try {
       const stats = await this.db.select({
-        totalGames: count(),
-        totalCards: sum(schema.partidas.totalCartas),
-        averageAccuracy: avg(schema.partidas.precision),
         gamesWonByBlue: sum(sql`CASE WHEN ${schema.partidas.equipoGanador} = 'azul' THEN 1 ELSE 0 END`),
         gamesWonByRed: sum(sql`CASE WHEN ${schema.partidas.equipoGanador} = 'rojo' THEN 1 ELSE 0 END`),
-        ties: sum(sql`CASE WHEN ${schema.partidas.equipoGanador} IS NULL THEN 1 ELSE 0 END`),
       }).from(schema.partidas);
 
       const result = stats[0];
       return {
-        totalGames: Number(result.totalGames) || 0,
-        totalCards: Number(result.totalCards) || 0,
-        averageAccuracy: Math.round(Number(result.averageAccuracy) || 0),
         gamesWonByBlue: Number(result.gamesWonByBlue) || 0,
         gamesWonByRed: Number(result.gamesWonByRed) || 0,
-        ties: Number(result.ties) || 0,
       };
     } catch (error) {
       console.error('Error getting game statistics:', error);
@@ -333,43 +316,32 @@ class DatabaseManager {
     }
   }
 
-  // Get recent games with details
-  async getRecentGames(limit: number = 10): Promise<Array<{
-    id: number;
-    fecha: string;
-    mazo_nombre: string;
-    equipo_ganador: string | null;
-    puntuacion_azul: number;
-    puntuacion_rojo: number;
-    total_cartas: number;
-    cartas_correctas: number;
-    precision: number;
+  async getPlayerWins(): Promise<Array<{
+    nombre: string;
+    wins: number;
   }>> {
     this.ensureInitialized();
 
     try {
       const result = await this.db.select({
-        id: schema.partidas.id,
-        fecha: schema.partidas.fecha,
-        mazo_nombre: schema.mazos.nombre,
-        equipo_ganador: schema.partidas.equipoGanador,
-        puntuacion_azul: schema.partidas.puntuacionAzul,
-        puntuacion_rojo: schema.partidas.puntuacionRojo,
-        total_cartas: schema.partidas.totalCartas,
-        cartas_correctas: schema.partidas.cartasCorrectas,
-        precision: schema.partidas.precision,
+        nombre: schema.jugadores.nombre,
+        wins: count(),
       })
-      .from(schema.partidas)
-      .leftJoin(schema.mazos, eq(schema.partidas.mazoId, schema.mazos.id))
-      .orderBy(desc(schema.partidas.fecha))
-      .limit(limit);
+      .from(schema.partidaJugadores)
+      .innerJoin(schema.partidas, eq(schema.partidaJugadores.partidaId, schema.partidas.id))
+      .innerJoin(schema.jugadores, eq(schema.partidaJugadores.jugadorId, schema.jugadores.id))
+      .where(
+        sql`${schema.partidas.equipoGanador} IS NOT NULL AND ${schema.partidaJugadores.equipo} = ${schema.partidas.equipoGanador}`
+      )
+      .groupBy(schema.jugadores.nombre)
+      .orderBy(desc(count()), schema.jugadores.nombre);
 
       return result.map((row) => ({
-        ...row,
-        mazo_nombre: row.mazo_nombre ?? 'Unknown',
+        nombre: row.nombre,
+        wins: Number(row.wins) || 0,
       }));
     } catch (error) {
-      console.error('Error getting recent games:', error);
+      console.error('Error getting player wins:', error);
       throw error;
     }
   }

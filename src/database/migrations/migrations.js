@@ -3,11 +3,13 @@
 import journal from './meta/_journal.json';
 import m0000 from './0000_initial_schema.sql';
 import m0001 from './0001_chunky_catseye.sql';
+import m0002 from './0002_slim_partida_stats.sql';
 
 export default {
   journal,
   migrations: {
     m0000,
-    m0001
+    m0001,
+    m0002
   }
 }

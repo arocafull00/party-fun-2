@@ -16,13 +16,12 @@ import { CustomScreen } from "../shared/components/CustomScreen";
 import { AppHeader } from "../shared/components/app-header";
 import { AppHeaderIconButton } from "../shared/components/app-header-icon-button";
 import { styles } from "./statistics-screen.styles";
-import { StatisticsGeneralSection } from "./statistics/statistics-general-section";
 import { StatisticsTeamWinsSection } from "./statistics/statistics-team-wins-section";
-import { StatisticsHistorySection } from "./statistics/statistics-history-section";
+import { StatisticsPlayerWinsSection } from "./statistics/statistics-player-wins-section";
 import { DotsBackground } from "../shared/components/DotsBackground";
 
 const StatisticsScreen: React.FC = () => {
-  const { stats: statistics, recentGames, loading, refetch } = useStatistics();
+  const { stats: statistics, playerWins, loading, refetch } = useStatistics();
   const [refreshing, setRefreshing] = useState(false);
   const insets = useSafeAreaInsets();
 
@@ -32,50 +31,14 @@ const StatisticsScreen: React.FC = () => {
     setRefreshing(false);
   };
 
-  const formatDate = (dateString: string): string => {
-    try {
-      const date = new Date(dateString);
-      return date.toLocaleDateString("es-ES", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-      });
-    } catch {
-      return dateString;
-    }
-  };
-
-  const getWinnerEmoji = (winner: string | null): string => {
-    if (winner === "azul") {
-      return "🔵";
-    }
-    if (winner === "rojo") {
-      return "🔴";
-    }
-    return "🤝";
-  };
-
-  const getWinnerText = (winner: string | null): string => {
-    if (winner === "azul") {
-      return "Azul";
-    }
-    if (winner === "rojo") {
-      return "Rojo";
-    }
-    return "Empate";
-  };
-
   const calculateWinPercentages = () => {
-    const total = statistics.totalGames;
+    const total = statistics.gamesWonByBlue + statistics.gamesWonByRed;
     if (total === 0) {
-      return { blue: 0, red: 0, tie: 0 };
+      return { blue: 0, red: 0 };
     }
     return {
       blue: Math.round((statistics.gamesWonByBlue / total) * 100),
       red: Math.round((statistics.gamesWonByRed / total) * 100),
-      tie: Math.round((statistics.ties / total) * 100),
     };
   };
 
@@ -126,19 +89,12 @@ const StatisticsScreen: React.FC = () => {
             <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
           }
         >
-          <StatisticsGeneralSection statistics={statistics} />
-          <View style={styles.sectionDivider} />
           <StatisticsTeamWinsSection
             statistics={statistics}
             winPercentages={winPercentages}
           />
           <View style={styles.sectionDivider} />
-          <StatisticsHistorySection
-            recentGames={recentGames}
-            formatDate={formatDate}
-            getWinnerEmoji={getWinnerEmoji}
-            getWinnerText={getWinnerText}
-          />
+          <StatisticsPlayerWinsSection playerWins={playerWins} />
         </ScrollView>
       </View>
     </CustomScreen>
