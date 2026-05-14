@@ -44,9 +44,31 @@ export const newGameScreenStyles = StyleSheet.create({
   startButton: {
     marginTop: spacing.xs,
   },
+  modalOverlayRoot: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: "center",
+    elevation: 24,
+  },
+  modalBackdrop: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  modalKeyboardAvoid: {
+    flex: 1,
+    justifyContent: "center",
+    width: "100%",
+    paddingHorizontal: spacing.lg,
+    pointerEvents: "box-none",
+  },
+  modalPlayerScroll: {
+    width: "100%",
+    maxHeight: "86%",
+  },
+  modalScrollInner: {
+    paddingVertical: spacing.lg,
+  },
   modalContainer: {
     backgroundColor: '#ffffff',
-    margin: spacing.lg,
     borderRadius: borderRadius.xl,
     padding: spacing.lg,
   },

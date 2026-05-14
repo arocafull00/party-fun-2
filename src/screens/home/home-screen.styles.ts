@@ -60,11 +60,19 @@ export const styles = StyleSheet.create({
   },
   actionButtons: {
     flexDirection: "row",
-    gap: spacing.md,
+    gap: spacing.sm,
+  },
+  actionButtonsStacked: {
+    flexDirection: "column",
   },
   actionButtonItem: {
     flex: 1,
     minWidth: 0,
+  },
+  actionButtonItemFullWidth: {
+    width: "100%",
+    flexBasis: "100%",
+    flexGrow: 0,
   },
   homePrimaryButton: {
     width: "100%",
@@ -90,12 +98,12 @@ export const styles = StyleSheet.create({
   homeSecondaryButtonContent: {
     minHeight: 48,
     paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.lg,
+    paddingHorizontal: spacing.md,
     gap: spacing.sm,
   },
   homeSecondaryButtonLabel: {
     fontFamily: typography.families.bodyBold,
-    fontSize: typography.sizes.lg,
+    fontSize: typography.sizes.md,
     letterSpacing: 0.2,
   },
   emptyCard: {

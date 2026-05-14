@@ -1,10 +1,20 @@
-import React, { useState } from "react";
-import { View, ScrollView, Alert, KeyboardAvoidingView, Platform } from "react-native";
-import { Text, Button, Portal, Modal } from "react-native-paper";
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  ScrollView,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  Keyboard,
+  Pressable,
+  BackHandler,
+} from "react-native";
+import { Text, Button, Portal } from "react-native-paper";
 import { router } from "expo-router";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useDecks } from "../../hooks/useDecks";
-import { useGameStore, Player } from "../../store/game-store";
+import { useGameStore, useGameStarted, Player } from "../../store/game-store";
 import { database } from "../../database/database";
 import { CustomScreen } from "../../shared/components/CustomScreen";
 import { FocusTextInput } from "../../shared/components/FocusTextInput";
@@ -17,6 +27,7 @@ import { TeamColor } from "./interfaces/types";
 import { newGameScreenStyles as styles } from "./new-game-screen.styles";
 
 const NewGameScreen: React.FC = () => {
+  const insets = useSafeAreaInsets();
   const {
     selectedDeck,
     teams,
@@ -26,6 +37,7 @@ const NewGameScreen: React.FC = () => {
     clearTeams,
     startGame,
   } = useGameStore();
+  const gameStarted = useGameStarted();
 
   useDecks();
   const [showPlayerModal, setShowPlayerModal] = useState(false);
@@ -79,7 +91,30 @@ const NewGameScreen: React.FC = () => {
     router.push("/deck-management?selectMode=true");
   };
 
+  useEffect(() => {
+    if (!showPlayerModal) {
+      return;
+    }
+    const sub = BackHandler.addEventListener("hardwareBackPress", () => {
+      Keyboard.dismiss();
+      setShowPlayerModal(false);
+      setNewPlayerName("");
+      return true;
+    });
+    return () => sub.remove();
+  }, [showPlayerModal]);
+
+  const dismissPlayerOverlay = () => {
+    Keyboard.dismiss();
+    setShowPlayerModal(false);
+    setNewPlayerName("");
+  };
+
   const handleStartGame = async () => {
+    if (gameStarted) {
+      router.push("/game-turn");
+      return;
+    }
     if (!selectedDeck) {
       router.push("/deck-management?selectMode=true");
       return;
@@ -166,55 +201,59 @@ const NewGameScreen: React.FC = () => {
         </ScrollView>
       </View>
       <Portal>
-        <Modal
-          visible={showPlayerModal}
-          onDismiss={() => {
-            setShowPlayerModal(false);
-            setNewPlayerName("");
-          }}
-          contentContainerStyle={styles.modalContainer}
-        >
-          <KeyboardAvoidingView
-            behavior={Platform.OS === "ios" ? "padding" : "height"}
-            keyboardVerticalOffset={24}
-          >
-            <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>Añadir Jugador</Text>
-              <Text style={styles.modalSubtitle}>
-                Equipo {selectedTeamForPlayer === "azul" ? "Azul" : "Rojo"}
-              </Text>
-              <FocusTextInput
-                label="Nombre del jugador"
-                value={newPlayerName}
-                onChangeText={setNewPlayerName}
-                onSubmitEditing={handleAddPlayer}
-                blurOnSubmit={false}
-                style={styles.textInput}
-                autoFocus
-              />
-              <View style={styles.modalActions}>
-                <Button
-                  mode="outlined"
-                  onPress={() => {
-                    setShowPlayerModal(false);
-                    setNewPlayerName("");
-                  }}
-                  style={styles.modalButton}
-                >
-                  Cerrar
-                </Button>
-                <Button
-                  mode="contained"
-                  onPress={handleAddPlayer}
-                  style={styles.modalButton}
-                  disabled={!newPlayerName.trim()}
-                >
-                  Añadir
-                </Button>
-              </View>
-            </View>
-          </KeyboardAvoidingView>
-        </Modal>
+        {showPlayerModal ? (
+          <View style={styles.modalOverlayRoot} pointerEvents="box-none">
+            <Pressable style={styles.modalBackdrop} onPress={dismissPlayerOverlay} />
+            <KeyboardAvoidingView
+              behavior="padding"
+              keyboardVerticalOffset={Platform.OS === "ios" ? insets.top + 24 : 0}
+              style={styles.modalKeyboardAvoid}
+            >
+              <ScrollView
+                keyboardShouldPersistTaps="handled"
+                bounces={false}
+                showsVerticalScrollIndicator={false}
+                style={styles.modalPlayerScroll}
+                contentContainerStyle={styles.modalScrollInner}
+              >
+                <View style={styles.modalContainer}>
+                  <View style={styles.modalContent}>
+                    <Text style={styles.modalTitle}>Añadir Jugador</Text>
+                    <Text style={styles.modalSubtitle}>
+                      Equipo {selectedTeamForPlayer === "azul" ? "Azul" : "Rojo"}
+                    </Text>
+                    <FocusTextInput
+                      label="Nombre del jugador"
+                      value={newPlayerName}
+                      onChangeText={setNewPlayerName}
+                      onSubmitEditing={handleAddPlayer}
+                      blurOnSubmit={false}
+                      style={styles.textInput}
+                      autoFocus
+                    />
+                    <View style={styles.modalActions}>
+                      <Button
+                        mode="outlined"
+                        onPress={dismissPlayerOverlay}
+                        style={styles.modalButton}
+                      >
+                        Cerrar
+                      </Button>
+                      <Button
+                        mode="contained"
+                        onPress={handleAddPlayer}
+                        style={styles.modalButton}
+                        disabled={!newPlayerName.trim()}
+                      >
+                        Añadir
+                      </Button>
+                    </View>
+                  </View>
+                </View>
+              </ScrollView>
+            </KeyboardAvoidingView>
+          </View>
+        ) : null}
       </Portal>
     </CustomScreen>
   );

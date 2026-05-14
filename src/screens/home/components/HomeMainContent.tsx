@@ -1,14 +1,25 @@
 import React from "react";
-import { ScrollView, View } from "react-native";
+import { ScrollView, View, useWindowDimensions } from "react-native";
 import { Button } from "react-native-paper";
 
 import { homeScreenColors, styles } from "../home-screen.styles";
 import { HomeLogoSection } from "./HomeLogoSection";
 import { useRouter } from "expo-router";
+import { useGameHydrated, useGameStarted } from "../../../store/game-store";
 
 export const HomeMainContent: React.FC = () => {
   const router = useRouter();
+  const { width } = useWindowDimensions();
+  const hasHydrated = useGameHydrated();
+  const gameStarted = useGameStarted();
+  const shouldStackSecondaryButtons = width < 420;
+
   const onNewGame = () => {
+    if (!hasHydrated) return;
+    if (gameStarted) {
+      router.push("/game-turn");
+      return;
+    }
     router.push("/new-game");
   };
   const onOpenDeckManagement = () => {
@@ -31,14 +42,29 @@ export const HomeMainContent: React.FC = () => {
             icon="play"
             buttonColor={homeScreenColors.ctaBlue}
             textColor="#FFFFFF"
+            disabled={!hasHydrated}
             style={styles.homePrimaryButton}
             contentStyle={styles.homePrimaryButtonContent}
             labelStyle={styles.homePrimaryButtonLabel}
           >
-            Nueva partida
+            {!hasHydrated
+              ? "Cargando partida..."
+              : gameStarted
+                ? "Continuar partida"
+                : "Nueva partida"}
           </Button>
-          <View style={styles.actionButtons}>
-            <View style={styles.actionButtonItem}>
+          <View
+            style={[
+              styles.actionButtons,
+              shouldStackSecondaryButtons && styles.actionButtonsStacked,
+            ]}
+          >
+            <View
+              style={[
+                styles.actionButtonItem,
+                shouldStackSecondaryButtons && styles.actionButtonItemFullWidth,
+              ]}
+            >
               <Button
                 mode="contained"
                 onPress={onOpenDeckManagement}
@@ -53,7 +79,12 @@ export const HomeMainContent: React.FC = () => {
                 Cartas
               </Button>
             </View>
-            <View style={styles.actionButtonItem}>
+            <View
+              style={[
+                styles.actionButtonItem,
+                shouldStackSecondaryButtons && styles.actionButtonItemFullWidth,
+              ]}
+            >
               <Button
                 mode="contained"
                 onPress={onOpenStatistics}
@@ -65,7 +96,7 @@ export const HomeMainContent: React.FC = () => {
                 contentStyle={styles.homeSecondaryButtonContent}
                 labelStyle={styles.homeSecondaryButtonLabel}
               >
-                Reglas
+                Estadísticas
               </Button>
             </View>
           </View>

@@ -97,6 +97,7 @@ const TurnReviewScreen: React.FC = () => {
         contentContainerStyle={[
           styles.scrollContent,
           {
+            paddingTop: spacing.md + insets.top,
             paddingLeft: spacing.md + insets.left,
             paddingRight: spacing.md + insets.right,
             paddingBottom: spacing.lg + insets.bottom,

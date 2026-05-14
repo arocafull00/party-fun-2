@@ -49,6 +49,7 @@ export interface GameState {
   selectedDeck: Mazo | null;
   decks: Mazo[];
   cards: Carta[];
+  hasHydrated: boolean;
 
   // Game state
   gameStarted: boolean;
@@ -104,14 +105,40 @@ export interface GameState {
   endGame: () => void;
   resetGame: () => void;
   clearPersistedGame: () => Promise<void>;
+  setHasHydrated: (hydrated: boolean) => void;
 }
 
 export const TURN_TIME = 30;
-type PersistedGameState = Pick<GameState, "selectedDeck">;
+type PersistedGameState = Pick<
+  GameState,
+  | "selectedDeck"
+  | "teams"
+  | "gameStarted"
+  | "currentPhase"
+  | "currentTeam"
+  | "currentPlayerIndex"
+  | "nextPlayerByTeam"
+  | "timer"
+  | "phaseCards"
+  | "allGameCards"
+  | "gameHistory"
+  | "currentTurnCards"
+>;
 
 const getPersistedGameState = (state: GameState): Partial<PersistedGameState> => {
   return {
     selectedDeck: state.selectedDeck,
+    teams: state.teams,
+    gameStarted: state.gameStarted,
+    currentPhase: state.currentPhase,
+    currentTeam: state.currentTeam,
+    currentPlayerIndex: state.currentPlayerIndex,
+    nextPlayerByTeam: state.nextPlayerByTeam,
+    timer: state.timer,
+    phaseCards: state.phaseCards,
+    allGameCards: state.allGameCards,
+    gameHistory: state.gameHistory,
+    currentTurnCards: state.currentTurnCards,
   };
 };
 
@@ -128,6 +155,7 @@ export const useAllGameCards = () => useGameStore((s) => s.allGameCards);
 export const useGameHistory = () => useGameStore((s) => s.gameHistory);
 export const useSelectedDeck = () => useGameStore((s) => s.selectedDeck);
 export const useDecksFromStore = () => useGameStore((s) => s.decks);
+export const useGameHydrated = () => useGameStore((s) => s.hasHydrated);
 
 export const useGameActions = () => {
   const setTimer = useGameStore((s) => s.setTimer);
@@ -172,6 +200,7 @@ export const useGameStore = create<GameState>()(
       selectedDeck: null,
       decks: [],
       cards: [],
+      hasHydrated: false,
 
       // Game state
       gameStarted: false,
@@ -433,10 +462,6 @@ export const useGameStore = create<GameState>()(
           gameStarted: result.gameComplete ? false : prev.gameStarted,
         }));
 
-        if (result.gameComplete) {
-          void useGameStore.persist.clearStorage();
-        }
-
         return {
           phaseComplete: result.phaseComplete,
           gameComplete: result.gameComplete,
@@ -445,7 +470,6 @@ export const useGameStore = create<GameState>()(
 
       endGame: () => {
         set({ gameStarted: false, isTimerRunning: false });
-        void useGameStore.persist.clearStorage();
       },
 
       resetGame: () => {
@@ -467,18 +491,21 @@ export const useGameStore = create<GameState>()(
           },
           cards: [],
         }));
-        void useGameStore.persist.clearStorage();
       },
 
       clearPersistedGame: async () => {
         await useGameStore.persist.clearStorage();
       },
+      setHasHydrated: (hydrated) => set({ hasHydrated: hydrated }),
     }),
     {
       name: "game-store",
       version: 3,
       storage: createJSONStorage(() => AsyncStorage),
       partialize: (state) => getPersistedGameState(state),
+      onRehydrateStorage: () => (state) => {
+        state?.setHasHydrated(true);
+      },
     }
   )
 );

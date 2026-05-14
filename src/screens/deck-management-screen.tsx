@@ -183,11 +183,11 @@ export const DeckManagementScreen: React.FC = () => {
       <DotsBackground />
       <View style={styles.screen}>
         <View style={styles.header}>
-          <Text style={styles.title}>{isSelectMode ? "Selecciona un Mazo" : "Mis Barajas"}</Text>
+          <Text style={styles.title}>{isSelectMode ? "Selecciona un Mazo" : "Mis Mazos"}</Text>
           <Text style={styles.subtitle}>
             {isSelectMode
-              ? "Elige una baraja para usar en la partida."
-              : "Elige una baraja para empezar a jugar o crea una nueva."}
+              ? "Elige un mazo para usar en la partida."
+              : "Elige un mazo para empezar a jugar o crea uno nuevo."}
           </Text>
         </View>
         <ScrollView
@@ -197,8 +197,8 @@ export const DeckManagementScreen: React.FC = () => {
         >
           {decks.length === 0 ? (
             <View style={styles.emptyContainer}>
-              <Text style={styles.emptyTitle}>Todavía no tienes barajas.</Text>
-              <Text style={styles.emptyDescription}>Pulsa crear nueva baraja para comenzar.</Text>
+              <Text style={styles.emptyTitle}>Todavía no tienes mazos.</Text>
+              <Text style={styles.emptyDescription}>Pulsa crear nuevo mazo para comenzar.</Text>
             </View>
           ) : null}
 
@@ -231,7 +231,7 @@ export const DeckManagementScreen: React.FC = () => {
             <View style={styles.customDeckPlus}>
               <Icon source="plus" size={26} color={colors.primary} />
             </View>
-            <Text style={styles.customDeckText}>Nueva Baraja Personalizada</Text>
+            <Text style={styles.customDeckText}>Nuevo Mazo Personalizado</Text>
           </Pressable>
         </ScrollView>
       </View>

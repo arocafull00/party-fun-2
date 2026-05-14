@@ -68,7 +68,7 @@ const CreateDeckScreen: React.FC = () => {
         })
         .catch((err) => {
           console.error("Error loading deck:", err);
-          Alert.alert("Error", "No se pudo cargar la baraja");
+          Alert.alert("Error", "No se pudo cargar el mazo");
         })
         .finally(() => setIsLoadingDeck(false));
     }
@@ -217,7 +217,7 @@ const CreateDeckScreen: React.FC = () => {
 
             <View style={styles.titleRow}>
               <View style={styles.titleTexts}>
-                <Text style={styles.editorTitle}>Editor de Baraja</Text>
+                <Text style={styles.editorTitle}>Editor de Mazo</Text>
                 <Text style={styles.editorSubtitle}>Añade todas las palabras que quieras!</Text>
               </View>
               <View style={styles.illustration}>
@@ -282,7 +282,7 @@ const CreateDeckScreen: React.FC = () => {
                     </View>
                     <Icon source="package-variant" size={40} color={colors.primary} />
                   </View>
-                  <Text style={styles.emptyTitle}>Tu baraja está vacía</Text>
+                  <Text style={styles.emptyTitle}>Tu mazo está vacío</Text>
                   <Text style={styles.emptySubtitle}>Añade palabras para empezar a jugar.</Text>
                 </View>
               </View>
@@ -324,7 +324,7 @@ const CreateDeckScreen: React.FC = () => {
               loading={loading || saving || savingEdit}
               buttonColor={colors.primary}
             >
-              {isEditMode ? "Guardar Cambios" : "Guardar Baraja"}
+              {isEditMode ? "Guardar Cambios" : "Guardar Mazo"}
             </Button>
           </View>
         </View>
@@ -381,7 +381,7 @@ const CreateDeckScreen: React.FC = () => {
       {isLoadingDeck ? (
         <View style={styles.loadingOverlay}>
           <ActivityIndicator size="large" color={colors.primary} />
-          <Text style={styles.loadingText}>Cargando baraja...</Text>
+          <Text style={styles.loadingText}>Cargando mazo...</Text>
         </View>
       ) : null}
     </View>

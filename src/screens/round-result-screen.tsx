@@ -1,27 +1,19 @@
 import React from "react";
-import { View, Image } from "react-native";
+import { View, Image, ScrollView } from "react-native";
 import { Text, Button } from "react-native-paper";
 import { router } from "expo-router";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useGameStore } from "../store/game-store";
 import { colors, spacing } from "../theme/theme";
 import { CustomScreen } from "../shared/components/CustomScreen";
 import { RoundScoreCard } from "./round-result/components/round-score-card";
-import { NextRoundPreviewCard } from "./round-result/components/next-round-preview-card";
 import { styles } from "./round-result-screen.styles";
 
-const PHASE_CONFIG: Record<
-  number,
-  {
-    name: string;
-    icon: React.ComponentProps<typeof MaterialCommunityIcons>["name"];
-  }
-> = {
-  1: { name: "Pista Libre", icon: "microphone" },
-  2: { name: "Una Palabra", icon: "format-quote-close" },
-  3: { name: "Mímica", icon: "drama-masks" },
+const PHASE_CONFIG: Record<number, { name: string }> = {
+  1: { name: "Pista Libre" },
+  2: { name: "Una Palabra" },
+  3: { name: "Mímica" },
 };
 
 const RoundResultScreen: React.FC = () => {
@@ -42,9 +34,10 @@ const RoundResultScreen: React.FC = () => {
 
   return (
     <CustomScreen contentStyle={styles.container} header={null}>
-      <View
-        style={[
-          styles.content,
+      <ScrollView
+        style={styles.scroll}
+        contentContainerStyle={[
+          styles.scrollContent,
           {
             paddingTop: spacing.xl + insets.top,
             paddingBottom: spacing.lg + insets.bottom,
@@ -52,59 +45,57 @@ const RoundResultScreen: React.FC = () => {
             paddingRight: spacing.lg + insets.right,
           },
         ]}
+        showsVerticalScrollIndicator={false}
       >
-        <Image
-          source={require("../../assets/completed-round-title.png")}
-          style={styles.titleImage}
-          resizeMode="contain"
-        />
-
-        <View style={styles.scoresSection}>
-          <View style={styles.scoreCardsRow}>
-            <RoundScoreCard
-              teamName="EQUIPO AZUL"
-              score={teams.azul.score}
-              color={colors.primary}
-              side="left"
-            />
-            <RoundScoreCard
-              teamName="EQUIPO ROJO"
-              score={teams.rojo.score}
-              color={colors.redTeam}
-              side="right"
-            />
-          </View>
-        </View>
-
-        {!isLastRound && (
-          <NextRoundPreviewCard
-            phaseName={nextPhase.name}
-            phaseIcon={nextPhase.icon}
+        <View style={styles.content}>
+          <Image
+            source={require("../../assets/completed-round-title.png")}
+            style={styles.titleImage}
+            resizeMode="contain"
           />
-        )}
 
-        {isLastRound && (
-          <View style={styles.finalMessageContainer}>
-            <Text style={styles.finalMessage}>¡JUEGO TERMINADO!</Text>
-            <Text style={styles.finalSubmessage}>
-              Veamos los resultados finales
-            </Text>
+          <View style={styles.scoresSection}>
+            <View style={styles.scoreCardsRow}>
+              <RoundScoreCard
+                teamName="EQUIPO AZUL"
+                score={teams.azul.score}
+                color={colors.primary}
+                side="left"
+              />
+              <RoundScoreCard
+                teamName="EQUIPO ROJO"
+                score={teams.rojo.score}
+                color={colors.redTeam}
+                side="right"
+              />
+            </View>
           </View>
-        )}
 
-        <View style={styles.buttonContainer}>
-          <Button
-            mode="contained"
-            onPress={handleNext}
-            style={styles.continueButton}
-            contentStyle={styles.continueButtonContent}
-            labelStyle={styles.continueButtonLabel}
-            buttonColor={colors.primary}
-          >
-            {isLastRound ? "Ver Resultados Finales" : "Continuar"}
-          </Button>
+          {isLastRound && (
+            <View style={styles.finalMessageContainer}>
+              <Text style={styles.finalMessage}>¡JUEGO TERMINADO!</Text>
+              <Text style={styles.finalSubmessage}>
+                Veamos los resultados finales
+              </Text>
+            </View>
+          )}
+
+          <View style={styles.buttonContainer}>
+            <Button
+              mode="contained"
+              onPress={handleNext}
+              style={styles.continueButton}
+              contentStyle={styles.continueButtonContent}
+              labelStyle={styles.continueButtonLabel}
+              buttonColor={colors.primary}
+            >
+              {isLastRound
+                ? "Ver Resultados Finales"
+                : `Continuar: ${nextPhase.name}`}
+            </Button>
+          </View>
         </View>
-      </View>
+      </ScrollView>
     </CustomScreen>
   );
 };

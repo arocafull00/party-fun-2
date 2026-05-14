@@ -8,11 +8,14 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 0,
     paddingTop: 0,
   },
-  content: {
+  scroll: {
     flex: 1,
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.xl,
-    paddingBottom: spacing.lg,
+  },
+  scrollContent: {
+    flexGrow: 1,
+  },
+  content: {
+    width: "100%",
     alignItems: "center",
     gap: spacing.lg,
   },

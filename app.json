@@ -9,10 +9,10 @@
       "web"
     ],
     "orientation": "default",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/AppIcons/playstore.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/icon.png",
+      "image": "./assets/AppIcons/playstore.png",
       "resizeMode": "contain",
       "backgroundColor": "#005ab2"
     },
@@ -23,14 +23,15 @@
       "supportsTablet": true
     },
     "android": {
+      "softwareKeyboardLayoutMode": "resize",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#4A90E2"
+        "foregroundImage": "./assets/AppIcons/playstore.png",
+        "backgroundColor": "#005ab2"
       },
       "package": "com.arocafull.partyfun2"
     },
     "web": {
-      "favicon": "./assets/favicon.png",
+      "favicon": "./assets/AppIcons/playstore.png",
       "bundler": "metro"
     },
     "scheme": "partyfun",
