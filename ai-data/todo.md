@@ -1,4 +1,4 @@
-Quiero que generes la estructura completa de una app móvil estilo PartyFun en React Native con Expo y SQLite. La app debe tener las siguientes pantallas y funcionalidades:
+Quiero que generes la estructura completa de una app móvil estilo Funny Words en React Native con Expo y SQLite. La app debe tener las siguientes pantallas y funcionalidades:
 
 ### Tecnologías
 - React Native con Expo

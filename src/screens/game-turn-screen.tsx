@@ -236,7 +236,7 @@ const GameTurnScreen: React.FC = () => {
             <View style={styles.prepInner}>
               <AppHeader
                 variant="game"
-                title="Party Fun 2"
+                title="Funny Words"
                 left={
                   <AppHeaderIconButton
                     icon="help-circle-outline"
@@ -298,7 +298,7 @@ const GameTurnScreen: React.FC = () => {
         <View style={styles.prepInner}>
         <DotsBackground />
           <AppHeader
-            title="Party Fun 2"
+            title="Funny Words"
             left={
               <AppHeaderIconButton
                 icon="help-circle-outline"

@@ -2,7 +2,7 @@
 name: replicate-ui-from-image
 description: >-
   Replicate a UI from a screenshot or design image using an existing component or
-  screen as structural reference. Enforces party-fun-2 theme tokens, StyleSheet
+  screen as structural reference. Enforces project theme tokens, StyleSheet
   co-location, and aggressive component extraction. Use when the user attaches an
   image and asks to match, implement, or clone an interface (replicar interfaz,
   clonar diseño, pantalla como en la imagen).

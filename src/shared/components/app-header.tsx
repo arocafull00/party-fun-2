@@ -8,7 +8,7 @@ import { spacing } from "../../theme/theme";
 import { AppHeaderIconPlaceholder } from "./app-header-icon-button";
 import { styles } from "./app-header.styles";
 
-const DEFAULT_TITLE = "Party Fun 2";
+const DEFAULT_TITLE = "Funny Words";
 
 export type AppHeaderVariant = "default" | "game";
 

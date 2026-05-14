@@ -39,7 +39,7 @@ export const HomeLogoSection: React.FC = () => {
   return (
     <View style={styles.logoSection}>
       <Animated.Image
-        accessibilityLabel="Party Fun 2"
+        accessibilityLabel="Funny Words"
         accessibilityRole="image"
         resizeMode="contain"
         source={require("../../../../assets/title.png")}

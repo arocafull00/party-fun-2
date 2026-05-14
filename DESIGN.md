@@ -1,4 +1,4 @@
-# Design System Document: Party Fun 2
+# Design System Document: Funny Words
 
 ## 1. Overview & Creative North Star
 

@@ -74,7 +74,7 @@ export default function RootLayout() {
         <PaperProvider theme={theme}>
           <CustomScreen containerStyle={styles.loadingContainer}>
             <ActivityIndicator size="large" color={theme.colors.primary} />
-            <Text style={styles.loadingText}>Inicializando PartyFun...</Text>
+            <Text style={styles.loadingText}>Inicializando Funny Words...</Text>
           </CustomScreen>
           <StatusBar style="dark" hidden={true} />
         </PaperProvider>
@@ -98,7 +98,7 @@ export default function RootLayout() {
               headerShown: false,
             }}
           >
-            <Stack.Screen name="index" options={{ title: "PartyFun" }} />
+            <Stack.Screen name="index" options={{ title: "Funny Words" }} />
             <Stack.Screen
               name="create-deck"
               options={{ title: "Crear Mazo" }}
